@@ -173,11 +173,28 @@ var AN = {
 	    Log( -1, 'moveToPreview' );
 	},
 	moveCardToZone : function(o) {
+	        	console.log('msg', o)
 	    if ( !isZoneSimple(o.from)) 
 	    {
 	        if ( isZoneSimple(o.to) )
 	        {
-	            
+	    		var z = G[o.pX == you ? 'you' : 'opp'][o.to];
+	    		console.log(z)
+		        C[o.cardID].params.teamPosition = null;
+		        C[o.cardID].removeTeamPower();
+
+		        C[o.cardID].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
+		        	intoCard: true, 
+		        	incline: false, 
+		        	fadeIn: true, 
+		        	//curveMoving: 'Y', 
+		        	after: { func: function() {
+                        C[o.cardID].destroyCard();
+                        //updateCardCount( { owner: o.owner, area: o.to } );
+                        delete C[o.cardID];
+                        updTable();
+                        //startTable();
+                    } } } } );
 	        }
 	        else if ( !isZoneSimple(o.from) )
 	        {
@@ -262,5 +279,8 @@ var AN = {
 			    }, timer:1200});
 	        }
 	    }
+	},
+	damage : function(cardID, o) {
+		C[cardID].effect({type:'simple', target:'one'})
 	}
 }
