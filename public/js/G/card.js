@@ -1225,6 +1225,7 @@ function Card( o ) {
 
 
     this.injure = function() {
+        LogI['injure'] = 0;
         Log( 1, 'injure' );
         var result = 0;
         if ( this.params.isHealt ) {
@@ -1234,6 +1235,8 @@ function Card( o ) {
                 } )
                 )
             this.$power.addClass( 'powerInjured' );
+            this.$power.html(Actions.getInjuredPower({cardID:this.id,S:S, Accordance:Accordance,Known:Known}));
+
             this.params.isHealt = false;
         }
         Log( -1, 'injure' );
@@ -1454,5 +1457,38 @@ Card.prototype = {
                     position:this.params.teamPosition
                 };
         return result;
+    },
+    /**
+     * Анимационный эффект возникающий над полем
+     * @param  {[type]} o [description]
+     * @param  {String} o.type Тип анимации simple
+     * @param  {String} o.target Над какими элементами должен появиться эффект one
+     * @return {[type]}   [description]
+     */
+    effect : function(o) {
+        var _this = this;
+        if (o.type == 'simple') {
+            if (o.target == 'one') {
+                var sprite = $('<div />', {})
+                    .css('width', _this.params.W)
+                    .css('height', _this.params.H)
+                    .css('top', _this.params.position.Y)
+                    .css('left', _this.params.position.X)
+                    .css('position', 'absolute')
+                    .css('display','none')
+                    .append($('<img />',{
+                        src : "public/pics/damage.png",
+                        width :  _this.params.W,
+                        height :  _this.params.H,
+                    }))
+                H.animate.append(sprite);
+                sprite.show(500,function(){
+                    _this.injure();
+                    sprite.hide(500, function(){
+                        sprite.remove()
+                    })
+                })
+            }
+        }
     }
 }
