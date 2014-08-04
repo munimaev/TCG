@@ -1,26 +1,168 @@
 <!doctype html>
-<html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-    </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="/socket.io/socket.io.js"></script>
-  <script>
-    var socket = io();
-  </script>
-  </body>
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>One Column Portfolio Template for Bootstrap 3</title>
+
+  <link rel="stylesheet" href="/public/css/bootstrap.min.css"/>
+
+</head>
+<body>
+
+  <div class="container">
+  <div class="row">
+    <p>&nbsp;</p>
+    <pre>{{youGame}}</pre>
+    <table class="table" id="tables">
+      <tr>
+        <th width="30%">#</th>
+        <th width="40%">pA</th>
+        <th width="40%">pB</th>
+      </tr>
+  </table>
+    <p>&nbsp;</p>
+    <p></p>
+  </div>
+</div>
+  
+  <!-- <div ng-view></div> -->
+  <script src="/public/js/jquery.js"></script>
+  <script src="/public/js/bootstrap.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/js/TSGclient.js"></script>
+  <!-- <script src="/public/vendor/bower_components/angular/angular.js"></script>
+  <script src="/public/vendor/bower_components/angular-route/angular-route.js"></script>
+  <script src="/public/vendor/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+  <script src="/public/js/app.js"></script>
+  <script src="/public/js/services.js"></script>
+  <script src="/public/js/controllers.js"></script>
+  <script src="/public/js/filters.js"></script>
+  <script src="/public/js/directives.js"></script> -->
+    <script>
+      var socket = io();
+      var Tables = {
+
+      }
+      var user = {name:"P_5555", table:null};
+      user.name = "P_" + Math.floor(Math.random() * 1000000)
+      function startSession() {
+        //socket.emit('hostCreateNewGame', "123");
+      }
+
+      socket.on('connected', function(d){
+        console.log('c')
+        socket.emit('lobby:tables');
+      });
+
+      socket.on('setTables', function(d){
+        var uTable = null;
+        for (var i in d ) {
+          if (d[i].pA == user.name || d[i].pB == user.name  ) {
+            uTable = i;
+          }
+          if (Tables[i]) {
+            for (var i2 in Tables[i]) {
+              Tables[i][i2] = d[i][i2]
+            }
+          } else {
+            Tables[i] = d[i]
+          }
+        }
+        user.table = uTable;
+        updTables();
+      });
+
+      function updTables() {
+        for (var i in Tables) {
+
+          if ($('#table'+i).size()) {
+            $('#table'+i).html('')
+          }
+          else {
+            $('#tables')
+            .append(
+              $('<tr />', {
+                "id": "table" + i
+              })
+            )
+          }
+
+          $('#table'+i)
+            .append(
+              $('<td />', {
+                "text": i
+              })
+            )
+            .append(
+              $('<td />')
+              .append(
+                $('<button />', getBtnProp(i,'pA'))
+              )
+            )
+            .append(
+              $('<td />')
+              .append(
+                $('<button />', getBtnProp(i,'pB'))
+              )
+            )
+
+        }
+      }
+
+      function getBtnProp(id,pX) {
+        var result = {
+          "text": sitBtnText(id,pX),
+          "type" : "button",
+          "class": "btn btn-primary btn-sm",
+          "style": "font-weight:bold;",
+          "click": (function(){
+                             var data = {'id':id,'pX':pX,'user':user.name};
+                             var command = Tables[id][pX] == user.name ? "unsit" : "sit";
+                             return function() {
+                               socket.emit('player:'+command, data);
+                             };})()
+        };
+        if (sitBtnDis(id,pX)) {
+          result.disabled = "disabled"
+        }
+        return result;
+      }
+
+      function sitBtnText(id,pX) {
+        reuslt = "+";
+        if (Tables[id][pX]) reuslt = Tables[id][pX];
+        return reuslt;
+      }
+
+      function sitBtnDis(id,pX) {
+        if (user.table!==null 
+          && user.name!=Tables[id][pX]  ) {
+          return true;
+        }
+        return false;
+      }
+
+      function getTr(id) {
+      } 
+
+
+      socket.on('sitInLobby', function(d){
+        user.lobbi = d.key;
+        console.log(user)
+      });
+      socket.on('unsitInLobby', function(d){
+        user.lobbi = null;
+        console.log(user);
+      });
+      socket.on('startGame', function(d){
+        window.location.assign('/game')
+      });
+
+    </script>
+
+</body>
 </html>
