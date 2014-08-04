@@ -1139,7 +1139,6 @@ function updTeams() {
     
     // определить размер плитки
     var finalSqr = maxSqrSize;
-    console.log(position)
     updPosition(position,finalSqr);
 }
 function getPosition(pX) {
@@ -1188,14 +1187,15 @@ function updPosition(position,sqr) {
     if ( S.phase == 'attack' 
         || S.phase == 'block' 
         || S.phase == 'jutsu' 
-        || S.phase == 'shutdown')  isFight = true
+        || S.phase == 'shutdown'
+        || S.phase == 'comeback')  isFight = true
     if (isFight) msqr = sqr / 2;
 
     var villageWidth = ( position.you.village.W ) * msqr;
     var marginLeft = (I.W - villageWidth) / 2; 
     var o2 = {
         X : marginLeft,
-        Y : (I.H ) / 2 + (isFight ? 17 : 1) * sqr,
+        Y : (I.H ) / 2 + (isFight ? 17 :6) * sqr,
         zona : 'village',
         owner : you,
         player : 'you' ,
@@ -1212,7 +1212,7 @@ function updPosition(position,sqr) {
     var marginLeft = (I.W - villageWidth) / 2;
     var o2 = {
         X : marginLeft,
-        Y : (I.H ) / 2 - (isFight ? 24 : 16) * sqr,
+        Y : (I.H ) / 2 - (isFight ? 24 : 22) * sqr,
         zona : 'village',
         owner : opp,
         player : 'opp' ,
@@ -1618,7 +1618,6 @@ function blockMove(_this) {
             }
             G.selectedTeam.card.select( false );
             G.selectedTeam = null;
-            startTable();
         }
         if ( _this.params.owner == opp ) {
             G.selectedTeam.card.select( false );
