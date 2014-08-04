@@ -52,7 +52,7 @@ var Actions = {
 	        newKey = 0;
 	    }
     	o.S.phase = o.Stadies.order[newKey];
-    	Actions[o.S.phase+'AtStart'](o)
+    	if (o.S.phase+'AtStart' in Actions) Actions[o.S.phase+'AtStart'](o)
     	if (!module) updTable();
 
 	},
@@ -64,7 +64,15 @@ var Actions = {
 	    {
 	        if ( isZoneSimple(o.to) )
 	        {
-	            
+	            o.S[o.pX][o.from].team[o.team].splice(o.cardInArray,1);
+	            o.S[o.pX][o.to].push(o.cardID);
+
+				if (!module) {
+					C[o.cardID].params.zona = o.to;
+					AnimationPush({func:function() {
+						AN.moveCardToZone(o);
+					}, time:1000});
+				}
 	        }
 	        else if ( !isZoneSimple(o.from) )
 	        {
@@ -220,6 +228,23 @@ var Actions = {
 			updTable();
 		}
 	},
+	'comebackAtStart' : function(o) {
+		var pXs = ['pA','pB'];
+		var zones = ['attack','block'];
+		for (var pX in pXs) {
+			for (var zone in zones) {
+				var z = o.S[pXs[pX]][zones[zone]];
+				for (var t in z.team) {
+					o.S[pXs[pX]].village.team[t] = o.S[pXs[pX]][zones[zone]].team[t];
+					delete o.S[pXs[pX]][zones[zone]].team[t];
+				}
+			}
+		}
+		o.S.battlefield = {};
+		if (!module) {
+			updTable();
+		}
+	},
 	'shutdownAtStart' : function(o) {
         for (var attackID in o.S.battlefield) {
 			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
@@ -230,11 +255,11 @@ var Actions = {
 			var blockPower  = Actions.getTeamPower(blockTeam, o);
 			if (attackPower > blockPower) {
 				if (attackPower - blockPower > 5) {
-					Actions.completeDefeat(blockckTeam, o);
+					Actions.completeDefeat(blockTeam, o);
 					Actions.completeWin(attackTeam, o);
 				} 
 				else {
-					Actions.normalDefeat(blockckTeam, o);
+					Actions.normalDefeat(blockTeam, o);
 					Actions.normalWin(attackTeam, o);
 				}
 			}
@@ -256,29 +281,40 @@ var Actions = {
 
 	},
 	'completeDefeat' : function(team, o) {
-		o.damage = 2;
-		o.causeOfDamage = 'completeDefeat';
-		Actions.giveDamage(team[0],o);
+		if (!team) return;
 		o.damage = 1;
-		for (var i==1;i <= team.length - 1; i++) {
-			Actions.giveDamage(team[0],o);
+		o.causeOfDamage = 'completeDefeat';
+		console.log(team, team.length)
+		for (var i=1; i <= team.length - 1; i++) {
+			Actions.giveDamage(team[i],o);
 		}
+		o.damage = 2;
+		Actions.giveDamage(team[0],o);
 	},
 	'completeWin' : function(team, o) {
+		if (!team) return;
 	},
 	'normalDefeat' : function(team, o) {
+		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'normalDefeat';
 		Actions.giveDamage(team[0],o);
 	},
 	'normalWin' : function(team, o) {
+		if (!team) return;
 	},
 	'drawBattle' : function(team, o) {
+		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'drawBattle';
 		Actions.giveDamage(team[0],o);
 	},
 	'giveDamage' : function(cardID, o) {
+		if (!module) {
+			AnimationPush({func:function() {
+				AN.damage(cardID,o);
+			}, time:610});
+		}
 		if (o.damage == 1) {
 			if (Actions.getHealtStatus(cardID, o)) {
 				Actions.injureTarget(cardID, o);
@@ -286,9 +322,12 @@ var Actions = {
 			else {
 				Actions.killTarget(cardID, o);
 			}
+		} else if (o.damage >=2) {
+			Actions.killTarget(cardID, o);
 		}
 	},
 	'injureTarget' : function(cardID, o) {
+		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
 		o.S.statuses[cardID].injured = true;
 	},
 	'killTarget' : function(cardID, o) {
@@ -296,13 +335,17 @@ var Actions = {
 		var zones = ['village', 'attack','block'];
 		for (var pX in pXs) {
 			for (var zone in zones) {
-				var teams = p.S[pXs[pX]][zones[zone]].team
+				var teams = o.S[pXs[pX]][zones[zone]].team
 				for (var team in teams) {
 					for (var card in teams[team]) {
 						if (cardID == teams[team][card]) {
 							o.from = zones[zone];
 							o.to = 'discard';
 							o.pX = pXs[pX];
+							o.team = team;
+							o.cardInArray = card;
+							o.cardID = cardID;
+	        	console.log('msg')
 							Actions.moveCardToZone(o);
 							break;
 						}
@@ -312,8 +355,8 @@ var Actions = {
 		}
 	},
 	'getTeamPower' : function(team, o) {
-		console.log(team)
 		var result = 0;
+		if (!team) return result;
 		result += Actions.getLeaderPower(team[0], o);
 		for (var i = 1 ; i <= team.length - 1 ;i++) {
 			result += Actions.getSupportPower(team[i], o);
@@ -343,6 +386,13 @@ var Actions = {
 			return false;
 		}
 		return true;
+	},
+	'getInjuredPower' : function(o) {
+		var result = '';
+		result += o.Known[o.Accordance[o.cardID]].ai;
+		result += '/';
+		result += o.Known[o.Accordance[o.cardID]].si;
+		return result;
 	},
 	'log' : function() { console.log('msg')}
 };
