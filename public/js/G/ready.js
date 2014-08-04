@@ -22,8 +22,9 @@ $( document ).ready(function() {
     H.opp.deck.span    = $("#oppBar .deck span");
     H.opp.discard.span = $("#oppBar .discard span");
     H.opp.chackra.span = $("#oppBar .chackra span");
-    H.next =  $("#next");
-    H.phase =  $("#phase");
+    H.next = $("#next");
+    H.phase = $("#phase");
+    H.animate = $("#animate");
 
 	var urlGet = {};
 	for (var i in l = location.search.substr(1).split('&')) {
