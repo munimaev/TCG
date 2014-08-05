@@ -7,7 +7,6 @@ var H = {
 var ready = false;
 function arraySearch(array, value) {
     for ( var i in array) {
-        console.log('msg',i,array[i], value)
         if (array[i] == value) {
             return i;
         }
