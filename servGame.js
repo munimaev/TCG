@@ -212,7 +212,7 @@ function getStartSnapshot() {
 	            }
 	        }
 	    },
-	    battlefield : {1:4,2:5,3:6},
+	    battlefield : {1:5,2:6,3:4},
 	    stack : {
 
 	    },
