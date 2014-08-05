@@ -579,6 +579,7 @@ function moveBlockers( _this ) {
  * Обрабатывает клик по пустому месту на поле.
  */
 function emptyClick() {
+    LogI['emptyClick'] = 0;
     Log( 1, 'emptyClick' );
     Log( 0, 'Stadies.current',Stadies.current );
     if ( Stadies.current == 'block'
@@ -1251,11 +1252,16 @@ function updPosition(position,sqr) {
                 && attackTeams[attackTeam].S < blockTeams[S.battlefield[attackTeam]].S) 
             {
                 var raz = blockTeams[S.battlefield[attackTeam]].S - attackTeams[attackTeam].S;
-                additiinalMargin = raz * 5;
                 if (raz % 2 == 1) {
-                    additiinalMargin = (raz - 1) * 5;
+                    if (blockTeams[S.battlefield[attackTeam]].S % 2 == 1) {
+                        additiinalMargin =(raz+1) / 2 * 5;
+                    } else {
+                        additiinalMargin =(raz-1) / 2 * 5;
+                    }
+                } else {
+                    additiinalMargin = (raz / 2)  * 5;
                 }
-            }
+            } 
             var o2 = {
                 X : comulativeMargin + additiinalMargin * sqr,
                 Y : (I.H ) / 2 +  (attacker == you ? 1 : -16) * sqr,
@@ -1271,10 +1277,15 @@ function updPosition(position,sqr) {
 
                 var additiinalMargin = 0;
                 if (blockTeams[S.battlefield[attackTeam]].S < attackTeams[attackTeam].S) {
-                    var raz = attackTeams[attackTeam].S - blockTeams[S.battlefield[attackTeam]].S;
-                    additiinalMargin = raz * 5;
+                    var raz = attackTeams[attackTeam].S - blockTeams[S.battlefield[attackTeam]].S ;
                     if (raz % 2 == 1) {
-                        additiinalMargin = raz * 5;
+                        if (attackTeams[attackTeam].S % 2 == 1) {
+                            additiinalMargin =(raz+1) / 2 * 5;
+                        } else {
+                            additiinalMargin =(raz-1) / 2 * 5;
+                        }
+                    } else {
+                        additiinalMargin = (raz / 2)  * 5;
                     }
                 }
                 var o2 = {
@@ -1345,7 +1356,7 @@ function createteam( o, o2 ) {
             condition: 'createteam'
         });
         C[o[0]].animation( { X: posLeft + o2.X,
-            Y: posTop + o2.Y + oppMod1, W: 10 * gridCell,
+            Y: posTop + o2.Y + oppMod1, W: 10 * gridCell, x:0, y:0,z:0,deg:0,
             additional: { 
                 outCard: true,
             } } );
@@ -1388,7 +1399,7 @@ function createteam( o, o2 ) {
             position:'support',
             condition: 'createteam'
         });
-        C[o[i]].animation( { X: posLeft + o2.X, Y: posTop + o2.Y,
+        C[o[i]].animation( { X: posLeft + o2.X, Y: posTop + o2.Y,x:0, y:0,z:0,deg:0,
             W: 8 * gridCell, additional: { outCard: true } } );
         C[o[i]].changeZone( o2.zona );
         C[o[i]].params.team = o2.team;
