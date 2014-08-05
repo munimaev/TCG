@@ -7,7 +7,6 @@ function isZoneSimple(name) {
 }
 function arraySearch(array, value) {
     for ( var i in array) {
-        //console.log('msg',i,array[i], value)
         if (array[i] == value) {
             return i;
         }
@@ -53,7 +52,14 @@ var Actions = {
 	    }
     	o.S.phase = o.Stadies.order[newKey];
     	if (o.S.phase+'AtStart' in Actions) Actions[o.S.phase+'AtStart'](o)
-    	if (!module) updTable();
+    	if (!module) {
+    		updTable();
+	    	if (o.Stadies[o.S.phase].autoNextPhase) {
+				AnimationPush({func:function() {
+					AN.autoNextPhase(o);
+				}, time:100});
+	    	}
+	    }
 
 	},
 	'moveCardToZone' : function (o) {
@@ -69,6 +75,7 @@ var Actions = {
 
 				if (!module) {
 					C[o.cardID].params.zona = o.to;
+					//console.log('--> ' + o.cardID)
 					AnimationPush({func:function() {
 						AN.moveCardToZone(o);
 					}, time:1000});
@@ -229,6 +236,41 @@ var Actions = {
 		}
 	},
 	'comebackAtStart' : function(o) {
+	},
+	'shutdownAtStart' : function(o) {
+        for (var attackID in o.S.battlefield) {
+			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
+			var blockID     = o.S.battlefield[attackID];
+			var blocker     = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+			var blockTeam   = o.S[blocker].block.team[blockID];
+			var attackPower = Actions.getTeamPower(attackTeam, o);
+			var blockPower  = Actions.getTeamPower(blockTeam, o);
+			if (attackPower > blockPower) {
+				if (attackPower - blockPower >= 5) {
+					Actions.completeDefeat(blockTeam, o);
+					Actions.completeWin(attackTeam, o);
+				} 
+				else {
+					Actions.normalDefeat(blockTeam, o);
+					Actions.normalWin(attackTeam, o);
+				}
+			}
+			else if (attackPower < blockPower) {
+				if (blockPower - attackPower >= 5) {
+					Actions.completeDefeat(attackTeam, o);
+					Actions.completeWin(blockTeam, o);
+				} 
+				else {
+					Actions.normalDefeat(attackTeam, o);
+					Actions.normalWin(blockTeam, o);
+				}
+			}
+			else {
+				Actions.drawBattle(attackTeam, o);
+				Actions.drawBattle(blockTeam, o);
+			}
+        }
+
 		var pXs = ['pA','pB'];
 		var zones = ['attack','block'];
 		for (var pX in pXs) {
@@ -244,47 +286,12 @@ var Actions = {
 		if (!module) {
 			updTable();
 		}
-	},
-	'shutdownAtStart' : function(o) {
-        for (var attackID in o.S.battlefield) {
-			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
-			var blockID     = o.S.battlefield[attackID];
-			var blocker     = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-			var blockTeam   = o.S[blocker].block.team[blockID];
-			var attackPower = Actions.getTeamPower(attackTeam, o);
-			var blockPower  = Actions.getTeamPower(blockTeam, o);
-			if (attackPower > blockPower) {
-				if (attackPower - blockPower > 5) {
-					Actions.completeDefeat(blockTeam, o);
-					Actions.completeWin(attackTeam, o);
-				} 
-				else {
-					Actions.normalDefeat(blockTeam, o);
-					Actions.normalWin(attackTeam, o);
-				}
-			}
-			else if (attackPower < blockPower) {
-				if (blockPower - attackPower > 5) {
-					Actions.completeDefeat(blockTeam, o);
-					Actions.completeWin(attackTeam, o);
-				} 
-				else {
-					Actions.normalDefeat(blockTeam, o);
-					Actions.normalWin(attackTeam, o);
-				}
-			}
-			else {
-				Actions.drawBattle(attackTeam, o);
-				Actions.drawBattle(blockTeam, o);
-			}
-        }
 
 	},
 	'completeDefeat' : function(team, o) {
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'completeDefeat';
-		console.log(team, team.length)
 		for (var i=1; i <= team.length - 1; i++) {
 			Actions.giveDamage(team[i],o);
 		}
@@ -345,8 +352,10 @@ var Actions = {
 							o.team = team;
 							o.cardInArray = card;
 							o.cardID = cardID;
-	        	console.log('msg')
-							Actions.moveCardToZone(o);
+
+							var o2 = {};
+							for (var i in o) o2[i] = o[i]
+							Actions.moveCardToZone(o2)
 							break;
 						}
 					}
