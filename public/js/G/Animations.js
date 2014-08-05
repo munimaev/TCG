@@ -173,13 +173,13 @@ var AN = {
 	    Log( -1, 'moveToPreview' );
 	},
 	moveCardToZone : function(o) {
-	        	console.log('msg', o)
+	    //console.log('>--', o.cardID)
 	    if ( !isZoneSimple(o.from)) 
 	    {
 	        if ( isZoneSimple(o.to) )
 	        {
 	    		var z = G[o.pX == you ? 'you' : 'opp'][o.to];
-	    		console.log(z)
+	    		//console.log(z)
 		        C[o.cardID].params.teamPosition = null;
 		        C[o.cardID].removeTeamPower();
 
@@ -282,5 +282,10 @@ var AN = {
 	},
 	damage : function(cardID, o) {
 		C[cardID].effect({type:'simple', target:'one'})
+	},
+	autoNextPhase : function(o) {
+		if (Can.pressNextBtn(o))
+		console.log('> pressNextBtn')
+			socket.emit('pressNextBtn',{u:Client})
 	}
 }
