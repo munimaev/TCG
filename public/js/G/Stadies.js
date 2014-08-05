@@ -6,21 +6,21 @@ var Stadies = {
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : true,
     },
     draw : {
         rusName : 'Взятие карты',
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : true,
     },
     mission : {
         rusName :  'Фаза миссии', //'Организовать команды'
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : false,
     },
     organisation: {
         rusName :  'Фаза организации', //'Выбрать команды для сражения',//
@@ -29,7 +29,7 @@ var Stadies = {
             organisationMove( _this );
         },
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : false,
     },
     attack : {
         rusName : 'Фаза атаки',
@@ -54,7 +54,7 @@ var Stadies = {
             }
         },
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : false,
     },
     block : {
         rusName : 'Фаза блока',
@@ -63,43 +63,42 @@ var Stadies = {
             blockMove(_this);
         },
         party: 'blocker',
-        atStart : function() {}
+        autoNextPhase : false,
     },
     jutsu : {
         rusName : 'Обмен техниками',
         workingUnit : 'card',
         clickAction : null,
         party: 'both',
-        atStart : function() {}
+        autoNextPhase : false,
     },
     shutdown : {
         rusName : 'Фаза подсчета',
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function(o) {
-        }
+        autoNextPhase : true,
     },
     comeback : {
         rusName : 'Фаза возврата',
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : true,
     },
     winner : {
         rusName : 'Фаза побы',
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : true,
     },
     end : {
         rusName : 'Закончить хад',//'Конца хода',
         workingUnit : 'card',
         clickAction : null,
         party: 'attacker',
-        atStart : function() {}
+        autoNextPhase : true,
     },
 }
 if (module) {
