@@ -649,8 +649,10 @@ function Card( o ) {
 
         if ( (!o.isInclining && o.isMoving && !o.additional.incline) || o.additional.after ) {
             done = function() {
+                //if (o._this.id == 'c005')console.log('after',o);
                 //console.log(o._this.params);
                 if ( !o.isInclining && o.isMoving && !o.additional.incline ) {
+                //console.log(o._this.id, 'after')
                     o._this.animation( { x: 0, y: 0, z: 0, deg: 0,
                         duration: Math.round( o.duration / 2 ) } );
                 }
@@ -736,7 +738,7 @@ function Card( o ) {
         //console.log(o)
 
         return function( now, fx ) {
-            //console.log('step');
+            //if (o._this.id == 'c005')console.log(o);
 
             if ( trace == null && newNow == 0 ) {
                 newNow = 1;
@@ -1076,7 +1078,6 @@ function Card( o ) {
         if ( this.params.faceUp )
             return false;
         this.setAllParams();
-        console.log('msg')
         var _this = C[this.id];
         this.animation( { y: 1, deg: -90,
             after: {
