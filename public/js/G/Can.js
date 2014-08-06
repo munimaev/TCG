@@ -201,7 +201,8 @@ var Can = {
         if (o.pX != o.S.activePlayer
             && o.attackTeam in o.S[o.S.activePlayer].attack.team
             && (o.blockTeam in o.S[o.pX].block.team 
-                || o.blockTeam in o.S[o.pX].village.team)
+                || o.blockTeam in o.S[o.pX].village.team
+                || o.blockTeam == null)
             ) {
             return true;
         }
