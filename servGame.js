@@ -191,6 +191,7 @@ function getStartSnapshot() {
 	        playedNinjaActivePlayer : 0
 	    },
 	    pA : {
+	    	rewards : 0,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -206,9 +207,9 @@ function getStartSnapshot() {
 	        },
 	        block : {
 	            team : {
-	            	4:['c007','c005'],
+	            	4:['c005'],
 	            	5:['c002','c003'],
-	            	6:['c004','c006']
+	            	6:['c007','c004','c006']
 	            }
 	        }
 	    },
@@ -217,6 +218,7 @@ function getStartSnapshot() {
 
 	    },
 	    pB : {
+	    	rewards : 0,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -230,7 +232,7 @@ function getStartSnapshot() {
 	            team : {
 	            	1:['c107'],
 	            	2:['c102','c103'],
-	            	3:['c104','c105','c106']
+	            	3:['c104','c115','c117']
 	        	}
 	        },
 	        block : {
@@ -238,7 +240,15 @@ function getStartSnapshot() {
 	        }
 	    },
 	    statuses : {
-	    	
+			// c002: {
+			// 	injured: true
+			// },
+			// c007: {
+			// 	injured: true
+			// },
+			// c102: {
+			// 	injured: true
+			// }
 	    }
 	};
 	var pu;
@@ -296,15 +306,15 @@ function getStartCards() {
 	    c113: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
 	    c113: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
 	    c114: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1429' , elements: 'E', name : "Hinata Hyuga"},
-	    c115: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
+	    c115: {owner: 'pB', type: 'N', ah: 4, sh: 3, ai: 1, si: 1, img: 'n1366' , elements: 'E', name : "Foo"},
 	    c116: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
-	    c117: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n823' , elements: 'E', name : "Asuma Sarutobi"},
-	    c118: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
-	    c119: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
-	    c120: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
-	    c121: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n589' , elements: 'F', name : "Sasuke Uchiha"},
-	    c122: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'pr046' , elements: 'F', name : "Yamato"},
-	    c123: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n844' , elements: 'F', name : "Yugito Ni'i"},
+	    c117: {owner: 'pB', type: 'N', ah: 6, sh: 2, ai: 2, si: 0, img: 'n823' , elements: 'E', name : "Asuma Sarutobi"},
+	    c118: {owner: 'pB', type: 'N', ah: 4, sh: 3, ai: 1, si: 3, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
+	    c119: {owner: 'pB', type: 'N', ah: 5, sh: 3, ai: 0, si: 0, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
+	    c120: {owner: 'pB', type: 'N', ah: 6, sh: 0, ai: 0, si: 0, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
+	    c121: {owner: 'pB', type: 'N', ah: 6, sh: 2, ai: 2, si: 0, img: 'n589' , elements: 'F', name : "Sasuke Uchiha"},
+	    c122: {owner: 'pB', type: 'N', ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'F', name : "Yamato"},
+	    c123: {owner: 'pB', type: 'N', ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'F', name : "Yugito Ni'i"},
 	};
 	return C;
 }
@@ -327,20 +337,58 @@ function getStartMeta(S) {
 
 function getStartAccordiance() {
 	var result = {
-		c101 : 'c107',
-		c102 : 'c106',
-		c103 : 'c105',
-		c104 : 'c104',
-		c105 : 'c103',
-		c106 : 'c102',
-		c107 : 'c101',
-		c001 : 'c001',
-		c002 : 'c002',
-		c003 : 'c003',
-		c004 : 'c004',
-		c005 : 'c005',
-		c006 : 'c006',
-		c007 : 'c007',
+	    c001: 'c001',
+	    c002: 'c002',
+	    c003: 'c003',
+	    c004: 'c004',
+	    c005: 'c005',
+	    c006: 'c006',
+	    c007: 'c007',
+	    c008: 'c008',
+	    c009: 'c009',
+	    c015: 'c015',
+	    c010: 'c010',
+	    c011: 'c011',
+	    c012: 'c012',
+	    c013: 'c013',
+	    c014: 'c014',
+	    c016: 'c016',
+	    c017: 'c017',
+	    c018: 'c018',
+	    c019: 'c019',
+	    c020: 'c020',
+	    c021: 'c021',
+	    c022: 'c022',
+	    c023: 'c023',
+	    c024: 'c024',
+	    c025: 'c025',
+	    c026: 'c026',
+	    
+	    
+	    c101: 'c101',
+	    c102: 'c102',
+	    c103: 'c103',
+	    c104: 'c104',
+	    c105: 'c105',
+	    c106: 'c106',
+	    c107: 'c107',
+	    c108: 'c108',
+	    c109: 'c109',
+	    c110: 'c110',
+	    c111: 'c111',
+	    c112: 'c112',
+	    c113: 'c113',
+	    c113: 'c113',
+	    c114: 'c114',
+	    c115: 'c115',
+	    c116: 'c116',
+	    c117: 'c117',
+	    c118: 'c118',
+	    c119: 'c119',
+	    c120: 'c120',
+	    c121: 'c121',
+	    c122: 'c122',
+	    c123: 'c123',
 	};
 
 	return result;
