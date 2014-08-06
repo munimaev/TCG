@@ -11,6 +11,8 @@ function AnimationNext() {
 	if (AnimationIsRun || !Animations.length) return;
 	var animation = Animations.splice(0,1);
 	AnimationIsRun = true;
+	console.log(animation[0].name)
+	debugger;
 	animation[0].func();
 	setTimeout(function(){
 		AnimationIsRun = false;
@@ -238,7 +240,6 @@ var AN = {
 		            })
 	            }
 	        	else if  (you != o.owner) {
-	        		console.log(C[o.card].params.incline)
 		        	C[o.card].animation( { 
 			        	X: I.table.W / 2 + I.table.Y - I.card.W, 
 			        	Y: I.table.H / 2 - I.card.W, 
@@ -249,7 +250,6 @@ var AN = {
 			        	additional: { 
 			        		incline: true,  
 			        		after: { func: function() {
-	        					console.log(C[o.card].params.incline)
 			        			C[o.card].setNewParams(Known[Accordance[o.card]]);
 			        			C[o.card].params.incline.y = -1;
 			        			C[o.card].params.incline.deg = 90;
@@ -258,7 +258,6 @@ var AN = {
 		                        C[o.card].fillAsFaceUp( C[o.card].$id );
 		                        C[o.card].updateLinks();
 		                        C[o.card].updateMouse();
-	        					console.log(C[o.card].params.incline)
 		                        C[o.card].animation({
 		                        	y:0,
 						        	deg:0,
@@ -276,12 +275,42 @@ var AN = {
 	        	}
 			    AnimationPush({func:function() {
 			        updTeams();
-			    }, timer:1200});
+			    }, timer:1200, name: 'updTeams'});
 	        }
 	    }
 	},
 	damage : function(cardID, o) {
-		C[cardID].effect({type:'simple', target:'one'})
+		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/damage.png"})
+	},
+	reward : function(cardID, o) {
+		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/reward.png"})
+	},
+	uturn : function(cardID, o) {
+            var sprite = $('<div />', {})
+                .css('width', I.scroll.W)
+                .css('height', I.scroll.H)
+                .css('top', I.scroll.Y)
+                .css('left', I.scroll.X)
+                .css('position', 'absolute')
+                .css('opacity',0)
+                .append($('<img />',{
+                    src :"public/pics/uturn.png",
+                    width :  I.scroll.W,
+                    height :  I.scroll.H,
+                }))
+            H.animate.append(sprite);
+            sprite.animate({
+                    opacity: 1,
+                }, 600, 
+                function() {
+                    sprite.animate({
+
+                            opacity: 0,
+                        }, 600, 
+                        function() {
+                            sprite.remove()
+                        });
+                });
 	},
 	autoNextPhase : function(o) {
 		if (Can.pressNextBtn(o))
