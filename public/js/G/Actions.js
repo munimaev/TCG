@@ -35,7 +35,7 @@ var Actions = {
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.playerDrawCards(o);
-			}, time:1500});
+			}, time:1500, name: 'Draw 6 cards'});
 		}
 	},
 	'toNextPhase' : function(o) {
@@ -51,13 +51,16 @@ var Actions = {
 	        newKey = 0;
 	    }
     	o.S.phase = o.Stadies.order[newKey];
-    	if (o.S.phase+'AtStart' in Actions) Actions[o.S.phase+'AtStart'](o)
+
+    	if (o.S.phase+'AtStart' in Actions) {
+    		Actions[o.S.phase+'AtStart'](o);
+    	}
     	if (!module) {
-    		updTable();
+    		updTable(); 
 	    	if (o.Stadies[o.S.phase].autoNextPhase) {
 				AnimationPush({func:function() {
 					AN.autoNextPhase(o);
-				}, time:100});
+				}, time:100, name: 'autoNextPhase'});
 	    	}
 	    }
 
@@ -72,13 +75,14 @@ var Actions = {
 	        {
 	            o.S[o.pX][o.from].team[o.team].splice(o.cardInArray,1);
 	            o.S[o.pX][o.to].push(o.cardID);
+	            o.S.statuses[o.cardsID] = {};
 
 				if (!module) {
 					C[o.cardID].params.zona = o.to;
 					//console.log('--> ' + o.cardID)
 					AnimationPush({func:function() {
 						AN.moveCardToZone(o);
-					}, time:1000});
+					}, time:1000, name: 'moveCardToZone '});
 				}
 	        }
 	        else if ( !isZoneSimple(o.from) )
@@ -102,7 +106,7 @@ var Actions = {
 						AnimationPush({func:function() {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
-						}, time:1000});
+						}, time:1000, name: 'moveCardToZone '});
 					}
 	            }
 		        else if ( !isZoneSimple(o.to) ) 
@@ -113,7 +117,7 @@ var Actions = {
 						AnimationPush({func:function() {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
-						}, time:1000});
+						}, time:1000, name: 'moveCardToZone '});
 					}
 		        }
 	        }
@@ -212,6 +216,17 @@ var Actions = {
 			updTable();
 		}
 	},
+	/**
+	 * Функция производит премещение команд во время фазы блока.
+	 * @param  {Object} o [description]
+	 * @param  {Object} o.S снимок игры
+	 * @param  {String} o.attackTeam индификатор атакующей команды
+	 * @param  {String} o.blockTeam индификатор Блокирующей команд. Если не передать этот параметр,
+	 * то команда, которая блокирует o.attackTeam вернеться в деревню без замеры.
+	 * @param  {String} o.pX блокирующий игрок, он же игрок отправвиший действие
+	 * @param  {String} o.from зона из которой коаманда будет отправлена в блок
+	 * @return {undefined}   undefined
+	 */
 	'block' : function(o) {
 		// если место блока занято
 		if (o.S.battlefield[o.attackTeam]) {
@@ -221,18 +236,26 @@ var Actions = {
 		}
 		// если место блока свободно
 		// 
-		o.S[o.pX].block.team[o.blockTeam] = o.S[o.pX][o.from].team[o.blockTeam];
-		if (o.from == 'block') {
-			for (var i in o.S.battlefield) {
-				if (o.S.battlefield[i] == o.blockTeam ) o.S.battlefield[i] = null;
+		if (o.blockTeam) {
+			o.S[o.pX].block.team[o.blockTeam] = o.S[o.pX][o.from].team[o.blockTeam];
+			if (o.from == 'block') {
+				for (var i in o.S.battlefield) {
+					if (o.S.battlefield[i] == o.blockTeam ) o.S.battlefield[i] = null;
+				}
+			} else {
+				delete o.S[o.pX][o.from].team[o.blockTeam];
 			}
-		} else {
-			delete o.S[o.pX][o.from].team[o.blockTeam];
+			o.S.battlefield[o.attackTeam] = o.blockTeam;
 		}
-		o.S.battlefield[o.attackTeam] = o.blockTeam;
-
 		if (!module) {
 			updTable();
+		}
+	},
+	'startAtStart' : function(o) {
+		if (!module) {
+			AnimationPush({func:function() {
+				AN.uturn(o);
+			}, time:1000, name: 'startAtStart '});
 		}
 	},
 	'comebackAtStart' : function(o) {
@@ -241,33 +264,47 @@ var Actions = {
         for (var attackID in o.S.battlefield) {
 			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
 			var blockID     = o.S.battlefield[attackID];
-			var blocker     = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-			var blockTeam   = o.S[blocker].block.team[blockID];
+			var blocker     = o.blocker = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
 			var attackPower = Actions.getTeamPower(attackTeam, o);
-			var blockPower  = Actions.getTeamPower(blockTeam, o);
-			if (attackPower > blockPower) {
-				if (attackPower - blockPower >= 5) {
-					Actions.completeDefeat(blockTeam, o);
-					Actions.completeWin(attackTeam, o);
-				} 
-				else {
-					Actions.normalDefeat(blockTeam, o);
-					Actions.normalWin(attackTeam, o);
+			// если атакующая команда заюблокирована
+			if (blockID) {
+
+				var blockTeam   = o.S[blocker].block.team[blockID];
+				var blockPower  = Actions.getTeamPower(blockTeam, o);
+				if (attackPower > blockPower) {
+					if (attackPower - blockPower >= 5) {
+						Actions.completeDefeat(blockTeam, o);
+						Actions.completeWin(attackTeam, o);
+					} 
+					else {
+						Actions.normalDefeat(blockTeam, o);
+						Actions.normalWin(attackTeam, o);
+					}
 				}
-			}
-			else if (attackPower < blockPower) {
-				if (blockPower - attackPower >= 5) {
-					Actions.completeDefeat(attackTeam, o);
-					Actions.completeWin(blockTeam, o);
-				} 
+				else if (attackPower < blockPower) {
+					if (blockPower - attackPower >= 5) {
+						Actions.completeDefeat(attackTeam, o);
+						Actions.completeWin(blockTeam, o);
+					} 
+					else {
+						Actions.normalDefeat(attackTeam, o);
+						Actions.normalWin(blockTeam, o);
+					}
+				}
 				else {
-					Actions.normalDefeat(attackTeam, o);
-					Actions.normalWin(blockTeam, o);
+					Actions.drawBattle(attackTeam, o);
+					Actions.drawBattle(blockTeam, o);
 				}
 			}
 			else {
-				Actions.drawBattle(attackTeam, o);
-				Actions.drawBattle(blockTeam, o);
+				if (attackPower >= 5) {
+					o.rewardToPlayer = o.S.activePlayer;
+					Actions.completeReward(attackTeam, o);
+				}
+				else {
+					o.rewardToPlayer = o.S.activePlayer;
+					Actions.normalReward(attackTeam, o);
+				}
 			}
         }
 
@@ -298,17 +335,29 @@ var Actions = {
 		o.damage = 2;
 		Actions.giveDamage(team[0],o);
 	},
-	'completeWin' : function(team, o) {
-		if (!team) return;
-	},
 	'normalDefeat' : function(team, o) {
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'normalDefeat';
 		Actions.giveDamage(team[0],o);
 	},
+	'completeWin' : function(team, o) {
+		if (!team) return;
+	},
 	'normalWin' : function(team, o) {
 		if (!team) return;
+	},
+	'normalReward' : function(team, o) {
+		if (!team) return;
+		o.rewardsCount = 1;
+		o.causeOfReward = 'normalReward';
+		Actions.giveReward(team[0],o);
+	},
+	'completeReward' : function(team, o) {
+		if (!team) return;
+		o.rewardsCount = 2;
+		o.causeOfReward = 'completeReward';
+		Actions.giveReward(team[0],o);
 	},
 	'drawBattle' : function(team, o) {
 		if (!team) return;
@@ -320,7 +369,7 @@ var Actions = {
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.damage(cardID,o);
-			}, time:610});
+			}, time:610, name: 'giveDamage'});
 		}
 		if (o.damage == 1) {
 			if (Actions.getHealtStatus(cardID, o)) {
@@ -333,9 +382,22 @@ var Actions = {
 			Actions.killTarget(cardID, o);
 		}
 	},
+	'giveReward' : function(cardID, o) {
+		if (!module) {
+			for (var i = 1; i <= o.rewardsCount; i++) {
+				AnimationPush({func:function() {
+					AN.reward(cardID,o);
+				}, time:610, name: 'giveReward'});
+			}
+		}
+		o.S[o.rewardToPlayer].reward += o.rewardsCount;
+	},
 	'injureTarget' : function(cardID, o) {
 		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
 		o.S.statuses[cardID].injured = true;
+		if (!module) {
+			C[cardID].injure();
+		}
 	},
 	'killTarget' : function(cardID, o) {
 		var pXs = ['pA', 'pB'];
