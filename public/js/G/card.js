@@ -54,6 +54,10 @@ function Card( o ) {
             W: I.card.W,
             zona: ('zona' in o) ? o.zona : 'deck',
         };
+        if (S.statuses[this.id]) {
+            var statuses = S.statuses[this.id];
+            if (statuses.injured) this.params.isHealt = false; 
+        }
     };
 
     this.setNewParams = function(upd){
@@ -135,6 +139,9 @@ function Card( o ) {
     };
     this.fillAsFaceUp = function( link ) {
         var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
+        var currentAttack = this.params.isHealt ? this.params.ah : this.params.ai;
+        var currentSupport = this.params.isHealt ? this.params.sh : this.params.si;
+        console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
         link
             .append( $( '<div />', { 'class': 'cbg' } ) )
             .append( $( '<div />', { 'class': 'outShell' } )
@@ -172,8 +179,8 @@ function Card( o ) {
                     ) // end append 'romb'
                 .append(
                     $( '<div />', {
-                        'class': 'powerCurrent power',
-                        'text': this.params.ah + '/' + this.params.sh
+                        'class': 'powerCurrent power ' + (this.params.isHealt  ? '' :'powerInjured'),
+                        'text': currentAttack + '/' + currentSupport
                     } ) // end create 'power'
                     .css( 'fontSize', this.params.W / 4 + 'px' )
                     .css( 'lineHeight', this.params.W / 4 + 'px' )
@@ -1229,7 +1236,7 @@ function Card( o ) {
         LogI['injure'] = 0;
         Log( 1, 'injure' );
         var result = 0;
-        if ( this.params.isHealt ) {
+        //if ( this.params.isHealt ) {
             $( '.center.ceb', this.$romb ).append(
                 $( '<div />', {
                     'class': 'injured',
@@ -1239,7 +1246,7 @@ function Card( o ) {
             this.$power.html(Actions.getInjuredPower({cardID:this.id,S:S, Accordance:Accordance,Known:Known}));
 
             this.params.isHealt = false;
-        }
+        //}
         Log( -1, 'injure' );
         return result;
     };
@@ -1470,25 +1477,32 @@ Card.prototype = {
         var _this = this;
         if (o.type == 'simple') {
             if (o.target == 'one') {
+                var pic = o.pic || "public/pics/damage.png"; 
                 var sprite = $('<div />', {})
                     .css('width', _this.params.W)
                     .css('height', _this.params.H)
                     .css('top', _this.params.position.Y)
                     .css('left', _this.params.position.X)
                     .css('position', 'absolute')
-                    .css('display','none')
+                    .css('opacity',0)
                     .append($('<img />',{
-                        src : "public/pics/damage.png",
+                        src : pic,
                         width :  _this.params.W,
                         height :  _this.params.H,
                     }))
                 H.animate.append(sprite);
-                sprite.show(500,function(){
-                    _this.injure();
-                    sprite.hide(500, function(){
-                        sprite.remove()
-                    })
-                })
+
+                sprite.animate({
+                        opacity: 1,
+                    }, 500, 
+                    function() {
+                        sprite.animate({
+                                opacity: 0,
+                            }, 500, 
+                            function() {
+                                sprite.remove()
+                            });
+                    });
             }
         }
     }
