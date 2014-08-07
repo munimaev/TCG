@@ -207,7 +207,8 @@ body {
 
 }
 .login,
-#phase {
+#phase,
+.rewards {
     font-weight: bold;
 
     -webkit-text-shadow:  1px -1px rgba(190,131,89,1),
@@ -219,6 +220,23 @@ body {
                          -1px -1px rgba(190,131,89,1),
                           1px  1px rgba(206,163,129,1);
 }
+
+
+.rewards {
+    margin: 4px;
+}
+.rewards span {
+    display: block;
+    float: left;
+    width: 100%;
+    text-align: right;
+}
+.rewards .pic {
+    position:  absolute;
+    height: 100%;
+    width: auto;
+}
+
 #phase {
     text-align: center;
 }
