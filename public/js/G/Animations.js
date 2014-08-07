@@ -12,7 +12,6 @@ function AnimationNext() {
 	var animation = Animations.splice(0,1);
 	AnimationIsRun = true;
 	console.log(animation[0].name)
-	debugger;
 	animation[0].func();
 	setTimeout(function(){
 		AnimationIsRun = false;
@@ -285,7 +284,19 @@ var AN = {
 	reward : function(cardID, o) {
 		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/reward.png"})
 	},
-	uturn : function(cardID, o) {
+	uturn : function(o) {
+		var o = o || {};
+		o.bigBannerPics = "public/pics/uturn.png";
+		AN.bigBanner(o);
+	},
+	winner : function(o) {
+		var o = o || {};
+		if (o.winner == you) o.bigBannerPics = "public/pics/win.png";
+		if (o.winner == opp) o.bigBannerPics = "public/pics/lose.jpg";
+		AN.bigBanner(o);
+	},
+	bigBanner : function(o) {
+
             var sprite = $('<div />', {})
                 .css('width', I.scroll.W)
                 .css('height', I.scroll.H)
@@ -294,7 +305,7 @@ var AN = {
                 .css('position', 'absolute')
                 .css('opacity',0)
                 .append($('<img />',{
-                    src :"public/pics/uturn.png",
+                    src : o.bigBannerPics,
                     width :  I.scroll.W,
                     height :  I.scroll.H,
                 }))
@@ -313,8 +324,9 @@ var AN = {
                 });
 	},
 	autoNextPhase : function(o) {
-		if (Can.pressNextBtn(o))
-		console.log('> pressNextBtn')
+		console.log('Can.pressNextBtn(o) = ' +  Can.pressNextBtn(o))
+		if (Can.pressNextBtn(o)){
 			socket.emit('pressNextBtn',{u:Client})
+		}
 	}
 }
