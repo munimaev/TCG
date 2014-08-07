@@ -49,7 +49,10 @@ var Actions = {
 	    var newKey = Number( key ) + 1;
 	    if ( newKey >= o.Stadies.order.length ) {
 	        newKey = 0;
+	        o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
 	    }
+
+    	console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
     	o.S.phase = o.Stadies.order[newKey];
 
     	if (o.S.phase+'AtStart' in Actions) {
@@ -57,8 +60,9 @@ var Actions = {
     	}
     	if (!module) {
     		updTable(); 
-	    	if (o.Stadies[o.S.phase].autoNextPhase) {
+	    	if (o.Stadies[o.S.phase].autoNextPhase && !o.S.stop) {
 				AnimationPush({func:function() {
+					o.pX = you;
 					AN.autoNextPhase(o);
 				}, time:100, name: 'autoNextPhase'});
 	    	}
@@ -325,6 +329,27 @@ var Actions = {
 		}
 
 	},
+	'winnerAtStart' : function(o) {
+		var pXs = [o.S.activePlayer,(o.S.activePlayer == 'pA' ? 'pB' : 'pA')];
+		for (var pX in pXs) {
+			if (o.S[pXs[pX]].rewards >= 10) {
+				o.winner = pXs[pX];
+				Actions.winner(o);
+				Actions.stopGame(o);
+				break;
+			}
+		}
+	},
+	'winner' : function(o) {
+		if (!module) {
+			AnimationPush({func:function() {
+				AN.winner(o);
+			}, time:1200, name: 'winner'});
+		}
+	},
+	'stopGame' : function(o) {
+		o.S.stop = true;
+	},
 	'completeDefeat' : function(team, o) {
 		if (!team) return;
 		o.damage = 1;
@@ -390,7 +415,7 @@ var Actions = {
 				}, time:610, name: 'giveReward'});
 			}
 		}
-		o.S[o.rewardToPlayer].reward += o.rewardsCount;
+		o.S[o.rewardToPlayer].rewards += o.rewardsCount;
 	},
 	'injureTarget' : function(cardID, o) {
 		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
