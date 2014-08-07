@@ -187,11 +187,12 @@ function getStartSnapshot() {
 	var result = { // as Snapshot
 	    activePlayer: 'pB',
 	    phase: "block",
+	    stop: false,
 	    counters : {
 	        playedNinjaActivePlayer : 0
 	    },
 	    pA : {
-	    	rewards : 0,
+	    	rewards : 5,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -209,7 +210,7 @@ function getStartSnapshot() {
 	            team : {
 	            	4:['c005'],
 	            	5:['c002','c003'],
-	            	6:['c007','c004','c006']
+	            	6:['c001','c004','c006']
 	            }
 	        }
 	    },
@@ -218,7 +219,7 @@ function getStartSnapshot() {
 
 	    },
 	    pB : {
-	    	rewards : 0,
+	    	rewards : 7,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -230,9 +231,9 @@ function getStartSnapshot() {
 	        },
 	        attack : {
 	            team : {
-	            	1:['c107'],
+	            	1:['c101'],
 	            	2:['c102','c103'],
-	            	3:['c104','c115','c117']
+	            	3:['c104','c105','c106']
 	        	}
 	        },
 	        block : {
@@ -240,15 +241,15 @@ function getStartSnapshot() {
 	        }
 	    },
 	    statuses : {
-			// c002: {
-			// 	injured: true
-			// },
-			// c007: {
-			// 	injured: true
-			// },
-			// c102: {
-			// 	injured: true
-			// }
+			c002: {
+				injured: true
+			},
+			c006: {
+				injured: true
+			},
+			c001: {
+				injured: true
+			}
 	    }
 	};
 	var pu;
