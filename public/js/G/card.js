@@ -11,7 +11,8 @@ function Card( o ) {
 
     this.setParam = function( name, alternative, upd ) {
         var o = upd || o || {};
-        if ('faceUp' in o && !o.faceUp == true) {
+        if ('faceUp' in o && !o.faceUp == true
+            && name != 'zindex') {
             return null;
         }
         if ( name in o ) return o[name];
@@ -52,6 +53,7 @@ function Card( o ) {
             teamPosition: ('position' in o) ? o.position : null,
             type: ('type' in o) ? o.type : 'N',
             W: I.card.W,
+            zindex: this.setParam( 'zindex', 0, upd),
             zona: ('zona' in o) ? o.zona : 'deck',
         };
         if (S.statuses[this.id]) {
@@ -344,13 +346,13 @@ function Card( o ) {
         } else {
             this.fillAsFaceDown( $card );
         }
-        ;
         $( '#main' ).append( $card );
     };
 
     this.create( this.id );
 
     this.updateLinks();
+    this.instMouseControleUp( null, {_this:this} );
 
     this.updateMouse = function() {
         var ido = o.id;
@@ -1058,8 +1060,7 @@ function Card( o ) {
     };
 
     this.setZIndex = function( ind ) {
-        if ( !ind )
-            return false;
+        var ind = ind ||  this.params.zindex || 0;
         this.$id.css( 'z-index', Number( ind ) );
         this.params.zindex = ind;
         if (this.params.incline.x == 0
@@ -1071,6 +1072,7 @@ function Card( o ) {
             this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (3) + 'px )' );
         }
     };
+    this.setZIndex()
 
     this.flip = function() {
         if ( this.params.faceUp ) {
