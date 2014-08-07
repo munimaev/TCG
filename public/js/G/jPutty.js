@@ -162,6 +162,20 @@ $(window).readyresize(function(width, height) {
     G.you.chackra.Y = main_H - bar_H + 6;
     G.opp.chackra.Y = 6;
 
+    // Rewards
+
+    $('.rewards')
+            .putty('xysize',  bar_H + login_W + dd_W * 3 + hand_W , -1, dd_W - 8,  bar_H - 8)            
+            .css('lineHeight',  (bar_H - 5) + 'px')
+            .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
+
+    if (!('rewards' in G.opp)) G.opp.rewards = {};
+    if (!('rewards' in G.you)) G.you.rewards = {};
+    G.opp.rewards.W = G.you.rewards.W = dd_W - 8;
+    G.opp.rewards.H = G.you.rewards.H = bar_H - 12;
+    G.opp.rewards.X = G.you.rewards.X = bar_H + login_W + dd_W + dd_W + hand_W + dd_W;
+    G.you.rewards.Y = main_H - bar_H + 6;
+    G.opp.rewards.Y = 6;
 
     // Next Phase
     $('#next')
@@ -169,7 +183,7 @@ $(window).readyresize(function(width, height) {
             .css('lineHeight',  (bar_H - 12) + 'px')
             .css('fontSize',  (bar_H - 12 ) / 1.5 + 'px');
     $('#phase')
-            .putty('xysize', bar_H + login_W + dd_W * 3 + hand_W, 1, (main_W - dd_W * 1.5 - 1) - (bar_H + login_W + dd_W * 3 + hand_W),  bar_H - 5)
+            .putty('xysize', bar_H + login_W + dd_W * 4 + hand_W, 1, (main_W - dd_W * 1.5 - 1) - (bar_H + login_W + dd_W * 4 + hand_W),  bar_H - 5)
             .css('lineHeight',  (bar_H - 5) + 'px')
             .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
 
@@ -245,9 +259,9 @@ function fillScroll(o){
         faceUp = true;
     }
     for (var i in G) {
-        window[G[i]] = new Card({'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp});
-        window[G[i]].$id.css('position','relative').css('display','inline-block').css('margin','0 1.1% 1.1% 0');
-        $('.scrollCards','#' + o.owner + '_' + o.area + '_' + o.clicker).append(window[G[i]].$id);
+        C[G[i]] = new Card({'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp, zindex:350});
+        C[G[i]].$id.css('position','relative').css('display','inline-block').css('margin','0 1.1% 1.1% 0');
+        $('.scrollCards','#' + o.owner + '_' + o.area + '_' + o.clicker).append(C[G[i]].$id);
     }
 }
 
