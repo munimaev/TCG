@@ -1653,9 +1653,9 @@ function blockMove(_this) {
                         }
                     })
                 }
+                G.selectedTeam.card.select( false );
+                G.selectedTeam = null;
             }
-            G.selectedTeam.card.select( false );
-            G.selectedTeam = null;
         }
         if ( _this.params.owner == opp ) {
             G.selectedTeam.card.select( false );
