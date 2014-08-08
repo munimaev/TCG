@@ -232,6 +232,7 @@ var Actions = {
 	 * @return {undefined}   undefined
 	 */
 	'block' : function(o) {
+		if (o.S.battlefield[o.attackTeam] == o.blockTeam) return;
 		// если место блока занято
 		if (o.S.battlefield[o.attackTeam]) {
 			o.S[o.pX].village.team[o.S.battlefield[o.attackTeam]] = o.S[o.pX].block.team[o.S.battlefield[o.attackTeam]];
