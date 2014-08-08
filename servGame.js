@@ -161,7 +161,7 @@ function imJoined(d) {
 }
 function bothIsJoin(d) {
 	var S = StartedGames[d.table]
-	S.isNewGame = false; // TODO определить новая или не новая
+	S.isNewGame = true; // TODO определить новая или не новая
 	if (S.socketA && S.socketB ) {
 		S.accordance = getStartAccordiance();
 		S.known = getStartCards();
@@ -208,13 +208,13 @@ function getStartSnapshot() {
 	        },
 	        block : {
 	            team : {
-	            	4:['c005'],
-	            	5:['c002','c003'],
-	            	6:['c001','c004','c006']
+	            	// 4:['c005'],
+	            	// 5:['c002','c003'],
+	            	// 6:['c001','c004','c006']
 	            }
 	        }
 	    },
-	    battlefield : {1:5,2:6,3:4},
+	    battlefield : {},
 	    stack : {
 
 	    },
@@ -231,9 +231,9 @@ function getStartSnapshot() {
 	        },
 	        attack : {
 	            team : {
-	            	1:['c101'],
-	            	2:['c102','c103'],
-	            	3:['c104','c105','c106']
+	            	// 1:['c101'],
+	            	// 2:['c102','c103'],
+	            	// 3:['c104','c105','c106']
 	        	}
 	        },
 	        block : {
@@ -253,7 +253,7 @@ function getStartSnapshot() {
 	    }
 	};
 	var pu;
-	for (var i = 7; i <= 50 ; i++) {
+	for (var i = 1; i <= 23 ; i++) {
 		pu = i < 10 ? "0"+i : i;
 		result.pA.deck.push('c1' + pu )
 		result.pB.deck.push('c0' + pu )
@@ -337,60 +337,25 @@ function getStartMeta(S) {
 }
 
 function getStartAccordiance() {
-	var result = {
-	    c001: 'c001',
-	    c002: 'c002',
-	    c003: 'c003',
-	    c004: 'c004',
-	    c005: 'c005',
-	    c006: 'c006',
-	    c007: 'c007',
-	    c008: 'c008',
-	    c009: 'c009',
-	    c015: 'c015',
-	    c010: 'c010',
-	    c011: 'c011',
-	    c012: 'c012',
-	    c013: 'c013',
-	    c014: 'c014',
-	    c016: 'c016',
-	    c017: 'c017',
-	    c018: 'c018',
-	    c019: 'c019',
-	    c020: 'c020',
-	    c021: 'c021',
-	    c022: 'c022',
-	    c023: 'c023',
-	    c024: 'c024',
-	    c025: 'c025',
-	    c026: 'c026',
-	    
-	    
-	    c101: 'c101',
-	    c102: 'c102',
-	    c103: 'c103',
-	    c104: 'c104',
-	    c105: 'c105',
-	    c106: 'c106',
-	    c107: 'c107',
-	    c108: 'c108',
-	    c109: 'c109',
-	    c110: 'c110',
-	    c111: 'c111',
-	    c112: 'c112',
-	    c113: 'c113',
-	    c113: 'c113',
-	    c114: 'c114',
-	    c115: 'c115',
-	    c116: 'c116',
-	    c117: 'c117',
-	    c118: 'c118',
-	    c119: 'c119',
-	    c120: 'c120',
-	    c121: 'c121',
-	    c122: 'c122',
-	    c123: 'c123',
-	};
+	var pXs = ['c0','c1'];
+	
+	var result = {};
+
+	for (var pX in pXs) {
+		var keys = [];
+		var values = [];
+		for (var i = 1; i <= 23 ; i++) {
+			keys.push(i < 10 ? '0' + i : ''+i)
+			values.push(i < 10 ? '0' + i : ''+i)
+		}
+		values.sort(  function() { return Math.random()-0.5} )
+		
+		for (var i in keys) {
+			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
+		};
+	}
+	console.log(result)
+
 
 	return result;
 }
