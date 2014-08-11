@@ -10,47 +10,36 @@ function arraySearch(array, value) {
 }
 var Can = {
 	pressNextBtn : function(o) {
-                    console.log(0)
         if (o.S.stop) return false;
-                    console.log(o.Stadies[o.S.phase].party, o.pX,o.S.activePlayer)
         if ( o.Stadies[o.S.phase].party == 'both') { 
     	    if (o.pX == o.S.activePlayer) {
     	    	if (o.meta.toNextPhase[o.pX] == false) {
-                    console.log(1)
     	    		return true;
     	    	} else {
-                    console.log(2)
     	    		return false;
     	    	}
     	    } else {
     	    	if (o.meta.toNextPhase[o.S.activePlayer] == true) {
-                    console.log(3)
     	    		return true;
     	    	} else {
-                    console.log(4)
     	    		return false;
     	    	}
     	    }
         }
         else if ( o.Stadies[o.S.phase].party == 'attacker') { 
             if (o.pX == o.S.activePlayer) {
-                    console.log(5)
                 return true;
             } else {
-                    console.log(6)
                 return false;
             }
         }
        else if ( o.Stadies[o.S.phase].party == 'blocker') { 
             if (o.pX == o.S.activePlayer) {
-                    console.log(7)
                 return false;
             } else {
-                    console.log(8)
                 return true;
             }
         }
-                    console.log(9)
 
 	},
 	putInPlay : function(o) {
@@ -58,8 +47,13 @@ var Can = {
         	 && arraySearch(o.S[o.pX].hand, o.card) !== null
         	 && o.Known[o.Accordance[o.card]].type == 'N' 
         	 && o.Known[o.Accordance[o.card]].owner == o.pX 
-        	 && o.S.counters.playedNinjaActivePlayer == 0 ) {
+             && o.S.counters.playedNinjaActivePlayer == 0  
+             && o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec) {
             return true;
+        }
+        else {
+            console.log(  
+              o.Known[o.Accordance[o.card]].owner , o.pX )
         }
     },
 	charge : function(o) {
