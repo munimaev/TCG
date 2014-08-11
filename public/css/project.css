@@ -356,18 +356,37 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     z-index: 2;
     -webkit-filter: blur(5px);
 }
-.card .icon .handcost {
+.card .icon .handcost1 ,
+.card .icon .handcost0  {
     width: 100%;
     height: 100%;
-    background-image: url('../pics/H1.png');
     background-size: 100% 100%;
 }
-.card .icon .turncost {
+
+.card .icon .handcost1 { background-image: url('../pics/H1.png'); }
+.card .icon .handcost0 { background-image: url('../pics/H0.png'); }
+
+.card .icon .turncost0,
+.card .icon .turncost1,
+.card .icon .turncost2,
+.card .icon .turncost3,
+.card .icon .turncost4,
+.card .icon .turncost5,
+.card .icon .turncost6,
+.card .icon .turncost7 {
     width: 100%;
     height: 100%;
-    background-image: url('../pics/T6.png');
     background-size: 100% 100%;
 }
+.card .icon .turncost0 { background-image: url('../pics/T0.png'); }
+.card .icon .turncost1 { background-image: url('../pics/T1.png'); }
+.card .icon .turncost2 { background-image: url('../pics/T2.png'); }
+.card .icon .turncost3 { background-image: url('../pics/T3.png'); }
+.card .icon .turncost4 { background-image: url('../pics/T4.png'); }
+.card .icon .turncost5 { background-image: url('../pics/T5.png'); }
+.card .icon .turncost6 { background-image: url('../pics/T6.png'); }
+.card .icon .turncost7 { background-image: url('../pics/T7.png'); }
+
 .card .mouseControle {
     width: 75%;
     height: 75%;
