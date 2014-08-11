@@ -55,6 +55,9 @@ function Card( o ) {
             W: I.card.W,
             zindex: this.setParam( 'zindex', 0, upd),
             zona: ('zona' in o) ? o.zona : 'deck',
+            name: ('name' in o) ? o.name : 'Имя',
+            hc : ('hc' in o) ? o.hc : 0,
+            ec : ('ec' in o) ? o.ec : 0,
         };
         if (S.statuses[this.id]) {
             var statuses = S.statuses[this.id];
@@ -228,7 +231,7 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'handcost' } )
+                        $( '<div />', { 'class': 'handcost' + this.params.hc } )
                         )
                     )
                 .append(
@@ -238,7 +241,7 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'turncost' } )
+                        $( '<div />', { 'class': 'turncost' + this.params.ec } )
                         )
                     )
                 .append(
@@ -1023,19 +1026,22 @@ function Card( o ) {
     };
 
     this.showPrewiev = function() {
-        if ( this.params.prewiev )
+        if ( this.params.prewiev || !this.params.faceUp)
             return true;
         var offset = this.$id.offset();
         var X = offset.top - (this.params.H * 4 / 92);
         var Y = (offset.left + this.params.H + (this.params.H / 20));
         var H = 150;
         var W = I.card.W * 3;
+        var hc = this.params.hc;
+        var ec = this.params.ec;
         var $prew = $( '<div />', {
             'class': 'cardPrewievWrap',
             'id': 'cadrPrewiev' + this.id
         } )
             .css( 'height', H )
-            .css( 'width', W + 'px' );
+            .css( 'width', W + 'px' )
+            .css( 'font-size', I.card.W / 8 + 'px' );
 
         //console.log( I.H,I.card.H ,H , this.params.H )
         var topPrew = X - H - this.params.H / 20;
@@ -1056,6 +1062,64 @@ function Card( o ) {
                 .css( 'left', Y + 'px' )
         }
         $( '#prewiev' ).append( $prew );
+        $prew
+        .append(
+            $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':3, 'width':'100%'}).append(
+                $('<tbody />', {'valign':'top'}).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':8}).append(
+                            $('<h3 />', {'text':this.params.name})
+                        )
+                    ).append(
+                        $('<td />', {'width':'2em'}).append(
+                            $('<img />', {'src':'public/pics/H'+hc+'.png', 'width':'2em','height':'2em', 'margin-top':'-5px'})
+                        )
+                    ).append(
+                        $('<td />', {'width':'2em'}).append(
+                            $('<img />', {'src':'public/pics/T'+ec+'.png', 'width':'2em','height':'2em', 'margin-top':'-5px'})
+                        )
+                    )
+                )
+            )
+            
+        )
+        .append(
+            $('<p>',{'text':' '})
+        )
+        .append(
+            $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':9, 'width':'100%'}).append(
+                $('<tbody />', {'valign':'top'}).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6 />', {'text':'Здоровый'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6/>', {'text':'Атрибут'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6 />', {'text':'Раненный'})
+                        )
+                    ).css('text-align','center')
+                ).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'class':'normalPower','text':this.params.ah + '/' + this.params.sh})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'text':'-=-'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'class':'power powerInjured','text':this.params.ai + '/' + this.params.si})
+                        )
+                    ).css('text-align','center')
+                )
+            )
+            
+        )
         this.params.prewiev = true;
     };
 
