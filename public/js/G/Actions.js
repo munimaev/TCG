@@ -49,10 +49,12 @@ var Actions = {
 	    var newKey = Number( key ) + 1;
 	    if ( newKey >= o.Stadies.order.length ) {
 	        newKey = 0;
+	        o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
 	        o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+	        o.S.counters.playedNinjaActivePlayer = 0;
 	    }
 
-    	console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
+    	//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
     	o.S.phase = o.Stadies.order[newKey];
 
     	if (o.S.phase+'AtStart' in Actions) {
