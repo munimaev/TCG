@@ -198,7 +198,7 @@ function draw1() {
  */
 function btnNextPhase() {    
     if (Can.pressNextBtn({pX:you,S:S,Stadies:Stadies,meta:Meta})) {
-        console.log("↰",{u:Client})
+       // console.log("↰",{u:Client})
         socket.emit('pressNextBtn',{u:Client})
     }
 }
