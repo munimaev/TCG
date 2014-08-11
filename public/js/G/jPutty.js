@@ -177,13 +177,28 @@ $(window).readyresize(function(width, height) {
     G.you.rewards.Y = main_H - bar_H + 6;
     G.opp.rewards.Y = 6;
 
+    // turn Counter
+
+    $('.turnCounter')
+            .putty('xysize',  bar_H + login_W + dd_W * 4 + hand_W , -1, dd_W - 8,  bar_H - 8)            
+            .css('lineHeight',  (bar_H - 5) + 'px')
+            .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
+
+    if (!('turnCounter' in G.opp)) G.opp.turnCounter = {};
+    if (!('turnCounter' in G.you)) G.you.turnCounter = {};
+    G.opp.turnCounter.W = G.you.turnCounter.W = dd_W - 8;
+    G.opp.turnCounter.H = G.you.turnCounter.H = bar_H - 12;
+    G.opp.turnCounter.X = G.you.turnCounter.X = bar_H + login_W + dd_W + dd_W  + dd_W + hand_W + dd_W;
+    G.you.turnCounter.Y = main_H - bar_H + 6;
+    G.opp.turnCounter.Y = 6;
+
     // Next Phase
     $('#next')
             .putty('xysize', main_W - dd_W * 1.5 - 1, 1, dd_W * 1.5 - 8,  bar_H - 12)
             .css('lineHeight',  (bar_H - 12) + 'px')
             .css('fontSize',  (bar_H - 12 ) / 1.5 + 'px');
     $('#phase')
-            .putty('xysize', bar_H + login_W + dd_W * 4 + hand_W, 1, (main_W - dd_W * 1.5 - 1) - (bar_H + login_W + dd_W * 4 + hand_W),  bar_H - 5)
+            .putty('xysize', bar_H + login_W + dd_W * 5 + hand_W, 1, (main_W - dd_W * 1.5 - 1) - (bar_H + login_W + dd_W * 5 + hand_W),  bar_H - 5)
             .css('lineHeight',  (bar_H - 5) + 'px')
             .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
 
