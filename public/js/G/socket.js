@@ -39,13 +39,20 @@ function updRewardsCount(player) {
 	var count =  S[Client[player]].rewards;
 	H[player].rewards.span.html(count)
 }
+function updTurnCounter(player) {
+	console.log('msg')
+	var count =  S[Client[player]].turnCounter;
+	H[player].turnCounter.span.html(count)
+}
 function updAllCount() {
+	console.log('updAllCount')
 	var P, A;
 	for (var p in P = ['you','opp']) {
 		for (var a in A = ['deck', 'discard', 'chackra']) {
 			updAreaCount(P[p],A[a]);
 		}
 		updRewardsCount(P[p]);
+		updTurnCounter(P[p]);
 	}
 }
 
