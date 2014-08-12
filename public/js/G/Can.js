@@ -10,6 +10,7 @@ function arraySearch(array, value) {
 }
 var Can = {
 	pressNextBtn : function(o) {
+        if (o.S.stop) return false;
         if ( o.Stadies[o.S.phase].party == 'both') { 
     	    if (o.pX == o.S.activePlayer) {
     	    	if (o.meta.toNextPhase[o.pX] == false) {
@@ -25,14 +26,14 @@ var Can = {
     	    	}
     	    }
         }
-        if ( o.Stadies[o.S.phase].party == 'attacker') { 
+        else if ( o.Stadies[o.S.phase].party == 'attacker') { 
             if (o.pX == o.S.activePlayer) {
                 return true;
             } else {
                 return false;
             }
         }
-        if ( o.Stadies[o.S.phase].party == 'blocker') { 
+       else if ( o.Stadies[o.S.phase].party == 'blocker') { 
             if (o.pX == o.S.activePlayer) {
                 return false;
             } else {
@@ -46,23 +47,25 @@ var Can = {
         	 && arraySearch(o.S[o.pX].hand, o.card) !== null
         	 && o.Known[o.Accordance[o.card]].type == 'N' 
         	 && o.Known[o.Accordance[o.card]].owner == o.pX 
-        	 && o.S.counters.playedNinjaActivePlayer == 0 ) {
+             && o.S.counters.playedNinjaActivePlayer == 0  
+             && o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec) {
             return true;
+        }
+        else {
+            console.log(  
+              o.Known[o.Accordance[o.card]].owner , o.pX )
         }
     },
 	charge : function(o) {
         if ( o.S.phase == 'mission' 
         	 && arraySearch(o.S[o.pX].hand, o.card) !== null
-        	 && o.Known[o.Accordance[o.card]].owner == o.pX) 
+             && o.Known[o.Accordance[o.card]]
+             && o.Known[o.Accordance[o.card]].owner == o.pX) 
         {
             return true;
         } 
         else 
         {
-        	console.log( o.S.phase == 'mission' 
-        	, arraySearch(o.S[o.pX].hand, o.card) !== null
-        	, o.Known[o.Accordance[o.card]].owner == o.pX
-            )
 			return false;
         }
     },
@@ -201,7 +204,8 @@ var Can = {
         if (o.pX != o.S.activePlayer
             && o.attackTeam in o.S[o.S.activePlayer].attack.team
             && (o.blockTeam in o.S[o.pX].block.team 
-                || o.blockTeam in o.S[o.pX].village.team)
+                || o.blockTeam in o.S[o.pX].village.team
+                || o.blockTeam == null)
             ) {
             return true;
         }

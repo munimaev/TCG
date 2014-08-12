@@ -98,13 +98,29 @@ body {
     position: absolute;
     width: 300px;
     min-height: 150px;
-    background-color: rgba(51,102,153,0.95);
+    background-color: rgba(51,102,153,1);
     border-radius: 9px;
+    padding: 10px;
     border: 2px solid #dfd495;
     -webkit-box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.5), inset 0 0 0 1px rgba(146,135,104,2),inset 0 0 10px 0 rgba(0,0,0,1),  0 0 0 1px rgba(146,135,104,1);
     box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.5), inset 0 0 0 1px rgba(146,135,104,1),inset 0 0 10px 0 rgba(0,0,0,1),  0 0 0 1px rgba(146,135,104,1);
+}
+.cardPrewievWrap h3 ,
+.cardPrewievWrap h4 ,
+.cardPrewievWrap h6 ,
+.cardPrewievWrap p {
+    line-height: 1em;
+    color: #FFF;
+    padding: 0 0 0.1em;
+    margin: 0px;
+}
+.cardPrewievWrap p {
+    padding: 0 0 0.5em;
+}
 
-
+.cardPrewievWrap .normalPower {
+    text-shadow: 1px 1px 0px black,  -1px -1px 0px black, -1px 1px 0px black,  1px -1px 0px black,
+        1px 0px 0px black,  -1px -0px 0px black, 0px 1px 0px black,  0px -1px 0px black;
 }
 .oppBar {
     border-bottom: 3px solid rgba(190,131,89,1);
@@ -207,7 +223,9 @@ body {
 
 }
 .login,
-#phase {
+#phase,
+.rewards,
+.turnCounter {
     font-weight: bold;
 
     -webkit-text-shadow:  1px -1px rgba(190,131,89,1),
@@ -219,6 +237,27 @@ body {
                          -1px -1px rgba(190,131,89,1),
                           1px  1px rgba(206,163,129,1);
 }
+
+
+.rewards,
+.turnCounter {
+    margin: 4px;
+}
+.turnCounter span,
+.rewards span {
+    display: block;
+    float: left;
+    width: 100%;
+    text-align: right;
+}
+
+.turnCounter .pic,
+.rewards .pic {
+    position:  absolute;
+    height: 100%;
+    width: auto;
+}
+
 #phase {
     text-align: center;
 }

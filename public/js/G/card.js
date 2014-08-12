@@ -11,7 +11,8 @@ function Card( o ) {
 
     this.setParam = function( name, alternative, upd ) {
         var o = upd || o || {};
-        if ('faceUp' in o && !o.faceUp == true) {
+        if ('faceUp' in o && !o.faceUp == true
+            && name != 'zindex') {
             return null;
         }
         if ( name in o ) return o[name];
@@ -52,8 +53,16 @@ function Card( o ) {
             teamPosition: ('position' in o) ? o.position : null,
             type: ('type' in o) ? o.type : 'N',
             W: I.card.W,
+            zindex: this.setParam( 'zindex', 0, upd),
             zona: ('zona' in o) ? o.zona : 'deck',
+            name: ('name' in o) ? o.name : 'Имя',
+            hc : ('hc' in o) ? o.hc : 0,
+            ec : ('ec' in o) ? o.ec : 0,
         };
+        if (S.statuses[this.id]) {
+            var statuses = S.statuses[this.id];
+            if (statuses.injured) this.params.isHealt = false; 
+        }
     };
 
     this.setNewParams = function(upd){
@@ -135,6 +144,9 @@ function Card( o ) {
     };
     this.fillAsFaceUp = function( link ) {
         var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
+        var currentAttack = this.params.isHealt ? this.params.ah : this.params.ai;
+        var currentSupport = this.params.isHealt ? this.params.sh : this.params.si;
+        console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
         link
             .append( $( '<div />', { 'class': 'cbg' } ) )
             .append( $( '<div />', { 'class': 'outShell' } )
@@ -172,8 +184,8 @@ function Card( o ) {
                     ) // end append 'romb'
                 .append(
                     $( '<div />', {
-                        'class': 'powerCurrent power',
-                        'text': this.params.ah + '/' + this.params.sh
+                        'class': 'powerCurrent power ' + (this.params.isHealt  ? '' :'powerInjured'),
+                        'text': currentAttack + '/' + currentSupport
                     } ) // end create 'power'
                     .css( 'fontSize', this.params.W / 4 + 'px' )
                     .css( 'lineHeight', this.params.W / 4 + 'px' )
@@ -219,7 +231,7 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'handcost' } )
+                        $( '<div />', { 'class': 'handcost' + this.params.hc } )
                         )
                     )
                 .append(
@@ -229,7 +241,7 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'turncost' } )
+                        $( '<div />', { 'class': 'turncost' + this.params.ec } )
                         )
                     )
                 .append(
@@ -337,13 +349,13 @@ function Card( o ) {
         } else {
             this.fillAsFaceDown( $card );
         }
-        ;
         $( '#main' ).append( $card );
     };
 
     this.create( this.id );
 
     this.updateLinks();
+    this.instMouseControleUp( null, {_this:this} );
 
     this.updateMouse = function() {
         var ido = o.id;
@@ -1014,19 +1026,22 @@ function Card( o ) {
     };
 
     this.showPrewiev = function() {
-        if ( this.params.prewiev )
+        if ( this.params.prewiev || !this.params.faceUp)
             return true;
         var offset = this.$id.offset();
         var X = offset.top - (this.params.H * 4 / 92);
         var Y = (offset.left + this.params.H + (this.params.H / 20));
         var H = 150;
         var W = I.card.W * 3;
+        var hc = this.params.hc;
+        var ec = this.params.ec;
         var $prew = $( '<div />', {
             'class': 'cardPrewievWrap',
             'id': 'cadrPrewiev' + this.id
         } )
             .css( 'height', H )
-            .css( 'width', W + 'px' );
+            .css( 'width', W + 'px' )
+            .css( 'font-size', I.card.W / 8 + 'px' );
 
         //console.log( I.H,I.card.H ,H , this.params.H )
         var topPrew = X - H - this.params.H / 20;
@@ -1047,12 +1062,69 @@ function Card( o ) {
                 .css( 'left', Y + 'px' )
         }
         $( '#prewiev' ).append( $prew );
+        $prew
+        .append(
+            $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':3, 'width':'100%'}).append(
+                $('<tbody />', {'valign':'top'}).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':8}).append(
+                            $('<h3 />', {'text':this.params.name})
+                        )
+                    ).append(
+                        $('<td />', {'width':'2em'}).append(
+                            $('<img />', {'src':'public/pics/H'+hc+'.png', 'width':'2em','height':'2em', 'margin-top':'-5px'})
+                        )
+                    ).append(
+                        $('<td />', {'width':'2em'}).append(
+                            $('<img />', {'src':'public/pics/T'+ec+'.png', 'width':'2em','height':'2em', 'margin-top':'-5px'})
+                        )
+                    )
+                )
+            )
+            
+        )
+        .append(
+            $('<p>',{'text':' '})
+        )
+        .append(
+            $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':9, 'width':'100%'}).append(
+                $('<tbody />', {'valign':'top'}).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6 />', {'text':'Здоровый'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6/>', {'text':'Атрибут'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h6 />', {'text':'Раненный'})
+                        )
+                    ).css('text-align','center')
+                ).append(
+                    $('<tr />', {}).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'class':'normalPower','text':this.params.ah + '/' + this.params.sh})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'text':'-=-'})
+                        )
+                    ).append(
+                        $('<td />', {'colspan':3}).append(
+                            $('<h3 />', {'class':'power powerInjured','text':this.params.ai + '/' + this.params.si})
+                        )
+                    ).css('text-align','center')
+                )
+            )
+            
+        )
         this.params.prewiev = true;
     };
 
     this.setZIndex = function( ind ) {
-        if ( !ind )
-            return false;
+        var ind = ind ||  this.params.zindex || 0;
         this.$id.css( 'z-index', Number( ind ) );
         this.params.zindex = ind;
         if (this.params.incline.x == 0
@@ -1064,6 +1136,7 @@ function Card( o ) {
             this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (3) + 'px )' );
         }
     };
+    this.setZIndex()
 
     this.flip = function() {
         if ( this.params.faceUp ) {
@@ -1229,7 +1302,7 @@ function Card( o ) {
         LogI['injure'] = 0;
         Log( 1, 'injure' );
         var result = 0;
-        if ( this.params.isHealt ) {
+        //if ( this.params.isHealt ) {
             $( '.center.ceb', this.$romb ).append(
                 $( '<div />', {
                     'class': 'injured',
@@ -1239,7 +1312,7 @@ function Card( o ) {
             this.$power.html(Actions.getInjuredPower({cardID:this.id,S:S, Accordance:Accordance,Known:Known}));
 
             this.params.isHealt = false;
-        }
+        //}
         Log( -1, 'injure' );
         return result;
     };
@@ -1470,25 +1543,32 @@ Card.prototype = {
         var _this = this;
         if (o.type == 'simple') {
             if (o.target == 'one') {
+                var pic = o.pic || "public/pics/damage.png"; 
                 var sprite = $('<div />', {})
                     .css('width', _this.params.W)
                     .css('height', _this.params.H)
                     .css('top', _this.params.position.Y)
                     .css('left', _this.params.position.X)
                     .css('position', 'absolute')
-                    .css('display','none')
+                    .css('opacity',0)
                     .append($('<img />',{
-                        src : "public/pics/damage.png",
+                        src : pic,
                         width :  _this.params.W,
                         height :  _this.params.H,
                     }))
                 H.animate.append(sprite);
-                sprite.show(500,function(){
-                    _this.injure();
-                    sprite.hide(500, function(){
-                        sprite.remove()
-                    })
-                })
+
+                sprite.animate({
+                        opacity: 1,
+                    }, 500, 
+                    function() {
+                        sprite.animate({
+                                opacity: 0,
+                            }, 500, 
+                            function() {
+                                sprite.remove()
+                            });
+                    });
             }
         }
     }

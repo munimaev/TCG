@@ -161,7 +161,7 @@ function imJoined(d) {
 }
 function bothIsJoin(d) {
 	var S = StartedGames[d.table]
-	S.isNewGame = false; // TODO определить новая или не новая
+	S.isNewGame = true; // TODO определить новая или не новая
 	if (S.socketA && S.socketB ) {
 		S.accordance = getStartAccordiance();
 		S.known = getStartCards();
@@ -185,12 +185,15 @@ function bothIsJoin(d) {
 
 function getStartSnapshot() {
 	var result = { // as Snapshot
-	    activePlayer: 'pB',
-	    phase: "block",
+	    activePlayer: 'pA',
+	    phase: "start",
+	    stop: false,
 	    counters : {
 	        playedNinjaActivePlayer : 0
 	    },
 	    pA : {
+	    	rewards : 0,
+	    	turnCounter : 0,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -206,17 +209,19 @@ function getStartSnapshot() {
 	        },
 	        block : {
 	            team : {
-	            	4:['c007','c005'],
-	            	5:['c002','c003'],
-	            	6:['c004','c006']
+	            	// 4:['c005'],
+	            	// 5:['c002','c003'],
+	            	// 6:['c001','c004','c006']
 	            }
 	        }
 	    },
-	    battlefield : {1:5,2:6,3:4},
+	    battlefield : {},
 	    stack : {
 
 	    },
 	    pB : {
+	    	rewards : 0,
+	    	turnCounter : 0,
 	        hand: [],
 	        deck: [],
 	        chackra : [],
@@ -228,9 +233,9 @@ function getStartSnapshot() {
 	        },
 	        attack : {
 	            team : {
-	            	1:['c107'],
-	            	2:['c102','c103'],
-	            	3:['c104','c105','c106']
+	            	// 1:['c101'],
+	            	// 2:['c102','c103'],
+	            	// 3:['c104','c105','c106']
 	        	}
 	        },
 	        block : {
@@ -238,11 +243,19 @@ function getStartSnapshot() {
 	        }
 	    },
 	    statuses : {
-	    	
+			// c002: {
+			// 	injured: true
+			// },
+			// c006: {
+			// 	injured: true
+			// },
+			// c001: {
+			// 	injured: true
+			// }
 	    }
 	};
 	var pu;
-	for (var i = 7; i <= 50 ; i++) {
+	for (var i = 1; i <= 23 ; i++) {
 		pu = i < 10 ? "0"+i : i;
 		result.pA.deck.push('c1' + pu )
 		result.pB.deck.push('c0' + pu )
@@ -253,58 +266,58 @@ function getStartSnapshot() {
 function getStartCards() {
 	var C = { // as Construcors
 		//Gaara
-	    c001: {owner: 'pA', type: 'N', ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
-	    c002: {owner: 'pA', type: 'N', ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
-	    c003: {owner: 'pA', type: 'N', ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
-	    c004: {owner: 'pA', type: 'N', ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
-	    c005: {owner: 'pA', type: 'N', ah: 2, sh: 0, ai: 1, si: 0, img: 'n602' , elements: 'W', name : "Matsuri" },
-	    c006: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
-	    c007: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
-	    c008: {owner: 'pA', type: 'N', ah: 3, sh: 3, ai: 2, si: 2, img: 'n1321' , elements: 'W', name : "Crow" },
-	    c009: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
-	    c015: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
-	    c010: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
-	    c011: {owner: 'pA', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
-	    c012: {owner: 'pA', type: 'N', ah: 0, sh: 3, ai: 0, si: 1, img: 'n1322' , elements: 'W', name : "Black Ant" },
-	    c013: {owner: 'pA', type: 'N', ah: 0, sh: 3, ai: 0, si: 1, img: 'n1086' , elements: 'W', name : "Crow" },
-	    c014: {owner: 'pA', type: 'N', ah: 3, sh: 2, ai: 1, si: 1, img: 'n180' , elements: 'W', name : "Yashamaru" },
-	    c016: {owner: 'pA', type: 'N', ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
-	    c017: {owner: 'pA', type: 'N', ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
-	    c018: {owner: 'pA', type: 'N', ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
-	    c019: {owner: 'pA', type: 'N', ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
-	    c020: {owner: 'pA', type: 'N', ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
-	    c021: {owner: 'pA', type: 'N', ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
-	    c022: {owner: 'pA', type: 'N', ah: 3, sh: 3, ai: 3, si: 2, img: 'n1481' , elements: 'WE', name : "Kankuro" },
-	    c023: {owner: 'pA', type: 'N', ah: 5, sh: 4, ai: 0, si: 3, img: 'n1484' , elements: 'W', name : "Temari" },
-	    c024: {owner: 'pA', type: 'N', ah: 5, sh: 4, ai: 2, si: 3, img: 'n1420' , elements: 'W', name : "Sasori" },
-	    c025: {owner: 'pA', type: 'N', ah: 5, sh: 1, ai: 3, si: 1, img: 'n130' , elements: 'W', name : "Баки" },
-	    c026: {owner: 'pA', type: 'N', ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },
+	    c001: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
+	    c002: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
+	    c003: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
+	    c004: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
+	    c005: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 1, si: 0, img: 'n602' , elements: 'W', name : "Matsuri" },
+	    c006: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
+	    c007: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
+	    c008: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 3, ai: 2, si: 2, img: 'n1321' , elements: 'W', name : "Crow" },
+	    c009: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
+	    c015: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
+	    c010: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
+	    c011: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
+	    c012: {owner: 'pB', type: 'N', ec: 1, hc: 0, ah: 0, sh: 3, ai: 0, si: 1, img: 'n1322' , elements: 'W', name : "Black Ant" },
+	    c013: {owner: 'pB', type: 'N', ec: 1, hc: 0, ah: 0, sh: 3, ai: 0, si: 1, img: 'n1086' , elements: 'W', name : "Crow" },
+	    c014: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 3, sh: 2, ai: 1, si: 1, img: 'n180' , elements: 'W', name : "Yashamaru" },
+	    c016: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
+	    c017: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
+	    c018: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
+	    c019: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
+	    c020: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
+	    c021: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
+	    c022: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 2, img: 'n1481' , elements: 'WE', name : "Kankuro" },
+	    c023: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 0, si: 3, img: 'n1484' , elements: 'W', name : "Temari" },
+	    c024: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 2, si: 3, img: 'n1420' , elements: 'W', name : "Sasori" },
+	    c025: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 1, ai: 3, si: 1, img: 'n130' , elements: 'W', name : "Баки" },
+	    c026: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },
 	    
 	    
-	    c101: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c102: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c103: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c104: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c105: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c106: {owner: 'pB', type: 'N', ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c107: {owner: 'pB', type: 'N', ah: 0, sh: 0, ai: 0, si: 0, img: 'n699' , elements: 'E', name : "Koharu Utatane (Childhood)"  },
-	    c108: {owner: 'pB', type: 'N', ah: 0, sh: 0, ai: 0, si: 0, img: 'n700' , elements: 'E', name : "Homura Mitomon (Childhood)"  },
-	    c109: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'n1272' , elements: 'E', name : "Shiho"  },
-	    c110: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
-	    c111: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
-	    c112: {owner: 'pB', type: 'N', ah: 1, sh: 1, ai: 1, si: 1, img: 'n348' , elements: 'E', name : "Tenten"  },
-	    c113: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
-	    c113: {owner: 'pB', type: 'N', ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
-	    c114: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1429' , elements: 'E', name : "Hinata Hyuga"},
-	    c115: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
-	    c116: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
-	    c117: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n823' , elements: 'E', name : "Asuma Sarutobi"},
-	    c118: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
-	    c119: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
-	    c120: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
-	    c121: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n589' , elements: 'F', name : "Sasuke Uchiha"},
-	    c122: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'pr046' , elements: 'F', name : "Yamato"},
-	    c123: {owner: 'pB', type: 'N', ah: 2, sh: 2, ai: 1, si: 2, img: 'n844' , elements: 'F', name : "Yugito Ni'i"},
+	    c101: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c102: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c103: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c104: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
+	    c105: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
+	    c106: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
+	    c107: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 0, ai: 0, si: 0, img: 'n699' , elements: 'E', name : "Koharu Utatane (Childhood)"  },
+	    c108: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 0, ai: 0, si: 0, img: 'n700' , elements: 'E', name : "Homura Mitomon (Childhood)"  },
+	    c109: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1272' , elements: 'E', name : "Shiho"  },
+	    c110: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
+	    c111: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
+	    c112: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 1, sh: 1, ai: 1, si: 1, img: 'n348' , elements: 'E', name : "Tenten"  },
+	    c113: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
+	    c113: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
+	    c114: {owner: 'pA', type: 'N', ec: 2, hc: 0, ah: 2, sh: 2, ai: 1, si: 2, img: 'n1429' , elements: 'E', name : "Hinata Hyuga"},
+	    c115: {owner: 'pA', type: 'N', ec: 3, hc: 0, ah: 4, sh: 3, ai: 1, si: 1, img: 'n1366' , elements: 'E', name : "Foo"},
+	    c116: {owner: 'pA', type: 'N', ec: 3, hc: 0, ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
+	    c117: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n823' , elements: 'E', name : "Asuma Sarutobi"},
+	    c118: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 4, sh: 3, ai: 1, si: 3, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
+	    c119: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 5, sh: 3, ai: 0, si: 0, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
+	    c120: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 0, ai: 0, si: 0, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
+	    c121: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n589' , elements: 'EF', name : "Sasuke Uchiha"},
+	    c122: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'EF', name : "Yamato"},
+	    c123: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'EF', name : "Yugito Ni'i"},
 	};
 	return C;
 }
@@ -326,22 +339,25 @@ function getStartMeta(S) {
 }
 
 function getStartAccordiance() {
-	var result = {
-		c101 : 'c107',
-		c102 : 'c106',
-		c103 : 'c105',
-		c104 : 'c104',
-		c105 : 'c103',
-		c106 : 'c102',
-		c107 : 'c101',
-		c001 : 'c001',
-		c002 : 'c002',
-		c003 : 'c003',
-		c004 : 'c004',
-		c005 : 'c005',
-		c006 : 'c006',
-		c007 : 'c007',
-	};
+	var pXs = ['c0','c1'];
+	
+	var result = {};
+
+	for (var pX in pXs) {
+		var keys = [];
+		var values = [];
+		for (var i = 1; i <= 23 ; i++) {
+			keys.push(i < 10 ? '0' + i : ''+i)
+			values.push(i < 10 ? '0' + i : ''+i)
+		}
+		values.sort(  function() { return Math.random()-0.5} )
+		
+		for (var i in keys) {
+			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
+		};
+	}
+	console.log(result)
+
 
 	return result;
 }
@@ -485,6 +501,7 @@ function changeInTeam(d) {
 }
 function putInPlay(d) {
 	var table = StartedGames[d.u.table];
+	console.log(d.u);
 	if (Can.putInPlay({
             Accordance : table.accordance,
             card: d.arg.card,

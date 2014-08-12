@@ -198,7 +198,7 @@ function draw1() {
  */
 function btnNextPhase() {    
     if (Can.pressNextBtn({pX:you,S:S,Stadies:Stadies,meta:Meta})) {
-        console.log("↰",{u:Client})
+       // console.log("↰",{u:Client})
         socket.emit('pressNextBtn',{u:Client})
     }
 }
@@ -614,6 +614,25 @@ function emptyClick() {
     }
     else if (S.phase == 'block') {
         if (G.selectedTeam) {
+            var arg = {
+                S:S,
+                attackTeam : getAttackTeamIdOnBlockTeamId(S,G.selectedTeam.teamId),
+                blockTeam : null,
+                pX : you,
+                from : 'block'
+            }
+            if ( Can.block(arg) ) {
+                socket.emit('block',{
+                    u:Client, 
+                    arg:{
+                        attackTeam : getAttackTeamIdOnBlockTeamId(S,G.selectedTeam.teamId),
+                        blockTeam : null,
+                        pX : you,
+                        from : 'block'
+                    }
+                })
+            }
+            G.selectedTeam.card.select( false );
             G.selectedTeam = null;
         }
     }
@@ -1327,7 +1346,7 @@ function getMaxWidthForTwoTeam( team1, team2 ) {
 function createteam( o, o2 ) {
     Log(1,'createteam');
     if (!o.length) {
-        console.log('error');
+        //console.log('error');
         return false;
     }
     //Log(0,'team',o2.team);
@@ -1435,14 +1454,14 @@ function updHands() {
 
 function updTable() {
     updCurrentPhase();
-    updAllCount()
     if (G.selectedTeam) {
         G.selectedTeam = null;
     }
     AnimationPush({func:function() {
+        updAllCount()
         updHands();
         updTeams();
-    }, timer:1000});
+    }, timer:1000, name:'updTable'});
 }
 
 function getAttackTeamIdOnBlockTeamId(S,team) {
@@ -1497,6 +1516,8 @@ function blockMove(_this) {
                         })
                     }
                 }
+                G.selectedTeam.card.select( false );
+                G.selectedTeam = null;
             }
             else if ( _this.params.zona == 'block' ) {
                 if ( G.selectedTeam.zona == 'village' ) {
@@ -1539,6 +1560,8 @@ function blockMove(_this) {
                         })
                     }
                 }
+                G.selectedTeam.card.select( false );
+                G.selectedTeam = null;
             }
         }
         if ( _this.params.owner == opp ) {
@@ -1582,6 +1605,8 @@ function blockMove(_this) {
                     })
                 }
             }
+            G.selectedTeam.card.select( false );
+            G.selectedTeam = null;
         }
     }
     else if ( G.selectedTeam.owner == opp ) {
@@ -1605,6 +1630,8 @@ function blockMove(_this) {
                         }
                     })
                 }
+                G.selectedTeam.card.select( false );
+                G.selectedTeam = null;
             }
             if ( _this.params.zona == 'block' ) {
 
@@ -1626,9 +1653,9 @@ function blockMove(_this) {
                         }
                     })
                 }
+                G.selectedTeam.card.select( false );
+                G.selectedTeam = null;
             }
-            G.selectedTeam.card.select( false );
-            G.selectedTeam = null;
         }
         if ( _this.params.owner == opp ) {
             G.selectedTeam.card.select( false );

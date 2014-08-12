@@ -35,12 +35,24 @@ function updAreaCount(player, area) {
 	var count =  S[Client[player]][area].length;
 	H[player][area].span.html(count)
 }
+function updRewardsCount(player) {
+	var count =  S[Client[player]].rewards;
+	H[player].rewards.span.html(count)
+}
+function updTurnCounter(player) {
+	console.log('msg')
+	var count =  S[Client[player]].turnCounter;
+	H[player].turnCounter.span.html(count)
+}
 function updAllCount() {
+	console.log('updAllCount')
 	var P, A;
 	for (var p in P = ['you','opp']) {
 		for (var a in A = ['deck', 'discard', 'chackra']) {
 			updAreaCount(P[p],A[a]);
 		}
+		updRewardsCount(P[p]);
+		updTurnCounter(P[p]);
 	}
 }
 
@@ -70,7 +82,7 @@ function get_arg(txt) {
 
 function applyUpd(d) {
 	if (d.upd) {
-		console.log("↳ upd ",d.upd)
+//		console.log("↳ upd ",d.upd)
 		if (d.upd.known) for (var i in d.upd.known) {
 			Known[i] = d.upd.known[i];
 		}
@@ -92,7 +104,7 @@ socket.on('action',function(d) {
 
 function applyAct(d) {
 	if (d.acts) {
-		console.log("↳ acts ",d.acts)
+//		console.log("↳ acts ",d.acts)
 		for (var i in d.acts) {
 			for (var i2 in d.acts[i].arg) {
 				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
