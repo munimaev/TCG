@@ -8,7 +8,7 @@
 
     <title>One Column Portfolio Template for Bootstrap 3</title>
 
-  <link rel="stylesheet" href="/public/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/public/vendor/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
 
 </head>
 <body>
@@ -16,7 +16,6 @@
   <div class="container">
   <div class="row">
     <p>&nbsp;</p>
-    <pre>{{youGame}}</pre>
     <table class="table" id="tables">
       <tr>
         <th width="30%">#</th>
@@ -29,19 +28,10 @@
   </div>
 </div>
   
-  <!-- <div ng-view></div> -->
   <script src="/public/js/jquery.js"></script>
-  <script src="/public/js/bootstrap.min.js"></script>
+  <script src="/public/vendor/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/public/js/TSGclient.js"></script>
-  <!-- <script src="/public/vendor/bower_components/angular/angular.js"></script>
-  <script src="/public/vendor/bower_components/angular-route/angular-route.js"></script>
-  <script src="/public/vendor/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
-  <script src="/public/js/app.js"></script>
-  <script src="/public/js/services.js"></script>
-  <script src="/public/js/controllers.js"></script>
-  <script src="/public/js/filters.js"></script>
-  <script src="/public/js/directives.js"></script> -->
+  <!-- <script src="/public/js/TSGclient.js"></script> -->
     <script>
       var socket = io();
       var Tables = {
