@@ -1,9 +1,6 @@
 var io;
 var gameSocket;
 var Tables = {
-    "123" : { pA: null, pB:null },
-    "456" : { pA: null, pB:null },
-    "789" : { pA: null, pB:null }
 };
 var preGamesLobbi = {
 
@@ -35,6 +32,7 @@ exports.initLobbi = function(sio, socket){
     gameSocket = socket;
     gameSocket.emit('connected', { message: "You are connected!" });
     gameSocket.on('lobby:tables', getTables);
+    gameSocket.on('lobby:create', lobby_create);
     gameSocket.on('player:sit', playerSit);
     gameSocket.on('player:unsit', playerUnsit);
     gameSocket.on('imJoined',imJoined);
@@ -53,8 +51,16 @@ exports.initLobbi = function(sio, socket){
     gameSocket.on('server:connected', updServerInfoPage);
 }
 
+function lobby_create(req) {
 
-function getTables() {
+	console.log(this.client)
+
+	for (var i in Tables) {
+		if (Tables[i].pA == '') {}
+	}
+}
+
+function getTables(socket_client) {
     io.emit('setTables',Tables);
 }
 
