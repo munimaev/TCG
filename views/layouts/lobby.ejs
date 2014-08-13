@@ -1,0 +1,178 @@
+<h1>Лобби</h1>
+<div class="row">
+	<table class="table" id="tables">
+	  <!-- <tr>
+	    <th width="30%">#</th>
+	    <th width="40%">pA</th>
+	    <th width="40%">pB</th>
+	  </tr> -->
+	</table>
+</div>
+  <script src="/socket.io/socket.io.js"></script>
+    <script>
+    	var login = '<%=session.login%>';
+      var socket = io();
+      var Tables = {
+
+      }
+      var user = {name:"P_5555", table:null};
+      user.name = "P_" + Math.floor(Math.random() * 1000000)
+      function startSession() {
+        //socket.emit('hostCreateNewGame', "123");
+      }
+
+      socket.on('connected', function(d){
+        console.log('c')
+        socket.emit('lobby:tables',{d:'d'});
+      });
+
+      socket.on('setTables', function(d){
+        var uTable = null;
+        for (var i in d ) {
+          if (d[i].pA == user.name || d[i].pB == user.name  ) {
+            uTable = i;
+          }
+          if (Tables[i]) {
+            for (var i2 in Tables[i]) {
+              Tables[i][i2] = d[i][i2]
+            }
+          } else {
+            Tables[i] = d[i]
+          }
+        }
+        user.table = uTable;
+        updTables();
+      });
+
+      function updTables() {
+      	var youOnTable = false;
+        for (var i in Tables) {
+        	if (Tables[i].pA == login || Tables[i].pA == login) {
+        		youOnTable = true;
+        	}
+          if ($('#table'+i).size()) {
+            $('#table'+i).html('')
+          }
+          else {
+            $('#tables')
+            .append(
+              $('<tr />', {
+                "id": "table" + i
+              })
+            )
+          }
+
+          $('#table'+i)
+            .append(
+              $('<td />', {
+                "text": i
+              })
+            )
+            .append(
+              $('<td />')
+              .append(
+                $('<button />', getBtnProp(i,'pA'))
+              )
+            )
+            .append(
+              $('<td />')
+              .append(
+                $('<button />', getBtnProp(i,'pB'))
+              )
+            )
+        }
+        if (!youOnTable) {
+        		console.log('msg')
+
+          if ($('#tableCreateNew').size()) {
+            $('#tableCreateNew').html('')
+          }
+          else {
+            $('#tables')
+            .append(
+              $('<tr />', {
+                "id": "tableCreateNew" 
+              })
+            )
+          }
+          $('#tableCreateNew')
+            .append(
+              $('<td />', {
+                "text": ''
+              })
+            )
+            .append(
+              $('<td />')
+              .append(
+                $('<button />', {
+                	'text':'Создать',
+				          "type" : "button",
+				          "class": "btn btn-primary btn-sm",
+				          "click": (function(){
+				                             //var data = {'id':id,'pX':pX,'user':user.name};
+				                             //var command = Tables[id][pX] == user.name ? "unsit" : "sit";
+				                             return function() {
+				                               socket.emit('lobby:create', {});
+				                             };})()
+				        })
+              )
+            )
+            .append(
+              $('<td />', {
+                "text": ''
+              })
+            )
+
+        }
+      }
+
+      function getBtnProp(id,pX) {
+        var result = {
+          "text": sitBtnText(id,pX),
+          "type" : "button",
+          "class": "btn btn-primary btn-sm",
+          "style": "font-weight:bold;",
+          "click": (function(){
+                             var data = {'id':id,'pX':pX,'user':user.name};
+                             var command = Tables[id][pX] == user.name ? "unsit" : "sit";
+                             return function() {
+                               socket.emit('player:'+command, data);
+                             };})()
+        };
+        if (sitBtnDis(id,pX)) {
+          result.disabled = "disabled"
+        }
+        return result;
+      }
+
+      function sitBtnText(id,pX) {
+        reuslt = "+";
+        if (Tables[id][pX]) reuslt = Tables[id][pX];
+        return reuslt;
+      }
+
+      function sitBtnDis(id,pX) {
+        if (user.table!==null 
+          && user.name!=Tables[id][pX]  ) {
+          return true;
+        }
+        return false;
+      }
+
+      function getTr(id) {
+      } 
+
+
+      socket.on('sitInLobby', function(d){
+        user.lobbi = d.key;
+        console.log(user)
+      });
+      socket.on('unsitInLobby', function(d){
+        user.lobbi = null;
+        console.log(user);
+      });
+      socket.on('startGame', function(d){
+        window.location.assign('/game')
+      });
+
+    </script>
