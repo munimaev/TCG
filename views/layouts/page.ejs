@@ -17,13 +17,16 @@
     <![endif]-->
   </head>
   <body>
-    <%-partial('../partials/topNavigation')%>
-    <h1>Hello, world!</h1>
-    <h1><%-body%></h1>
-    <%=blocks.title%>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="/public/vendor/bower_components/jquery/dist/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/public/vendor/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <div class="container">
+      <small><a href="/"><span class="glyphicon glyphicon-home"></span></a></small>
+      <%-partial('../partials/topNavigation')%>
+      <h1>Hello, world!</h1>
+      <h1><%-body%></h1>
+      <%=blocks.title%>
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      <script src="/public/vendor/bower_components/jquery/dist/jquery.min.js"></script>
+      <!-- Include all compiled plugins (below), or include individual files as needed -->
+      <script src="/public/vendor/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    </div>
   </body>
 </html>
