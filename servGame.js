@@ -1,5 +1,6 @@
 var io;
 var gameSocket;
+var session_store = {'s':'e'};
 var Tables = {
 };
 var preGamesLobbi = {
@@ -27,9 +28,10 @@ function arraySearch(array, value) {
  * @param sio The Socket.IO library
  * @param socket The socket object for the connected client.
  */
-exports.initLobbi = function(sio, socket){
+exports.initLobbi = function(sio, socket, session_store_){
     io = sio;
     gameSocket = socket;
+    session_store = session_store_;
     gameSocket.emit('connected', { message: "You are connected!" });
     gameSocket.on('lobby:tables', getTables);
     gameSocket.on('lobby:create', lobby_create);
@@ -52,15 +54,29 @@ exports.initLobbi = function(sio, socket){
 }
 
 function lobby_create(req) {
-
-	console.log(this.client)
-
+	var ses = JSON.parse(session_store.sessions[req.ses]);
 	for (var i in Tables) {
-		if (Tables[i].pA == '') {}
+		if (Tables[i].pA == ses.login || Tables[i].pB == ses.login ) {
+			return;
+		}
 	}
+	Tables[getNewTableId()] = {'pA': ses.login , 'sesA': req.ses};
+	getTables();
 }
 
-function getTables(socket_client) {
+function getNewTableId() {
+	var result = 1;
+	while(Tables[result]) {
+		result++;
+	}
+	return result;
+}
+
+function getTables() {
+	var data = {};
+	for (var i in Tables) {
+		data[i] = {pA:Tables[i].pA, pB:Tables[i].pB}
+	}
     io.emit('setTables',Tables);
 }
 
