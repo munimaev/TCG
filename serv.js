@@ -18,10 +18,12 @@ app.set('view engine', 'ejs');
 //http://stackoverflow.com/questions/4641053/socket-io-and-session
 var connect = require('express/node_modules/connect');
 var session_store ={a:'b'};
-
 //http://habrahabr.ru/post/145970/
+MemoryStore = require('express/node_modules/connect/node_modules/express-session/session/memory');
+var session_store = new MemoryStore();
  app.use(express.cookieParser());
- app.use(express.session({ secret: 'your secret here'}));
+ app.use(express.session({ secret: 'your secret here', store:session_store}));
+
 
 app.get('/', function(req, res){
   res.render('index.ejs', { myLayout: 'main', session : req.session })
@@ -35,13 +37,13 @@ app.get('/serv', function(req, res){
 
 var logicLogin = require('./logic/login');
 app.get('/login', function(req, res){
-	console.log(req.body);
 	if (req.query.login && req.query.password) {
 		logicLogin.processPost(req, res) // производим вход
 	} else {
   		res.render('index.ejs', { myLayout: 'login' }) 
 	}
 });
+
 app.get('/logout', function(req, res){
   delete req.session.login ;
   res.writeHead(303, {'Location': '/'});
@@ -50,7 +52,9 @@ app.get('/logout', function(req, res){
 
 app.get('/lobby', function(req, res){
 	if (req.session.login) {
+		req.session.id == req.cookies['connect.sid'];
 		res.render('index.ejs', { myLayout: 'lobby', session : req.session })
+		//console.log('req',req)
 	}
 	else {
 		res.writeHead(303, {'Location': '/login'});
@@ -60,9 +64,33 @@ app.get('/lobby', function(req, res){
 
 app.use('/public', express.static(__dirname + '/public'));
 
-
+// var usersData = {};
+// io.use(function(socket, next) {
+//     //handshake ok
+//     usersData[socket.id] = ourUserData;
+//     next();
+// });
 io.on('connection', function(socket){
-  SG.initLobbi(io, socket);
+  //console.log('\nsession_store',session_store)
+  var cookie_string = socket.request.headers.cookie;
+  var parsed_cookie = {};
+  var obj = cookie_string.split('; ')
+  for (var i in obj) {
+  	var pair = obj[i].split('=');
+  	parsed_cookie[pair[0]] = pair[1].trim()
+  }
+  var connect_sid = parsed_cookie['connect.sid'].split('.')[0].substr(4);
+  //console.log('\nconnect_sid', connect_sid)
+  if (connect_sid) {
+    // session_store.get(connect_sid, function (error, session) {
+    // 	session.connect_sid = connect_sid;
+    // });
+	SG.initLobbi(io, socket, session_store);
+  }
+  else {
+	  res.writeHead(303, {'Location': '/'});
+	  res.end();
+  }
 });
 
 http.listen(3000, function(){
