@@ -35,6 +35,8 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.emit('connected', { message: "You are connected!" });
     gameSocket.on('lobby:tables', getTables);
     gameSocket.on('lobby:create', lobby_create);
+    gameSocket.on('lobby:join', lobby_join);
+    gameSocket.on('lobby:delete', lobby_delete);
     gameSocket.on('player:sit', playerSit);
     gameSocket.on('player:unsit', playerUnsit);
     gameSocket.on('imJoined',imJoined);
@@ -60,13 +62,57 @@ function lobby_create(req) {
 			return;
 		}
 	}
-	Tables[getNewTableId()] = {'pA': ses.login , 'sesA': req.ses};
+	Tables[getNewObjectId(Tables)] = {'pA': ses.login , 'sesA': req.ses, 'sokA': this.id};
 	getTables();
 }
+function lobby_join(req) {
+	var ses = JSON.parse(session_store.sessions[req.ses]);
+	for (var i in Tables) {
+		if (Tables[i].pA == ses.login ) {
+			req.table = i;
+			lobby_delete(req)
+		}
+	}
+	if (Tables[req.toTable]) {
+		if (Tables[req.toTable].sokA) {
+			var id = getNewObjectId(StartedGames)
+			StartedGames[id] = {};
+			if (Math.random() > 0.5) {
+				StartedGames[id].pA   = Tables[req.toTable].pA
+				StartedGames[id].sesA = Tables[req.toTable].sesA
+				StartedGames[id].pB   = ses.login
+				StartedGames[id].sesB = req.ses
+			} else {
+				StartedGames[id].pB   = Tables[req.toTable].pA
+				StartedGames[id].sesB = Tables[req.toTable].sesA
+				StartedGames[id].pA   = ses.login
+				StartedGames[id].sesA = req.ses
+			}
+			this.emit('startGame',{"key":'alert'})
+			io.sockets.in(Tables[req.toTable].sokA).emit('startGame',{"key":'alert'});
+		}
+		req.table = req.toTable;
+		lobby_delete(req, true);
+	}
+	console.log(StartedGames)
+}
+function lobby_delete(req, forced) {
+	var ses = JSON.parse(session_store.sessions[req.ses]);
 
-function getNewTableId() {
+	if (forced
+		|| (Tables[req.table] 
+			&& (Tables[req.table].pA == ses.login 
+				|| Tables[req.table].pB == ses.login) )
+
+	){	
+		delete Tables[req.table];
+		getTables();
+	}
+}
+
+function getNewObjectId(obj) {
 	var result = 1;
-	while(Tables[result]) {
+	while(obj[result]) {
 		result++;
 	}
 	return result;
@@ -77,7 +123,7 @@ function getTables() {
 	for (var i in Tables) {
 		data[i] = {pA:Tables[i].pA, pB:Tables[i].pB}
 	}
-    io.emit('setTables',Tables);
+    io.emit('setTables',data);
 }
 
 function playerSit(d) {
