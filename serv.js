@@ -29,7 +29,15 @@ app.get('/', function(req, res){
   res.render('index.ejs', { myLayout: 'main', session : req.session })
 });
 app.get('/game', function(req, res){
-  res.sendfile(__dirname + '/game.html');
+	if (req.session.login) {
+		req.session.id == req.cookies['connect.sid'];
+		res.render('game.ejs', { myLayout: 'lobby', session : req.session })
+		//res.sendfile(__dirname + '/game.html');
+	}
+	else {
+		res.writeHead(303, {'Location': '/login'});
+		res.end();
+	}
 });
 app.get('/serv', function(req, res){
   res.sendfile(__dirname + '/serv.html');
