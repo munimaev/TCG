@@ -1,0 +1,64 @@
+<html><head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script>var ses = <%= session.id %></script>
+        <script src="public/js/jquery.js"></script>
+        <script src="public/js/G/ready.js"></script>
+        <script src="public/js/G/Stadies.js"></script>
+        <script src="public/js/G/Animations.js"></script>
+        <script src="public/js/G/Actions.js"></script>
+        <script src="public/js/G/Can.js"></script>
+        <script src="public/js/G/jPutty.js"></script><!-- кеширование ссылок -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="public/js/G/socket.js"></script>
+        <script src="public/js/G/loging.js"></script>
+        <!--<script src="public/js/G/snapshot.js"></script>-->
+        <!--<script src="public/js/G/constructors.js"></script>-->
+        <script src="public/js/G/card.js"></script>
+        <!--<script src="public/js/G/table.js"></script>-->
+        <script src="public/js/G/project.js"></script>
+        <!--<script src="public/js/G/server.js"></script>-->
+        <link href="public/css/project.css" rel="stylesheet" type="text/css">
+        <link href="public/css/projectTable.css" rel="stylesheet" type="text/css">
+    </head>
+    <body><div class="main" id="prewiev">
+    </div>
+    <div class="main" id="animate">
+    </div>
+    <div class="main" id="action">
+    </div>
+    <div class="main" id="noir">
+    </div>
+    <div class="main" id="main">
+        <div class="oppBar" id="oppBar">
+            <div class="avatar" ></div>
+            <div class="login">Opp Login 123</div>
+            <div class="discard" onclick="btnArea('discard','opp')"><span>0</span></div>
+            <div class="deck" onclick="btnArea('deck','opp')"><span>0</span></div>
+            <div class="oppHand" id="oppHand"></div>
+            <div class="chackra" onclick="btnArea('chackra','opp')"><span>0</span></div>
+            <div class="rewards"><img class="pic" src="public/pics/reward.png" /><span>0</span></div>
+            <div class="turnCounter"><img class="pic" src="public/pics/T0.png" /><span>0</span></div>
+        </div>
+        <div class="table" id="table" onclick="emptyClick()">
+        </div>
+        <div class="youBar" id="youBar">
+            <div class="avatar"></div>
+            <div class="login">You_Login 678</div>
+            <div class="discard" onclick="btnArea('discard','you')"><span>0</span></div>
+            <div class="deck" onclick="btnArea('deck','you')"><span>0</span></div>
+            <div class="youHand" id="youHand"></div>
+            <div class="chackra" onclick="btnArea('chackra','you')"><span>0</span></div>
+            <div class="rewards"><img class="pic" src="public/pics/reward.png" /><span>0</span></div>
+            <div class="turnCounter"><img class="pic" src="public/pics/T0.png" /><span>0</span></div>
+            <div id="phase">Старт</div>
+            <div id="next" onclick="btnNextPhase()"><span>Далее</span></div>
+        </div>
+    </div>
+    <script>
+
+//window.setTimeout(function(){startTable();}, 300);
+    </script>
+
+
+</body></html>
