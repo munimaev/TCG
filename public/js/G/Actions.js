@@ -15,6 +15,7 @@ function arraySearch(array, value) {
 }
 var Actions = {
 	'Draw Card': function(o) {
+		for (var i in o) console.log(i)
 		var S = o.S;
 		var pX = o.pX;
 		var draedCards = [];
@@ -24,18 +25,20 @@ var Actions = {
 			return id;
 		};
 	},
-	'Draw 6 cards' : function(obj) {
+	'Draw X cards' : function(obj) {
+		obj.count = obj.count || 6;
 		var o = {
 			pX : obj.pX,
 			cards:[]
 		};
-		for (var i = 1; i <= 6; i++) {
+		for (var i = 1; i <= obj.count; i++) {
 			o.cards.push(Actions['Draw Card'](obj));
 		}
+		obj.S[obj.pX].isNewGame = false;
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.playerDrawCards(o);
-			}, time:1500, name: 'Draw 6 cards'});
+			}, time:1500, name: 'Draw X cards'});
 		}
 	},
 	'toNextPhase' : function(o) {
@@ -62,12 +65,6 @@ var Actions = {
     	}
     	if (!module) {
     		updTable(); 
-	    	if (o.Stadies[o.S.phase].autoNextPhase && !o.S.stop) {
-				AnimationPush({func:function() {
-					o.pX = you;
-					AN.autoNextPhase(o);
-				}, time:100, name: 'autoNextPhase'});
-	    	}
 	    }
 
 	},
@@ -85,7 +82,6 @@ var Actions = {
 
 				if (!module) {
 					C[o.cardID].params.zona = o.to;
-					//console.log('--> ' + o.cardID)
 					AnimationPush({func:function() {
 						AN.moveCardToZone(o);
 					}, time:1000, name: 'moveCardToZone '});
@@ -262,8 +258,14 @@ var Actions = {
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.uturn(o);
-			}, time:1000, name: 'startAtStart '});
+			}, time:1210, name: 'startAtStart '});
 		}
+	},
+	'missionAtStart' : function(o) {
+		o.count = 1;
+		o.pX = o.S.activePlayer;
+		socket.emit('drawCardAtStartTurn', {u:Client});
+		//Actions['Draw X cards'](o)
 	},
 	'comebackAtStart' : function(o) {
 	},
