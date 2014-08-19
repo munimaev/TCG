@@ -1440,7 +1440,7 @@ function updCurrentPhase() {
         H.next.addClass('selectedZone');
     }
     if (S) {
-        H.phase.html( Stadies[S.phase].rusName );
+        AN.changePahseName( Stadies[S.phase].rusName );
     }
 }
 
@@ -1453,15 +1453,15 @@ function updHands() {
 }
 
 function updTable() {
-    updCurrentPhase();
     if (G.selectedTeam) {
         G.selectedTeam = null;
     }
     AnimationPush({func:function() {
+        updCurrentPhase();
         updAllCount()
         updHands();
         updTeams();
-    }, timer:1000, name:'updTable'});
+    }, time:1000, name:'updTable'});
 }
 
 function getAttackTeamIdOnBlockTeamId(S,team) {
