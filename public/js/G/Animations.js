@@ -3,7 +3,13 @@ dateObj = new Date()
 var Animations = [];
 var AnimationIsRun = false;
 function AnimationPush(o) {
+	// console.log('push ' + o.name + ' - ' + o.time)
 	Animations.push(o);
+	// console.log('-----------');
+	// for (var i in Animations) {
+	// 	console.log(i, Animations[i].name);
+	// }
+	// console.log('-----------');
 	AnimationNext();
 }
 
@@ -11,7 +17,6 @@ function AnimationNext() {
 	if (AnimationIsRun || !Animations.length) return;
 	var animation = Animations.splice(0,1);
 	AnimationIsRun = true;
-	console.log(animation[0].name)
 	animation[0].func();
 	setTimeout(function(){
 		AnimationIsRun = false;
@@ -274,7 +279,7 @@ var AN = {
 	        	}
 			    AnimationPush({func:function() {
 			        updTeams();
-			    }, timer:1200, name: 'updTeams'});
+			    }, time:1200, name: 'updTeams'});
 	        }
 	    }
 	},
@@ -296,7 +301,6 @@ var AN = {
 		AN.bigBanner(o);
 	},
 	bigBanner : function(o) {
-
             var sprite = $('<div />', {})
                 .css('width', I.scroll.W)
                 .css('height', I.scroll.H)
@@ -324,9 +328,16 @@ var AN = {
                 });
 	},
 	autoNextPhase : function(o) {
-		console.log('Can.pressNextBtn(o) = ' +  Can.pressNextBtn(o))
 		if (Can.pressNextBtn(o)){
 			socket.emit('pressNextBtn',{u:Client})
+		}
+	},
+	changePahseName : function(newName) {
+		if (H.phase.html() !== newName) {
+			H.phase.animate({opacity:0},250, function(){
+				H.phase.html(newName);
+				H.phase.animate({opacity:1},250);	
+			})
 		}
 	}
 }
