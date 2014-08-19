@@ -8,6 +8,7 @@ var preGamesLobbi = {
 }
 var StartedGames = {
 };
+exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
@@ -53,6 +54,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('changeInTeam', changeInTeam);
     gameSocket.on('moveTeamToAttack', moveTeamToAttack);
     gameSocket.on('block', block);
+    gameSocket.on('drawCardAtStartTurn', drawCardAtStartTurn);
     //-----------------------------------------
     // gameSocket.on('server:connected', updServerInfoPage);
 }
@@ -64,6 +66,31 @@ exports.disconnect = function(sok) {
 			getTables();
 			break;
 		}
+	}
+	for (var i in StartedGames) {
+		var end = false;
+		if ('socketA' in StartedGames[i] && StartedGames[i].socketA == sok) {
+			console.log('ANULL')
+			StartedGames[i].socketA = null;
+			end = true;
+		}
+		if ('socketB' in StartedGames[i] && StartedGames[i].socketB == sok) {
+			console.log('BNULL')
+			StartedGames[i].socketB = null;
+			end = true;
+		}
+		if ('socketA' in StartedGames[i] 
+			&& !StartedGames[i].socketA 
+			&& 'socketB' in StartedGames[i]
+			&&  !StartedGames[i].socketB) {
+			console.log('DELL')
+			console.log('socketA' in StartedGames[i] 
+			, !StartedGames[i].socketA 
+			, 'socketB' in StartedGames[i]
+			, !StartedGames[i].socketB)
+			delete StartedGames[i];
+		}
+		if (end) break;
 	}
 }
 
@@ -274,10 +301,12 @@ function getStartSnapshot(table) {
 	    activePlayer: 'pA',
 	    phase: "start",
 	    stop: false,
+	    turnNumber: 0,
 	    counters : {
 	        playedNinjaActivePlayer : 0
 	    },
 	    pA : {
+	    	isDrawCardAtStartTurn : false,
 	    	isNewGame : true,
 	    	rewards : 0,
 	    	turnCounter : 0,
@@ -343,7 +372,7 @@ function getStartSnapshot(table) {
 	    }
 	};
 	var pu;
-	for (var i = 1; i <= 30 ; i++) {
+	for (var i = 1; i <= 23 ; i++) {
 		pu = i < 10 ? "0"+i : i;
 		result.pA.deck.push('c1' + pu )
 		result.pB.deck.push('c0' + pu )
@@ -739,6 +768,41 @@ function charge(d) {
 			acts : [{'arg':arg, 'act' : 'moveCardToZone'}]
 		}
 		io.sockets.in(table.room).emit('updact', data);
+	} else {
+		console.log('bad')
+	}
+	// TODO возможно надо реагировать
+}
+
+function drawCardAtStartTurn(d) {
+	var table = StartedGames[d.u.table];
+	if (Can.drawCardAtStartTurn({
+            Accordance : table.accordance,
+            Known: table.known,
+            pX:d.u.you,
+            S:table.snapshot,
+        })) {
+		var arg = {
+			pX:d.u.you,
+			S: table.snapshot,
+			count: 1,
+		}
+		var drawenCardId = table.snapshot[d.u.you].deck[0];
+		Actions['Draw X cards'](arg);
+		arg.S = 'get_S';
+	
+		var data = {
+			upd : {	accordance:{}, known:{}	},
+			acts : [{'arg':arg, 'act' : 'Draw X cards'}]
+		}
+		io.sockets.in(table['room'+d.u.opp]).emit('updact', data);
+		data.upd.accordance[drawenCardId] 
+			= table[d.u.you].accordance[drawenCardId] 
+			= table.accordance[drawenCardId];
+		data.upd.known[table.accordance[drawenCardId]] 
+			= table[d.u.you].known[table.accordance[drawenCardId]] 
+			= table.known[table.accordance[drawenCardId]];
+		io.sockets.in(table['room'+d.u.you]).emit('updact', data);
 	} else {
 		console.log('bad')
 	}
