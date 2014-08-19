@@ -99,6 +99,11 @@ io.on('connection', function(socket){
 	  res.writeHead(303, {'Location': '/'});
 	  res.end();
   }
+
+  socket.on('disconnect', function (req) {
+  	SG.disconnect(this.id)
+  });
+
 });
 
 http.listen(3000, function(){
