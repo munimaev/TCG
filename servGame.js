@@ -8,6 +8,7 @@ var preGamesLobbi = {
 }
 var StartedGames = {
 };
+var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
@@ -33,6 +34,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket = socket;
     session_store = session_store_;
     gameSocket.emit('connected', { message: "You are connected!" });
+    //-----------------------------------------
     gameSocket.on('lobby:tables', getTables);
     gameSocket.on('lobby:create', lobby_create);
     gameSocket.on('lobby:join', lobby_join);
@@ -52,7 +54,17 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('moveTeamToAttack', moveTeamToAttack);
     gameSocket.on('block', block);
     //-----------------------------------------
-    gameSocket.on('server:connected', updServerInfoPage);
+    // gameSocket.on('server:connected', updServerInfoPage);
+}
+
+exports.disconnect = function(sok) {
+	for (var i in Tables) {
+		if (Tables[i].sokA == sok ) {
+			delete Tables[i];
+			getTables();
+			break;
+		}
+	}
 }
 
 function lobby_create(req) {
@@ -80,13 +92,17 @@ function lobby_join(req) {
 			if (Math.random() > 0.5) {
 				StartedGames[id].pA   = Tables[req.toTable].pA
 				StartedGames[id].sesA = Tables[req.toTable].sesA
-				StartedGames[id].pB   = ses.login
-				StartedGames[id].sesB = req.ses
+				SesssionTable[Tables[req.toTable].sesA] = id;
+				StartedGames[id].pB   = ses.login;
+				StartedGames[id].sesB = req.ses;
+				SesssionTable[req.ses] = id;
 			} else {
 				StartedGames[id].pB   = Tables[req.toTable].pA
 				StartedGames[id].sesB = Tables[req.toTable].sesA
-				StartedGames[id].pA   = ses.login
-				StartedGames[id].sesA = req.ses
+				SesssionTable[Tables[req.toTable].sesA] = id;
+				StartedGames[id].pA   = ses.login;
+				StartedGames[id].sesA = req.ses;
+				SesssionTable[req.ses] = id;
 			}
 			this.emit('startGame',{"key":'alert'})
 			io.sockets.in(Tables[req.toTable].sokA).emit('startGame',{"key":'alert'});
@@ -177,49 +193,49 @@ function updServerInfoPage (d) {
  */
 
 function S_init(d) {
-	if (!(d.b in StartedGames)) StartedGames[d.b] = {};
-	var snapshot = getStartSnapshot();
-	var needen = false;
-	if (StartedGames[d.b].socketA && StartedGames[d.b].socketB ) {
-		StartedGames[d.b] = {};
-		//console.log(StartedGames[d.b])
-	}
-
+	//console.log(StartedGames);
+	var tableId = SesssionTable[d.ses];
+	var table = StartedGames[tableId];
+	// console.log(SesssionTable)
+	// console.log(d)
+	// console.log(tableId)
+	// console.log(table)
+	var snapshot = getStartSnapshot(table);
 	var data = { 
     	snapshot : snapshot,
     	mySocketId: this.id,
-    	table: d.b
+    	table: tableId
     };
-    if (d.a == "1" ) {
+    if (table.sesB == d.ses) {
     	data.you = "pB";
     	data.opp = "pA";
-    	StartedGames[d.b].socketB = this.id;
-    	StartedGames[d.b].room = getRoomNumber(d);
-    	StartedGames[d.b].roompB = StartedGames[d.b].room +"_"+this.id;
-    	this.join(StartedGames[d.b].room);
-    	this.join(StartedGames[d.b].roompB);
-    	StartedGames[d.b].snapshot = snapshot;
-    	io.sockets.in(StartedGames[d.b].roompB).emit('C_init', data); //TODO отослать только проверенному пользователю
+    	StartedGames[tableId].socketB = this.id;
+    	StartedGames[tableId].room = getRoomNumber(tableId);
+    	StartedGames[tableId].roompB = StartedGames[tableId].room +"_"+this.id;
+    	this.join(StartedGames[tableId].room);
+    	this.join(StartedGames[tableId].roompB);
+    	StartedGames[tableId].snapshot = snapshot;
+    	io.sockets.in(StartedGames[tableId].roompB).emit('C_init', data); //TODO отослать только проверенному пользователю
     }
-    if (d.a == "2" ) {
+    if (table.sesA == d.ses) {
     	data.you = "pA";
     	data.opp = "pB";
-    	StartedGames[d.b].socketA = this.id;
-    	StartedGames[d.b].room = getRoomNumber(d);
-    	StartedGames[d.b].roompA = StartedGames[d.b].room +"_"+this.id;
-    	this.join(StartedGames[d.b].room);
-    	this.join(StartedGames[d.b].roompA);
-    	StartedGames[d.b].snapshot = snapshot;
-    	io.sockets.in(StartedGames[d.b].roompA).emit('C_init', data); //TODO отослать только проверенному пользователю
+    	StartedGames[tableId].socketA = this.id;
+    	StartedGames[tableId].room = getRoomNumber(tableId);
+    	StartedGames[tableId].roompA = StartedGames[tableId].room +"_"+this.id;
+    	this.join(StartedGames[tableId].room);
+    	this.join(StartedGames[tableId].roompA);
+    	StartedGames[tableId].snapshot = snapshot;
+    	io.sockets.in(StartedGames[tableId].roompA).emit('C_init', data); //TODO отослать только проверенному пользователю
     } else {
     	// TODO должно выкинуть в предыдущее окно
     }
-    io.sockets.in(StartedGames[d.b].roomS).emit('updServerInfoPage', StartedGames[d.b]);
+   // io.sockets.in(StartedGames[d.b].roomS).emit('updServerInfoPage', StartedGames[d.b]);
 }
 
 function getRoomNumber(d) {
-	if (StartedGames[d.b].room) {
-		return StartedGames[d.b].room;
+	if (StartedGames[d].room) {
+		return StartedGames[d].room;
 	} else {
 		return (( Math.random() * 100000 ) | 0) + "";
 	}
@@ -229,21 +245,20 @@ function imJoined(d) {
 }
 function bothIsJoin(d) {
 	var S = StartedGames[d.table]
-	S.isNewGame = true; // TODO определить новая или не новая
 	if (S.socketA && S.socketB ) {
-		S.accordance = getStartAccordiance();
+		S.accordance = getStartAccordiance(S);
 		S.known = getStartCards();
 		S.pA = {accordance:{},known:{}}; S.pB = {accordance:{},known:{}};
 		getStartAccordanceKnown(S,'pA');
 		getStartAccordanceKnown(S,'pB');
 		S.meta = getStartMeta(S);
 		io.sockets.in(S.roompA).emit('bothIsJoin', {
-			isNewGame: S.isNewGame, 
+			isNewGame: S.snapshot.pA.isNewGame, 
 			accordance:S.pA.accordance,
 			known:S.pA.known
 		});
 		io.sockets.in(S.roompB).emit('bothIsJoin', {
-			isNewGame: S.isNewGame, 
+			isNewGame: S.snapshot.pB.isNewGame, 
 			accordance:S.pB.accordance,
 			known:S.pB.known
 		});
@@ -251,7 +266,10 @@ function bothIsJoin(d) {
 	}
 }
 
-function getStartSnapshot() {
+function getStartSnapshot(table) {
+	if (table.snapshot) {
+		return table.snapshot;
+	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
 	    phase: "start",
@@ -260,6 +278,7 @@ function getStartSnapshot() {
 	        playedNinjaActivePlayer : 0
 	    },
 	    pA : {
+	    	isNewGame : true,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -288,6 +307,7 @@ function getStartSnapshot() {
 
 	    },
 	    pB : {
+	    	isNewGame : true,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -323,7 +343,7 @@ function getStartSnapshot() {
 	    }
 	};
 	var pu;
-	for (var i = 1; i <= 23 ; i++) {
+	for (var i = 1; i <= 30 ; i++) {
 		pu = i < 10 ? "0"+i : i;
 		result.pA.deck.push('c1' + pu )
 		result.pB.deck.push('c0' + pu )
@@ -391,6 +411,7 @@ function getStartCards() {
 }
 
 function getStartMeta(S) {
+	if (S.meta) return S.meta;
 	var result = {
 		toNextPhase : {pA:false,pB:false}, 
 		teamCounter:0,
@@ -406,7 +427,8 @@ function getStartMeta(S) {
 	return result;
 }
 
-function getStartAccordiance() {
+function getStartAccordiance(S) {
+	if (S.accordance) return S.accordance;
 	var pXs = ['c0','c1'];
 	
 	var result = {};
@@ -424,7 +446,7 @@ function getStartAccordiance() {
 			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
 		};
 	}
-	console.log(result)
+	//console.log(result)
 
 
 	return result;
@@ -476,12 +498,12 @@ function S_startDrawHand(d) {
 			= table[d.u.you].known[table.accordance[deck[i]]] 
 			= table.known[table.accordance[deck[i]]];
 	}
-	Actions['Draw 6 cards']({S:table.snapshot, pX:d.u.you});
+	Actions['Draw X cards']({S:table.snapshot, pX:d.u.you});
 	io.sockets.in(table['room' + d.u.you]).emit('update', data);
 	io.sockets.in(table.room).emit('action', {
-		acts: [{'arg':{S:'get_S',pX: d.u.you}, 'act' : 'Draw 6 cards'}]
+		acts: [{'arg':{S:'get_S',pX: d.u.you}, 'act' : 'Draw X cards'}]
 	});
-	io.sockets.in(table.roomS).emit('updServerInfoPage',table);
+	//io.sockets.in(table.roomS).emit('updServerInfoPage',table);
 }
 
 function pressNextBtn(d) {
@@ -569,7 +591,7 @@ function changeInTeam(d) {
 }
 function putInPlay(d) {
 	var table = StartedGames[d.u.table];
-	console.log(d.u);
+	//console.log(d.u);
 	if (Can.putInPlay({
             Accordance : table.accordance,
             card: d.arg.card,
