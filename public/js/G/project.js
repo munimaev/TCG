@@ -199,6 +199,7 @@ function draw1() {
 function btnNextPhase() {    
     if (Can.pressNextBtn({pX:you,S:S,Stadies:Stadies,meta:Meta})) {
        // console.log("↰",{u:Client})
+        Card.prototype.hideActionCircle();
         socket.emit('pressNextBtn',{u:Client})
     }
 }
@@ -266,6 +267,7 @@ function createCard( o ) {
     }
     if (constr.zona == '') {};
     C[o.id] = new Card( constr );
+    C[o.id].setZIndex( 825 )
 }
 
 /**
@@ -1374,15 +1376,24 @@ function createteam( o, o2 ) {
             position:'leader',
             condition: 'createteam'
         });
+        var afterFunc = (function(){
+            var id =  o[0];
+            return function(){
+                C[id].setZIndex( 200 );
+            }
+        })()
         C[o[0]].animation( { X: posLeft + o2.X,
             Y: posTop + o2.Y + oppMod1, W: 10 * gridCell, x:0, y:0,z:0,deg:0,
             additional: { 
                 outCard: true,
+                after : {
+                    func: afterFunc
+                }
             } } );
         C[o[0]].changeZone(  o2.zona);
         C[o[0]].params.team = o2.team;
         C[o[0]].params.teamPosition = 'leader';
-        C[o[0]].setZIndex( 200 );
+        
     }
     
     var countOdd = -2;
@@ -1418,12 +1429,20 @@ function createteam( o, o2 ) {
             position:'support',
             condition: 'createteam'
         });
+        var afterFunc = (function(){
+            var id =  o[i];
+            return function(){
+                C[id].setZIndex( 200 );
+            }
+        })()
         C[o[i]].animation( { X: posLeft + o2.X, Y: posTop + o2.Y,x:0, y:0,z:0,deg:0,
-            W: 8 * gridCell, additional: { outCard: true } } );
+            W: 8 * gridCell, additional: { outCard: true,
+                after : {
+                    func: afterFunc
+                } } } );
         C[o[i]].changeZone( o2.zona );
         C[o[i]].params.team = o2.team;
         C[o[i]].params.teamPosition = 'support';
-        C[o[i]].setZIndex( 200 );
         C[o[i]].removeTeamPower(o2.player);
     }
     if (o[0]) {
