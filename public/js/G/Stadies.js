@@ -1,5 +1,5 @@
 var Stadies = {
-    order: [ 'start', 'draw', 'mission', 'organisation', 'attack', 'block', /*'jutsu',*/ 'shutdown', 'comeback', 'winner', 'end' ],
+    order: [ 'start', /*'draw',*/ 'mission', 'organisation', 'attack', 'block', /*'jutsu',*/ 'shutdown'/*, 'comeback', 'winner', 'end'*/ ],
     current: 'organisation',
     start : {
         rusName : 'Начало хода',
