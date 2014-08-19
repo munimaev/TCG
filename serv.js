@@ -30,9 +30,21 @@ app.get('/', function(req, res){
 });
 app.get('/game', function(req, res){
 	if (req.session.login) {
-		req.session.id == req.cookies['connect.sid'];
-		res.render('game.ejs', { myLayout: 'lobby', session : req.session })
-		//res.sendfile(__dirname + '/game.html');
+    var ok = false;
+    for (var i in SG.StartedGames) {
+      if (SG.StartedGames[i].pA == req.session.login 
+        || SG.StartedGames[i].pB == req.session.login
+      ) {
+        ok = true;
+      }
+    }
+    if (ok) {
+      req.session.id == req.cookies['connect.sid'];
+      res.render('game.ejs', { myLayout: 'game', session : req.session })
+    } else {
+      res.writeHead(303, {'Location': '/lobby'});
+      res.end();
+    }
 	}
 	else {
 		res.writeHead(303, {'Location': '/login'});
