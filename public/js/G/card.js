@@ -133,14 +133,17 @@ function Card( o ) {
     this.instMouseControleDown = function( size, o ) {
         if (o._this.params.status == 'card') {
             o._this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (size / 15 + 1) + 'px )' )
+            o._this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (size / 15 + 1) + 'px )' )
             o._this.$mouse.addClass( 'full' )
         } else {
             o._this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (size / 15 + 1) + 'px )  rotate3d(0,0,1,45deg)' )
+            o._this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (size / 15 + 1) + 'px )  rotate3d(0,0,1,45deg)' )
             o._this.$mouse.removeClass('full')
         }
     };
     this.instMouseControleUp = function( size, o ) {
         o._this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (o._this.params.zindex) + 'px )' );
+        o._this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (o._this.params.zindex) + 'px )' );
     };
     this.fillAsFaceUp = function( link ) {
         var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
@@ -272,7 +275,8 @@ function Card( o ) {
                 if (this.params.elements.length == 1) {
                     return '#'+D.colors[this.params.elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
+                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);'
+                         + '-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
                 }
             break;
             case 'corner left':
@@ -301,7 +305,8 @@ function Card( o ) {
                 if (this.params.elements.length == 1) {
                     return '#'+D.colors[this.params.elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
+                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);'
+                         + '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
                 }
             break;
             case 'corner bottom':
@@ -530,13 +535,17 @@ function Card( o ) {
         }
 
         $( '.corner', '#' + o._this.id ).
-            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepCorner + 'px)' );
+            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepCorner + 'px)' ).
+            css( '-moz-transform', 'translate3d(0,0,' + o._this.params.deepCorner + 'px)' );
         $( '.side', '#' + o._this.id ).
-            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepSide + 'px)' );
+            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepSide + 'px)' ).
+            css( '-moz-transform', 'translate3d(0,0,' + o._this.params.deepSide + 'px)' );
         $( '.power', '#' + o._this.id ).
-            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepPower + 'px)' );
+            css( '-webkit-transform', 'translate3d(0,0,' + o._this.params.deepPower + 'px)' ).
+            css( '-moz-transform', 'translate3d(0,0,' + o._this.params.deepPower + 'px)' );
         $( '.icon', '#' + o._this.id ).
-            css( '-webkit-transform', 'translate3d(0,0,' + (o._this.params.deepPower - 0.1) + 'px )' );
+            css( '-webkit-transform', 'translate3d(0,0,' + (o._this.params.deepPower - 0.1) + 'px )' ).
+            css( '-moz-transform', 'translate3d(0,0,' + (o._this.params.deepPower - 0.1) + 'px )' );
 
         this.instMouseControleUp(newSize, o)
     };
@@ -773,7 +782,8 @@ function Card( o ) {
                 var nowZ = oldZ - (oldZ - newZ) * multipler;
                 var nowDeg = curOldDeg - (curOldDeg - curNewDeg) * multipler;
                 $( this ).
-                    css( '-webkit-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)' );
+                    css( '-webkit-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)' ).
+                    css( '-moz-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)' );
                 //console.log(fx.prop, fx.start, now, fx.end)
             }
 
@@ -799,7 +809,8 @@ function Card( o ) {
                 var curOldDeg = oldDegi;
                 var nowDegi = curOldDeg - (curOldDeg - curNewDeg) * multipler;
                 $( this ).
-                    css( '-webkit-transform', 'rotate3d(' + nowXi + ',' + nowYi + ',' + nowZi + ',' + nowDegi + 'deg)' );
+                    css( '-webkit-transform', 'rotate3d(' + nowXi + ',' + nowYi + ',' + nowZi + ',' + nowDegi + 'deg)' ).
+                    css( '-moz-transform', 'rotate3d(' + nowXi + ',' + nowYi + ',' + nowZi + ',' + nowDegi + 'deg)' );
             }
             if ( o.additional.intoCard ) {
                 if ( 'intoCard' in o.additional && o.additional.intoCard ) {
@@ -1130,10 +1141,14 @@ function Card( o ) {
         if (this.params.incline.x == 0
             && this.params.incline.y == 0
             && this.params.incline.z == 0
-            && this.params.incline.deg == 0) 
-        this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (ind) + 'px )' );
+            && this.params.incline.deg == 0
+        ) { 
+            this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (ind) + 'px )' );
+            this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (ind) + 'px )' );
+        }
         else {
             this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (3) + 'px )' );
+            this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (3) + 'px )' );
         }
     };
     this.setZIndex()
