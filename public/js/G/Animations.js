@@ -16,7 +16,7 @@ function AnimationPush(o) {
 function AnimationNext() {
 	if (AnimationIsRun || !Animations.length) return;
 	var animation = Animations.splice(0,1);
-	AnimationIsRun = true;
+	AnimationIsRun = animation[0].name;
 	animation[0].func();
 	setTimeout(function(){
 		AnimationIsRun = false;
@@ -42,7 +42,7 @@ var AN = {
 	    var position = $deck.offset();
 	    for (var i in o.cards) {
 	    	var id = o.cards[i];
-
+	    	console.log(o, you)
 	    	var construct = {};
 			if (you == o.pX) {
 				Y =  I.H * 2 / 3 - I.card.W / 2;
@@ -98,6 +98,7 @@ var AN = {
 		        owner:o.pX,
 		        position:"hand"
 		    })
+		    C[i].setZIndex( 800 )
 	        C[i].changeZone( 'movingHand' )
 	    }
 
@@ -128,6 +129,7 @@ var AN = {
 
 		                    return function() {
 		                        card.changeZone( 'hand' );
+		                        card.setZIndex( 400 )
 		                    };
 		                })()
 		            }
@@ -159,6 +161,7 @@ var AN = {
 			Y = /*I.hand.Y +*/ 0 // + I.card.W /*- margin / 2*/ - bottomMargin
 		}
 	    for ( var i in S[o.pX].hand ) {
+	    	if (!C[S[o.pX].hand[i]]) {console.log('!card') ;continue;}
 	        bottomMargin = (Math.ceil( (Number( i ) + 1) / cardInRow ) - 1) * (I.card.W + margin);
 	        C[S[o.pX].hand[i]].animation( {
 	            X: sideMargin / 2 + (margin + I.card.W) * (Number( i ) % cardInRow),
@@ -180,12 +183,14 @@ var AN = {
 	},
 	moveCardToZone : function(o) {
 	    //console.log('>--', o.cardID)
+	    
 	    if ( !isZoneSimple(o.from)) 
 	    {
 	        if ( isZoneSimple(o.to) )
 	        {
 	    		var z = G[o.pX == you ? 'you' : 'opp'][o.to];
 	    		//console.log(z)
+				C[o.cardID].setZIndex(825);
 		        C[o.cardID].params.teamPosition = null;
 		        C[o.cardID].removeTeamPower();
 
@@ -215,6 +220,7 @@ var AN = {
 	        {
 				if (you == o.owner) var z = G.you[o.to]
 	    		else var z = G.opp[o.to];
+				C[o.card].setZIndex(825);
 		        C[o.card].params.teamPosition = null;
 		        C[o.card].removeTeamPower();
 
@@ -234,6 +240,7 @@ var AN = {
 	        else if ( !isZoneSimple(o.to) ) 
 	        {
 	        	if (you == o.owner) {
+					C[o.card].setZIndex(825);
 		        	C[o.card].animation( { 
 			        	X: I.table.W / 2 + I.table.Y - I.card.W, 
 			        	Y: I.table.H / 2 - I.card.W, 
@@ -244,6 +251,7 @@ var AN = {
 		            })
 	            }
 	        	else if  (you != o.owner) {
+					C[o.card].setZIndex(825);
 		        	C[o.card].animation( { 
 			        	X: I.table.W / 2 + I.table.Y - I.card.W, 
 			        	Y: I.table.H / 2 - I.card.W, 
