@@ -1,5 +1,5 @@
 var socket = io();
-socket.on('connected', function(d){
+	socket.on('connected', function(d){
 });
 
 var Client = {};
@@ -21,6 +21,7 @@ socket.on('C_init', function(d){
 	Client.you = you = d.you;
 	Client.opp = opp = d.opp;
 	Client.table = d.table
+	Client.ses = ses;
 	S = d.snapshot;
 	updAllCount();
     if (S && ready) {
@@ -40,12 +41,10 @@ function updRewardsCount(player) {
 	H[player].rewards.span.html(count)
 }
 function updTurnCounter(player) {
-	console.log('msg')
 	var count =  S[Client[player]].turnCounter;
 	H[player].turnCounter.span.html(count)
 }
 function updAllCount() {
-	console.log('updAllCount')
 	var P, A;
 	for (var p in P = ['you','opp']) {
 		for (var a in A = ['deck', 'discard', 'chackra']) {
@@ -59,6 +58,7 @@ function updAllCount() {
 socket.on('bothIsJoin', function(d) {
 	Accordance = d.accordance;
 	Known = d.known;
+	console.log(d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
 })
