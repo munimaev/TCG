@@ -14,6 +14,9 @@
     -webkit-transform-style: preserve-3d;
     -webkit-transform-origin: 50% 50%;
     -webkit-transform:rotate3d(0,0,0,0deg);
+    -moz-transform-style: preserve-3d;
+    -moz-transform-origin: 50% 50%;
+    -moz-transform:rotate3d(0,0,0,0deg);
     top: 0;
     left:0;
     z-index: 400;
@@ -83,6 +86,9 @@
             -webkit-transform-style: preserve-3d;
             -webkit-transform-origin: 50% 50%;
             -webkit-transform:  translate3d(0,0,0.1px) rotate3d(0,0,1,45deg);
+            -moz-transform-style: preserve-3d;
+            -moz-transform-origin: 50% 50%;
+            -moz-transform:  translate3d(0,0,0.1px) rotate3d(0,0,1,45deg);
 
     top: 50%;
     left: 50%;
@@ -90,6 +96,7 @@
 }
 .shadow {
     -webkit-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
+    -moz-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
     box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
 
 }
@@ -104,6 +111,9 @@
 
             -webkit-transform-origin: 50% 50%;
             -webkit-transform: translate3d(0,0,0px) ;
+
+            -moz-transform-origin: 50% 50%;
+            -moz-transform: translate3d(0,0,0px) ;
 }
 
 
@@ -118,23 +128,34 @@
 
     -webkit-transform-origin: 0% 0%;
     -webkit-transform:rotate3d(0,1,0,0deg);
+    -moz-transform-origin: 0% 0%;
+    -moz-transform:rotate3d(0,1,0,0deg);
 }
 .romb .c3D.c1 {
     -webkit-transform-origin: 0% 0%;
     -webkit-transform: translate3d(0,0,100px) ;
     -webkit-transform:rotate3d(0,1,0,-90deg);
+    -moz-transform-origin: 0% 0%;
+    -moz-transform: translate3d(0,0,100px) ;
+    -moz-transform:rotate3d(0,1,0,-90deg);
 }
 .romb .c3D.c2 {
     -webkit-transform-origin: 0% 0%;
     -webkit-transform:rotate3d(1,0,0,90deg);
+    -moz-transform-origin: 0% 0%;
+    -moz-transform:rotate3d(1,0,0,90deg);
 }
 .romb .c3D.c3 {
     -webkit-transform-origin: 100% 100%;
     -webkit-transform:rotate3d(1,0,0,-90deg);
+    -moz-transform-origin: 100% 100%;
+    -moz-transform:rotate3d(1,0,0,-90deg);
 }
 .romb .c3D.c4 {
     -webkit-transform-origin: 100% 100%;
     -webkit-transform:rotate3d(0,1,0,90deg);
+    -moz-transform-origin: 100% 100%;
+    -moz-transform:rotate3d(0,1,0,90deg);
 }
 
 .romb .corner.top { top:0;  right: 0;}
@@ -150,6 +171,8 @@
 
             -webkit-transform-origin: 50% 50%;
             -webkit-transform: translate3d(0,0,0px);
+            -moz-transform-origin: 50% 50%;
+            -moz-transform: translate3d(0,0,0px);
 }
 
 .romb .side.left {width: 5%;height: 90%;}
@@ -173,12 +196,16 @@
     width: 2.5%;
             -webkit-transform-origin: 0% 0%;
             -webkit-transform:rotate3d(0,1,0,-90deg);
+            -moz-transform-origin: 0% 0%;
+            -moz-transform:rotate3d(0,1,0,-90deg);
 }
 .romb .s3D.s2 {
     height: 2.5%;
     width: 90%;
             -webkit-transform-origin: 0% 0%;
             -webkit-transform:rotate3d(1,0,0,90deg);
+            -moz-transform-origin: 0% 0%;
+            -moz-transform:rotate3d(1,0,0,90deg);
 }
 
 .romb .side.top.left { top:5%;  left: 0;}
@@ -200,6 +227,7 @@
     background-size: 100%;
 
     -webkit-transform: rotate3d(0,0,1,-45deg);
+    -moz-transform: rotate3d(0,0,1,-45deg);
 }
 
 
@@ -208,6 +236,8 @@
     width: 50%;
     -webkit-transform: translate3d(0,0,2px) ;
     -webkit-transform-style: preserve-3d;
+    -moz-transform: translate3d(0,0,2px) ;
+    -moz-transform-style: preserve-3d;
     position: absolute;
     font-size: 75px;
     line-height: 75px;
@@ -238,6 +268,8 @@
     position: absolute;
     -webkit-transform: translate3d(0,0,2px) ;
     -webkit-transform-style: preserve-3d;
+    -moz-transform: translate3d(0,0,2px) ;
+    -moz-transform-style: preserve-3d;
 }
 .card .atribut {
     width: 25%;
@@ -398,6 +430,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     height: 100%;
     margin: 0%;
     -webkit-transform:  translate3d(0,0,0.1px);
+    -moz-transform:  translate3d(0,0,0.1px);
 }
 
 .youTeamPower,
@@ -413,8 +446,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     background-color: #6393c1;
     border-radius: 50%;
 
-    -webkit-box-shadow:inset 0px 0px 0px 1px rgba(0,0,0,0.5);
-    box-shadow:inset 0px 0px 0px 1px rgba(0,0,0,0.5);
+    -webkit-box-shadow:inset 0px 0px 0px 2px rgba(0,0,0,0.5);
+    -moz-box-shadow:inset 0px 0px 0px 2px rgba(0,0,0,0.5);
+    box-shadow:inset 0px 0px 0px 2px rgba(0,0,0,0.5);
 
     background: #6d0019; /* Old browsers */
     background: -moz-linear-gradient(-45deg, #6d0019 37%, #f90409 98%); /* FF3.6+ */
@@ -427,6 +461,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
 
 
             -webkit-transform:  translate3d(0,0,0.111px);
+            -moz-transform:  translate3d(0,0,0.111px);
 
 }
 
@@ -458,6 +493,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     position: absolute;
     border-radius: 50%;
 
+    -moz-box-shadow:inset 0px 0px 0px 1px rgba(255,255,255,0.5),inset 0px 0px 5px 5px rgba(255,255,255,0.5),  0px 0px 10px 10px rgba(255,255,255,0.5);
+    
     -webkit-box-shadow:inset 0px 0px 0px 1px rgba(255,255,255,0.5),inset 0px 0px 5px 5px rgba(255,255,255,0.5),  0px 0px 10px 10px rgba(255,255,255,0.5);
     box-shadow:inset 0px 0px 0px 1px rgba(255,255,255,0.5),inset 0px 0px 5px 5px rgba(255,255,255,0.5),  0px 0px 10px 10px rgba(255,255,255,0.5);
 
