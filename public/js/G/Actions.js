@@ -66,7 +66,6 @@ var Actions = {
     	if (!module) {
     		updTable(); 
 	    }
-
 	},
 	'moveCardToZone' : function (o) {
 		// o.from 
@@ -84,7 +83,7 @@ var Actions = {
 					C[o.cardID].params.zona = o.to;
 					AnimationPush({func:function() {
 						AN.moveCardToZone(o);
-					}, time:1000, name: 'moveCardToZone '});
+					}, time:1000, name: 'moveCardToZone'});
 				}
 	        }
 	        else if ( !isZoneSimple(o.from) )
@@ -108,7 +107,7 @@ var Actions = {
 						AnimationPush({func:function() {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
-						}, time:1000, name: 'moveCardToZone '});
+						}, time:1000, name: 'moveCardToZone'});
 					}
 	            }
 		        else if ( !isZoneSimple(o.to) ) 
@@ -119,12 +118,11 @@ var Actions = {
 						AnimationPush({func:function() {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
-						}, time:1000, name: 'moveCardToZone '});
+						}, time:1000, name: 'moveCardToZone'});
 					}
 		        }
 	        }
 	    }
-
 	},
 	/**
 	 * createTeamFromCard
@@ -196,7 +194,6 @@ var Actions = {
             }
 			updTable();
 		}
-
 	},
 	'removeSelfFromTeam' : function(S, c2) {
 	    var team = S[c2.owner][c2.zone].team[c2.team];
@@ -207,7 +204,6 @@ var Actions = {
 	        }
 	    }
 	    return false;
-
 	},
 	'moveTeamToAttack' : function(o) {
 		o.S[o.pX][o.to].team[o.team] = o.S[o.pX][o.from].team[o.team];
@@ -255,6 +251,7 @@ var Actions = {
 		}
 	},
 	'startAtStart' : function(o) {
+		o.S.turnNumber = o.S.turnNumber + 1;
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.uturn(o);
@@ -262,10 +259,11 @@ var Actions = {
 		}
 	},
 	'missionAtStart' : function(o) {
-		o.count = 1;
-		o.pX = o.S.activePlayer;
-		socket.emit('drawCardAtStartTurn', {u:Client});
-		//Actions['Draw X cards'](o)
+		if (!module) {
+			o.count = 1;
+			o.pX = o.S.activePlayer;
+			socket.emit('drawCardAtStartTurn', {u:Client});
+		}
 	},
 	'comebackAtStart' : function(o) {
 	},
@@ -332,7 +330,6 @@ var Actions = {
 		if (!module) {
 			updTable();
 		}
-
 	},
 	'winnerAtStart' : function(o) {
 		var pXs = [o.S.activePlayer,(o.S.activePlayer == 'pA' ? 'pB' : 'pA')];
