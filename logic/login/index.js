@@ -33,12 +33,12 @@ function create(request, response) {
  * @param response
  */
 function processPost(request, response) {
-  console.log('processing POST request: ', request.query.login, request.query.password, request.query.remember);
+  //console.log('processing POST request: ', request.query.login, request.query.password, request.query.remember);
 
   var nextLocation = '/login' ;
 
   if ((request.query.login==='Thor')&&(request.query.password==='111') ||
-    (request.query.login==='Odin')&&(request.query.password==='222')) {
+    (request.query.login==='Odin')&&(request.query.password==='111')) {
     request.session.login = request.query.login;    
 
     if ( typeof(request.session.redirectedFrom) === 'string') {
