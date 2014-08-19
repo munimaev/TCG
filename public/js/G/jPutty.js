@@ -197,10 +197,11 @@ $(window).readyresize(function(width, height) {
             .putty('xysize', main_W - dd_W * 1.5 - 1, 1, dd_W * 1.5 - 8,  bar_H - 12)
             .css('lineHeight',  (bar_H - 12) + 'px')
             .css('fontSize',  (bar_H - 12 ) / 1.5 + 'px');
+
     $('#phase')
-            .putty('xysize', bar_H + login_W + dd_W * 5 + hand_W, 1, (main_W - dd_W * 1.5 - 1) - (bar_H + login_W + dd_W * 5 + hand_W),  bar_H - 5)
-            .css('lineHeight',  (bar_H - 5) + 'px')
-            .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
+            .putty('xysize', bar_H + login_W + dd_W * 3 + hand_W, -bar_H, (main_W - 0 - 1) - (bar_H + login_W + dd_W * 3 + hand_W),  bar_H - 12)
+            .css('lineHeight',  (bar_H - 12) + 'px')
+            .css('fontSize',  (bar_H - 12 ) / 1.5 + 'px');
 
     I.card.W = Math.round(main_W / 10);
 
