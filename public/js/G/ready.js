@@ -33,12 +33,12 @@ $( document ).ready(function() {
     H.phase = $("#phase");
     H.animate = $("#animate");
 
-	var urlGet = {};
-	for (var i in l = location.search.substr(1).split('&')) {
-	    var m = l[i].split('=');
-	    urlGet[m[0]] = m[1];
-	}
-	socket.emit('initGame', urlGet);
+	// var urlGet = {};
+	// for (var i in l = location.search.substr(1).split('&')) {
+	//     var m = l[i].split('=');
+	//     urlGet[m[0]] = m[1];
+	// }
+	socket.emit('initGame', {ses:ses});
     ready = true;
     if (S && ready) {
         socket.emit('imJoined',Client)
