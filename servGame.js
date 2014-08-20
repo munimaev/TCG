@@ -37,6 +37,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.emit('connected', { message: "You are connected!" });
     //-----------------------------------------
     gameSocket.on('lobby:tables', getTables);
+    gameSocket.on('lobby:games', getGames);
     gameSocket.on('lobby:create', lobby_create);
     gameSocket.on('lobby:join', lobby_join);
     gameSocket.on('lobby:delete', lobby_delete);
@@ -118,15 +119,19 @@ function lobby_join(req) {
 			StartedGames[id] = {};
 			if (Math.random() > 0.5) {
 				StartedGames[id].pA   = Tables[req.toTable].pA
+				StartedGames[id].loginA   = Tables[req.toTable].pA
 				StartedGames[id].sesA = Tables[req.toTable].sesA
 				SesssionTable[Tables[req.toTable].sesA] = id;
+				StartedGames[id].loginB   = ses.login;
 				StartedGames[id].pB   = ses.login;
 				StartedGames[id].sesB = req.ses;
 				SesssionTable[req.ses] = id;
 			} else {
+				StartedGames[id].loginpB   = Tables[req.toTable].pA
 				StartedGames[id].pB   = Tables[req.toTable].pA
 				StartedGames[id].sesB = Tables[req.toTable].sesA
 				SesssionTable[Tables[req.toTable].sesA] = id;
+				StartedGames[id].loginA   = ses.login;
 				StartedGames[id].pA   = ses.login;
 				StartedGames[id].sesA = req.ses;
 				SesssionTable[req.ses] = id;
@@ -167,6 +172,14 @@ function getTables() {
 		data[i] = {pA:Tables[i].pA, pB:Tables[i].pB}
 	}
     io.emit('setTables',data);
+}
+
+function getGames() {
+	var data = {};
+	for (var i in StartedGames) {
+		data[i] = {pA:StartedGames[i].loginA, pB:StartedGames[i].loginB}
+	}
+    io.emit('setGames',data);
 }
 
 function playerSit(d) {
@@ -227,6 +240,10 @@ function S_init(d) {
 	// console.log(d)
 	// console.log(tableId)
 	// console.log(table)
+	if (!table) {
+		this.emit('goOut');
+		return;
+	}
 	var snapshot = getStartSnapshot(table);
 	var data = { 
     	snapshot : snapshot,
@@ -299,7 +316,7 @@ function getStartSnapshot(table) {
 	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
-	    phase: "start",
+	    phase: "organisation",
 	    stop: false,
 	    turnNumber: 0,
 	    counters : {
@@ -307,7 +324,7 @@ function getStartSnapshot(table) {
 	    },
 	    pA : {
 	    	isDrawCardAtStartTurn : false,
-	    	isNewGame : true,
+	    	isNewGame : false,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -318,17 +335,16 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
+	            	1:['c105'],
+	            	2:['c102','c103'],
+	            	3:['c104','c105','c101']
 	            }
 	        },
 	        attack : {
 	            team : {}
 	        },
 	        block : {
-	            team : {
-	            	// 4:['c005'],
-	            	// 5:['c002','c003'],
-	            	// 6:['c001','c004','c006']
-	            }
+	            team : {}
 	        }
 	    },
 	    battlefield : {},
@@ -336,7 +352,7 @@ function getStartSnapshot(table) {
 
 	    },
 	    pB : {
-	    	isNewGame : true,
+	    	isNewGame : false,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -346,14 +362,14 @@ function getStartSnapshot(table) {
             mission : [],
             client : [],
 	        village : {
-	            team : {}
+	            team : {
+	            	4:['c005'],
+	            	5:['c002','c003'],
+	            	6:['c001','c004','c006']
+	        	}
 	        },
 	        attack : {
-	            team : {
-	            	// 1:['c101'],
-	            	// 2:['c102','c103'],
-	            	// 3:['c104','c105','c106']
-	        	}
+	            team : {}
 	        },
 	        block : {
 	            team : {}
@@ -372,7 +388,7 @@ function getStartSnapshot(table) {
 	    }
 	};
 	var pu;
-	for (var i = 1; i <= 23 ; i++) {
+	for (var i = 7; i <= 23 ; i++) {
 		pu = i < 10 ? "0"+i : i;
 		result.pA.deck.push('c1' + pu )
 		result.pB.deck.push('c0' + pu )
