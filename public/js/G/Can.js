@@ -203,7 +203,7 @@ var Can = {
         }
         else {
             console.log(  
-              o.Known[o.Accordance[o.card]].owner , o.pX )
+              /*o.Known[o.Accordance[o.card]].owner , o.pX*/ )
         }
     },
     removeFromTeam : function(o){
