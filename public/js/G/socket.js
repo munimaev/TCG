@@ -31,6 +31,11 @@ socket.on('C_init', function(d){
 });
 
 
+socket.on('goOut', function(d){
+        window.location.assign('/lobby')
+});
+
+
 // работа с интерфейсом
 function updAreaCount(player, area) {
 	var count =  S[Client[player]][area].length;
