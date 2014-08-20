@@ -46,6 +46,10 @@
         updTables();
       });
 
+      socket.on('setGames', function(d){
+        console.log(d)
+      });
+
       function updTables() {
       	var youOnTable = false;
 
