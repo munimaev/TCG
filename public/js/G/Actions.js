@@ -15,7 +15,7 @@ function arraySearch(array, value) {
 }
 var Actions = {
 	'Draw Card': function(o) {
-		for (var i in o) console.log(i)
+		//for (var i in o) console.log(i)
 		var S = o.S;
 		var pX = o.pX;
 		var draedCards = [];
