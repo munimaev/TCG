@@ -30,11 +30,13 @@ app.get('/', function(req, res){
 });
 app.get('/game', function(req, res){
 	if (req.session.login) {
+    console.log('============== /game');
     var ok = false;
     for (var i in SG.StartedGames) {
-      if (SG.StartedGames[i].pA == req.session.login 
-        || SG.StartedGames[i].pB == req.session.login
+      if (SG.StartedGames[i].loginA == req.session.login 
+        || SG.StartedGames[i].loginB == req.session.login
       ) {
+        console.log(i + ' : ' + SG.StartedGames[i].pA + ' / ' + SG.StartedGames[i].pB)
         ok = true;
       }
     }
