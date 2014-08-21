@@ -1472,6 +1472,7 @@ function updHands() {
 }
 
 function updTable() {
+    console.log('updTable')
     if (G.selectedTeam) {
         G.selectedTeam = null;
     }
