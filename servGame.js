@@ -127,7 +127,7 @@ function lobby_join(req) {
 				StartedGames[id].sesB = req.ses;
 				SesssionTable[req.ses] = id;
 			} else {
-				StartedGames[id].loginpB   = Tables[req.toTable].pA
+				StartedGames[id].loginB   = Tables[req.toTable].pA
 				StartedGames[id].pB   = Tables[req.toTable].pA
 				StartedGames[id].sesB = Tables[req.toTable].sesA
 				SesssionTable[Tables[req.toTable].sesA] = id;
@@ -233,6 +233,7 @@ function updServerInfoPage (d) {
  */
 
 function S_init(d) {
+	console.log('\nS_init')
 	//console.log(StartedGames);
 	var tableId = SesssionTable[d.ses];
 	var table = StartedGames[tableId];
@@ -241,6 +242,7 @@ function S_init(d) {
 	// console.log(tableId)
 	// console.log(table)
 	if (!table) {
+		console.log('goOut')
 		this.emit('goOut');
 		return;
 	}
@@ -285,9 +287,11 @@ function getRoomNumber(d) {
 	}
 }
 function imJoined(d) {
+	console.log('\nimJoined')
 		bothIsJoin(d);
 }
 function bothIsJoin(d) {
+	console.log('\nbothIsJoin')
 	var S = StartedGames[d.table]
 	if (S.socketA && S.socketB ) {
 		S.accordance = getStartAccordiance(S);
@@ -335,7 +339,7 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
-	            	1:['c105'],
+	            	1:['c106'],
 	            	2:['c102','c103'],
 	            	3:['c104','c105','c101']
 	            }
@@ -485,6 +489,7 @@ function getStartAccordiance(S) {
 			keys.push(i < 10 ? '0' + i : ''+i)
 			values.push(i < 10 ? '0' + i : ''+i)
 		}
+
 		values.sort(  function() { return Math.random()-0.5} )
 		
 		for (var i in keys) {
@@ -528,6 +533,7 @@ function oneCardAccordanceКnown(S, card, arr) {
 }
 
 function S_startDrawHand(d) {
+	console.log('startDrawHand')
 	var table = StartedGames[d.u.table];
 	var data = {upd:{}};
 	// отдать информацию о верхних картах
