@@ -14,7 +14,7 @@ function AnimationPush(o) {
 }
 
 function AnimationNext() {
-	if (AnimationIsRun || !Animations.length) return;
+	if (AnimationIsRun || !Animations.length || AN.stop) return;
 	var animation = Animations.splice(0,1);
 	AnimationIsRun = animation[0].name;
 	animation[0].func();
@@ -24,6 +24,7 @@ function AnimationNext() {
 	}, animation[0].time)
 }
 var AN = {
+	stop : false,
 	pA : {
 		handPrewiev : []
 	},
@@ -346,6 +347,29 @@ var AN = {
 				H.phase.html(newName);
 				H.phase.animate({opacity:1},250);	
 			})
+		}
+	},
+	Questions : {
+		/**
+		 * Указвает игроку выбрать нового лидера
+		 * @param  {[type]} o объект с аргументами
+		 * @param  {[type]} o.pX хлебная крошка в пути до команды
+		 * @param  {[type]} o.zone хлебная крошка в пути до команды
+		 * @param  {[type]} o.team хлебная крошка в пути до команды
+		 * @return {[type]}   [description]
+		 */
+		newLeader : function(o) {
+
+		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
+		    Context.workingUnit = 'card';
+		    Context.clickAction = function( card ) {
+		    	alert(1);
+		        // makeAsLeader( card );
+		        // Context.workingUnit = null;
+		        // Context.clickAction = null;
+		        // $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
+		        // startTable();
+		    }
 		}
 	}
 }
