@@ -33,14 +33,15 @@ app.get('/game', function(req, res){
     console.log('============== /game');
     var ok = false;
     for (var i in SG.StartedGames) {
+        console.log(i + ' : ' + SG.StartedGames[i].loginA + ' / ' + SG.StartedGames[i].loginB + ' | ' + req.session.login)
       if (SG.StartedGames[i].loginA == req.session.login 
         || SG.StartedGames[i].loginB == req.session.login
       ) {
-        console.log(i + ' : ' + SG.StartedGames[i].pA + ' / ' + SG.StartedGames[i].pB)
         ok = true;
       }
     }
     if (ok) {
+      console.log('load template')
       req.session.id == req.cookies['connect.sid'];
       res.render('game.ejs', { myLayout: 'game', session : req.session })
     } else {
