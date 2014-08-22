@@ -4,15 +4,16 @@ var session_store = {'s':'e'};
 var Tables = {
 };
 var preGamesLobbi = {
-
 }
 var StartedGames = {
 };
+var Testing = true;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
+
 //console.log(Stadies)
 
 function arraySearch(array, value) {
@@ -44,6 +45,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('player:sit', playerSit);
     gameSocket.on('player:unsit', playerUnsit);
     gameSocket.on('imJoined',imJoined);
+    gameSocket.on('newLeader',newLeader);
     //-----------------------------------------
     gameSocket.on('initGame', S_init);
     gameSocket.on('startDrawHand', S_startDrawHand);
@@ -246,9 +248,9 @@ function S_init(d) {
 		this.emit('goOut');
 		return;
 	}
-	var snapshot = getStartSnapshot(table);
+	var Snapshot = getStartSnapshot(table);
 	var data = { 
-    	snapshot : snapshot,
+    	Snapshot : Snapshot,
     	mySocketId: this.id,
     	table: tableId
     };
@@ -260,7 +262,7 @@ function S_init(d) {
     	StartedGames[tableId].roompB = StartedGames[tableId].room +"_"+this.id;
     	this.join(StartedGames[tableId].room);
     	this.join(StartedGames[tableId].roompB);
-    	StartedGames[tableId].snapshot = snapshot;
+    	StartedGames[tableId].Snapshot = Snapshot;
     	io.sockets.in(StartedGames[tableId].roompB).emit('C_init', data); //TODO отослать только проверенному пользователю
     }
     if (table.sesA == d.ses) {
@@ -271,7 +273,7 @@ function S_init(d) {
     	StartedGames[tableId].roompA = StartedGames[tableId].room +"_"+this.id;
     	this.join(StartedGames[tableId].room);
     	this.join(StartedGames[tableId].roompA);
-    	StartedGames[tableId].snapshot = snapshot;
+    	StartedGames[tableId].Snapshot = Snapshot;
     	io.sockets.in(StartedGames[tableId].roompA).emit('C_init', data); //TODO отослать только проверенному пользователю
     } else {
     	// TODO должно выкинуть в предыдущее окно
@@ -294,33 +296,33 @@ function bothIsJoin(d) {
 	console.log('\nbothIsJoin')
 	var S = StartedGames[d.table]
 	if (S.socketA && S.socketB ) {
-		S.accordance = getStartAccordiance(S);
-		S.known = getStartCards();
-		S.pA = {accordance:{},known:{}}; S.pB = {accordance:{},known:{}};
+		S.Accordance = getStartAccordiance(S);
+		S.Known = getStartCards();
+		S.pA = {Accordance:{},Known:{}}; S.pB = {Accordance:{},Known:{}};
 		getStartAccordanceKnown(S,'pA');
 		getStartAccordanceKnown(S,'pB');
 		S.meta = getStartMeta(S);
 		io.sockets.in(S.roompA).emit('bothIsJoin', {
-			isNewGame: S.snapshot.pA.isNewGame, 
-			accordance:S.pA.accordance,
-			known:S.pA.known
+			isNewGame: S.Snapshot.pA.isNewGame, 
+			Accordance:S.pA.Accordance,
+			Known:S.pA.Known
 		});
 		io.sockets.in(S.roompB).emit('bothIsJoin', {
-			isNewGame: S.snapshot.pB.isNewGame, 
-			accordance:S.pB.accordance,
-			known:S.pB.known
+			isNewGame: S.Snapshot.pB.isNewGame, 
+			Accordance:S.pB.Accordance,
+			Known:S.pB.Known
 		});
 		// TODO нужна комната для наблюдателя
 	}
 }
 
 function getStartSnapshot(table) {
-	if (table.snapshot) {
-		return table.snapshot;
+	if (table.Snapshot) {
+		return table.Snapshot;
 	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
-	    phase: "organisation",
+	    phase: "attack",
 	    stop: false,
 	    turnNumber: 0,
 	    counters : {
@@ -340,18 +342,21 @@ function getStartSnapshot(table) {
 	        village : {
 	            team : {
 	            	1:['c106'],
-	            	2:['c102','c103'],
-	            	3:['c104','c105','c101']
+	            	3:['c104','c105']
 	            }
 	        },
 	        attack : {
-	            team : {}
+	            team : {
+	            	2:['c102','c101','c103'],
+	            }
 	        },
 	        block : {
 	            team : {}
 	        }
 	    },
-	    battlefield : {},
+	    battlefield : {
+	    	2:null
+	    },
 	    stack : {
 
 	    },
@@ -367,8 +372,8 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
-	            	4:['c005'],
-	            	5:['c002','c003'],
+	            	// 4:['c005'],
+	            	5:['c002','c003','c005'],
 	            	6:['c001','c004','c006']
 	        	}
 	        },
@@ -431,9 +436,9 @@ function getStartCards() {
 	    c026: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },
 	    
 	    
-	    c101: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c102: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c103: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c121: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c122: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
+	    c123: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
 	    c104: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
 	    c105: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
 	    c106: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
@@ -452,9 +457,9 @@ function getStartCards() {
 	    c118: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 4, sh: 3, ai: 1, si: 3, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
 	    c119: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 5, sh: 3, ai: 0, si: 0, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
 	    c120: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 0, ai: 0, si: 0, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
-	    c121: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n589' , elements: 'EF', name : "Sasuke Uchiha"},
-	    c122: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'EF', name : "Yamato"},
-	    c123: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'EF', name : "Yugito Ni'i"},
+	    c101: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n589' , elements: 'EF', name : "Sasuke Uchiha"},
+	    c102: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'EF', name : "Yamato"},
+	    c103: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'EF', name : "Yugito Ni'i"},
 	};
 	return C;
 }
@@ -470,14 +475,14 @@ function getStartMeta(S) {
 	var zones = ['village','block', 'attack'];
 	for (var pX in pXs) 
 		for (var zone in zones)
-			for (var number in S.snapshot[pXs[pX]][zones[zone]].team)
+			for (var number in S.Snapshot[pXs[pX]][zones[zone]].team)
 				if (result.teamCounter <= number) result.teamCounter = number;
 
 	return result;
 }
 
 function getStartAccordiance(S) {
-	if (S.accordance) return S.accordance;
+	if (S.Accordance) return S.Accordance;
 	var pXs = ['c0','c1'];
 	
 	var result = {};
@@ -490,7 +495,7 @@ function getStartAccordiance(S) {
 			values.push(i < 10 ? '0' + i : ''+i)
 		}
 
-		values.sort(  function() { return Math.random()-0.5} )
+		if (!Testing) values.sort(  function() { return Math.random()-0.5} )
 		
 		for (var i in keys) {
 			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
@@ -505,13 +510,13 @@ function getStartAccordiance(S) {
 function getStartAccordanceKnown(S,pX) {
 	var result = {};
 	if (!S.isNewGame) {
-		var zones = [ S.snapshot[pX].hand, S.snapshot.pA.chackra, S.snapshot.pA.discard, S.snapshot.pB.chackra, S.snapshot.pB.discard ]
+		var zones = [ S.Snapshot[pX].hand, S.Snapshot.pA.chackra, S.Snapshot.pA.discard, S.Snapshot.pB.chackra, S.Snapshot.pB.discard ]
 		for (var zone in zones) {
 			for (var card in zones[zone]) {
 				oneCardAccordanceКnown(S, zones[zone][card], pX)
 			}
 		}
-		zones = [S.snapshot.pA.village, S.snapshot.pA.block, S.snapshot.pA.attack, S.snapshot.pB.village, S.snapshot.pB.block, S.snapshot.pB.attack ]
+		zones = [S.Snapshot.pA.village, S.Snapshot.pA.block, S.Snapshot.pA.attack, S.Snapshot.pB.village, S.Snapshot.pB.block, S.Snapshot.pB.attack ]
 		for (var zone in zones) {
 			for (var t in zones[zone].team) {
 				for (var card in zones[zone].team[t]) {
@@ -527,8 +532,8 @@ function oneCardAccordanceКnown(S, card, arr) {
 	if (typeof(arr) === 'string') arr = [arr];
 	for (var i in arr) {
 		var pX = arr[i];
-		S[pX].accordance[card] = S.accordance[card];
-		S[pX].known[S[pX].accordance[card]] = S.known[S[pX].accordance[card]];
+		S[pX].Accordance[card] = S.Accordance[card];
+		S[pX].Known[S[pX].Accordance[card]] = S.Known[S[pX].Accordance[card]];
 	}
 }
 
@@ -537,19 +542,19 @@ function S_startDrawHand(d) {
 	var table = StartedGames[d.u.table];
 	var data = {upd:{}};
 	// отдать информацию о верхних картах
-	data.upd.known = {};
-	data.upd.accordance = {};
-	var deck = table.snapshot[d.u.you].deck;
+	data.upd.Known = {};
+	data.upd.Accordance = {};
+	var deck = table.Snapshot[d.u.you].deck;
 	for (var i in deck) {
 		if (i > 5 ) break
-		data.upd.accordance[deck[i]] 
-			= table[d.u.you].accordance[deck[i]] 
-			= table.accordance[deck[i]];
-		data.upd.known[table.accordance[deck[i]]] 
-			= table[d.u.you].known[table.accordance[deck[i]]] 
-			= table.known[table.accordance[deck[i]]];
+		data.upd.Accordance[deck[i]] 
+			= table[d.u.you].Accordance[deck[i]] 
+			= table.Accordance[deck[i]];
+		data.upd.Known[table.Accordance[deck[i]]] 
+			= table[d.u.you].Known[table.Accordance[deck[i]]] 
+			= table.Known[table.Accordance[deck[i]]];
 	}
-	Actions['Draw X cards']({S:table.snapshot, pX:d.u.you});
+	Actions['Draw X cards']({S:table.Snapshot, pX:d.u.you});
 	io.sockets.in(table['room' + d.u.you]).emit('update', data);
 	io.sockets.in(table.room).emit('action', {
 		acts: [{'arg':{S:'get_S',pX: d.u.you}, 'act' : 'Draw X cards'}]
@@ -561,7 +566,7 @@ function pressNextBtn(d) {
 	if (Can.pressNextBtn({
 		pX:d.u.you, 
 		Stadies:Stadies,
-		S:StartedGames[d.u.table].snapshot,
+		S:StartedGames[d.u.table].Snapshot,
 		meta: StartedGames[d.u.table].meta})) {
 		var table = StartedGames[d.u.table];
 		table.meta.toNextPhase[d.u.you] = true;
@@ -569,16 +574,16 @@ function pressNextBtn(d) {
 			upd:{meta:table.meta},
 			acts : []
 		};
-		if ((Stadies[table.snapshot.phase].party == 'both' 
+		if ((Stadies[table.Snapshot.phase].party == 'both' 
 			&& table.meta.toNextPhase.pA 
 			&& table.meta.toNextPhase.pB
-		) || (Stadies[table.snapshot.phase].party == 'attacker' 
-			&& table.meta.toNextPhase[table.snapshot.activePlayer]
-		) || (Stadies[table.snapshot.phase].party == 'blocker' 
-			&& table.meta.toNextPhase[table.snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
+		) || (Stadies[table.Snapshot.phase].party == 'attacker' 
+			&& table.meta.toNextPhase[table.Snapshot.activePlayer]
+		) || (Stadies[table.Snapshot.phase].party == 'blocker' 
+			&& table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
 		)){
 			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
-			Actions['toNextPhase']({S:table.snapshot, Stadies:Stadies, Known:table.known, Accordance:table.accordance});
+			Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
 			data.acts.push({'arg':{S:'get_S', Stadies:'get_Stadies', Known:'get_Known', Accordance:'get_Accordance'}, 'act' : 'toNextPhase'})
 		} 
 		else {
@@ -597,15 +602,15 @@ function addToTeam(d) {
 	var table = StartedGames[d.u.table];
 		//console.log(d.arg)
 	if (Can.orgAddToTeam({
-			Accordance : table.accordance ,
+			Accordance : table.Accordance ,
 			c1 : {card:d.arg.c1.card} ,
 			c2 : {card:d.arg.c1.card} ,
-			Known : table.known ,
+			Known : table.Known ,
 			pX : d.arg.pX,
-			S : table.snapshot,
+			S : table.Snapshot,
         })) 
 	{
-		d.arg.S = table.snapshot;
+		d.arg.S = table.Snapshot;
 		Actions['addToTeam'](d.arg);
 		d.arg.S = 'get_S';
 		var data = {
@@ -620,15 +625,15 @@ function addToTeam(d) {
 function changeInTeam(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.orgChangeInTeam({
-			Accordance : table.accordance ,
+			Accordance : table.Accordance ,
 			c1 : {card:d.arg.c1.card} ,
 			c2 : {card:d.arg.c1.card} ,
-			Known : table.known ,
+			Known : table.Known ,
 			pX : d.arg.pX,
-			S : table.snapshot,
+			S : table.Snapshot,
         })) 
 	{
-		d.arg.S = table.snapshot;
+		d.arg.S = table.Snapshot;
 		Actions['organisation'](d.arg);
 		d.arg.S = 'get_S';
 		var data = {
@@ -644,19 +649,19 @@ function putInPlay(d) {
 	var table = StartedGames[d.u.table];
 	//console.log(d.u);
 	if (Can.putInPlay({
-            Accordance : table.accordance,
+            Accordance : table.Accordance,
             card: d.arg.card,
-            Known: table.known,
+            Known: table.Known,
             owner:d.arg.owner,
             pX:d.u.you,
-            S:table.snapshot,
+            S:table.Snapshot,
         })) {
 		var arg = {
 			card:d.arg.card,
 			from:d.arg.from,
 			owner:d.arg.owner,
 			pX:d.u.you,
-			S: table.snapshot,
+			S: table.Snapshot,
 			to:'village',
 		}
 		arg.teamCounter = ++table.meta.teamCounter;
@@ -669,17 +674,17 @@ function putInPlay(d) {
 		// Информация для противиника о новой карте
 		var updA = {}
 		var updK = {}
-		table[d.u.opp].accordance[arg.card] 
+		table[d.u.opp].Accordance[arg.card] 
 			= updA[arg.card] 
-			= table.accordance[arg.card];
-		table[d.u.opp].known[table.accordance[arg.card]] 
-			= updK[table.accordance[arg.card]] 
-			= table.known[table.accordance[arg.card]];
+			= table.Accordance[arg.card];
+		table[d.u.opp].Known[table.Accordance[arg.card]] 
+			= updK[table.Accordance[arg.card]] 
+			= table.Known[table.Accordance[arg.card]];
 		io.sockets.in(table['room'+d.u.opp])
 			.emit('update', {
 				upd:{
-					accordance:updA,
-					known:updK
+					Accordance:updA,
+					Known:updK
 				}
 			});
 		
@@ -693,16 +698,16 @@ function putInPlay(d) {
 function removeFromTeam(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.removeFromTeam({
-            Accordance : table.accordance,
+            Accordance : table.Accordance,
             card: d.arg.card,
-            Known: table.known,
+            Known: table.Known,
             owner:d.arg.owner,
             pX:d.u.you,
-            S:table.snapshot,
+            S:table.Snapshot,
         })) 
 	{
 		d.arg.teamCounter = ++table.meta.teamCounter;
-		d.arg.S = table.snapshot;
+		d.arg.S = table.Snapshot;
 		Actions['removeFromTeam'](d.arg);
 		d.arg.S = 'get_S';
 		var data = {
@@ -719,9 +724,9 @@ function removeFromTeam(d) {
 function moveTeamToAttack(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.moveTeamToAttack({
-            S : table.snapshot,
-            Known :  table.known,
-            Accordance : table.accordance,
+            S : table.Snapshot,
+            Known :  table.Known,
+            Accordance : table.Accordance,
             card : d.arg.card,
             pX :  d.arg.pX,
             team : d.arg.team,
@@ -729,7 +734,7 @@ function moveTeamToAttack(d) {
             to : d.arg.to,
         })) 
 	{
-		d.arg.S = table.snapshot;
+		d.arg.S = table.Snapshot;
 		Actions['moveTeamToAttack'](d.arg);
 		d.arg.S = 'get_S';
 		var data = {
@@ -746,13 +751,13 @@ function moveTeamToAttack(d) {
 function block(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.block({
-            S:table.snapshot,
+            S:table.Snapshot,
             attackTeam : d.arg.attackTeam,
             blockTeam : d.arg.blockTeam,
             pX : d.arg.pX
     })) 
 	{	
-		d.arg.S = table.snapshot;
+		d.arg.S = table.Snapshot;
 		Actions['block'](d.arg);
 		d.arg.S = 'get_S';
 		var data = {
@@ -769,19 +774,19 @@ function block(d) {
 function charge(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.charge({
-            Accordance : table.accordance,
+            Accordance : table.Accordance,
             card: d.arg.card,
-            Known: table.known,
+            Known: table.Known,
             owner:d.arg.owner,
             pX:d.u.you,
-            S:table.snapshot,
+            S:table.Snapshot,
         })) {
 		var arg = {
 			card:d.arg.card,
 			from:d.arg.from,
 			owner:d.arg.owner,
 			pX:d.u.you,
-			S: table.snapshot,
+			S: table.Snapshot,
 			to:'chackra',
 		}
 		Actions['moveCardToZone'](arg);
@@ -799,34 +804,74 @@ function charge(d) {
 function drawCardAtStartTurn(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.drawCardAtStartTurn({
-            Accordance : table.accordance,
-            Known: table.known,
+            Accordance : table.Accordance,
+            Known: table.Known,
             pX:d.u.you,
-            S:table.snapshot,
+            S:table.Snapshot,
         })) {
 		var arg = {
 			pX:d.u.you,
-			S: table.snapshot,
+			S: table.Snapshot,
 			count: 1,
 		}
-		var drawenCardId = table.snapshot[d.u.you].deck[0];
+		var drawenCardId = table.Snapshot[d.u.you].deck[0];
 		Actions['Draw X cards'](arg);
 		arg.S = 'get_S';
 	
 		var data = {
-			upd : {	accordance:{}, known:{}	},
+			upd : {	Accordance:{}, Known:{}	},
 			acts : [{'arg':arg, 'act' : 'Draw X cards'}]
 		}
 		io.sockets.in(table['room'+d.u.opp]).emit('updact', data);
-		data.upd.accordance[drawenCardId] 
-			= table[d.u.you].accordance[drawenCardId] 
-			= table.accordance[drawenCardId];
-		data.upd.known[table.accordance[drawenCardId]] 
-			= table[d.u.you].known[table.accordance[drawenCardId]] 
-			= table.known[table.accordance[drawenCardId]];
+		data.upd.Accordance[drawenCardId] 
+			= table[d.u.you].Accordance[drawenCardId] 
+			= table.Accordance[drawenCardId];
+		data.upd.Known[table.Accordance[drawenCardId]] 
+			= table[d.u.you].Known[table.Accordance[drawenCardId]] 
+			= table.Known[table.Accordance[drawenCardId]];
 		io.sockets.in(table['room'+d.u.you]).emit('updact', data);
 	} else {
 		console.log('bad')
+	}
+	// TODO возможно надо реагировать
+}
+
+function getUniversalObject(tableID, obj) {
+	var table = StartedGames[tableID];
+    var res = {
+        Accordance : Accordance,
+        Known : Known,
+        S : S,
+        pX : you
+    }
+    var obj = obj || {};
+    for (var i in obj) {
+        res[i] = obj[i];
+    }
+    return res;
+}
+
+function newLeader(d) {
+	console.log('on newLeader')
+	var table = StartedGames[d.u.table];
+	var additionalArg = 
+	if (Can.newLeader( getUniversalObject(d.u.table, d.arg))) {
+		var arg = {
+			card : d.arg.cardId,
+			team : d.arg.team,
+			zone : d.arg.zone,
+			pX : d.arg.pX,
+			S: table.Snapshot,
+		}
+		Actions.newLeader(arg);
+		arg.S = 'get_S';
+	
+		var data = {
+			acts : [{'arg':arg, 'act' : 'newLeader'}]
+		}
+		io.sockets.in(table['room']).emit('newLeader', data);
+	} else {
+		console.log('bad newLeader')
 	}
 	// TODO возможно надо реагировать
 }
