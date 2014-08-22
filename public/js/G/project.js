@@ -1690,3 +1690,23 @@ function blockMove(_this) {
     }
 
 }
+
+
+/**
+ * Функция возврежащет объет в котором бубут находиться ссылки на все осоновне объекты необъодимые для
+ * для функций объект Can и Асtion 
+ * @return {[type]} [description]
+ */
+function getUniversalObject(obj) {
+    var res = {
+        Accordance : Accordance,
+        Known : Known,
+        S : S,
+        pX : you
+    }
+    var obj = obj || {};
+    for (var i in obj) {
+        res[i] = obj[i];
+    }
+    return res;
+}
