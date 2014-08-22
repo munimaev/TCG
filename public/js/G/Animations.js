@@ -360,14 +360,38 @@ var AN = {
 		 */
 		newLeader : function(o) {
 
+		    var condidateCount = 0;
+		    for (var i in S[o.pX][o.zone].team[o.team]) {
+		    	var cardId = S[o.pX][o.zone].team[o.team][i];
+		    	if (Can.newLeader({
+			    		Known : Known,
+			    		Accordance : Accordance,
+			    		card : cardId,
+			    		team : o.team,
+			    		zone : o.zone,
+			    		pX : o.pX,
+			    		S : S
+		    		})
+		    	) {
+		    		condidateCount++;
+		    		C[cardId].setZIndex(1202);
+		    	}
+		    }
+		    if(!condidateCount) return;
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
 		    Context.clickAction = function( card ) {
-		    	alert(1);
-		        // makeAsLeader( card );
-		        // Context.workingUnit = null;
-		        // Context.clickAction = null;
-		        // $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
+		    	alert(1)
+				socket.emit('newLeader', {u:Client, arg:{
+		    		card : cardId,
+		    		team : o.team,
+		    		zone : o.zone,
+		    		pX : o.pX,
+				}});
+		        //makeAsLeader( card );
+		        Context.workingUnit = null;
+		        Context.clickAction = null;
+		        $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
 		        // startTable();
 		    }
 		}
