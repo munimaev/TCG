@@ -83,6 +83,35 @@ var Can = {
      * @param  {[type]} o.S
      * @param  {[type]} o.Known
      * @param  {[type]} o.Accordance
+     * @param  {[type]} o.card - первая выбранная
+     * @param  {[type]} o.team
+     * @param  {[type]} o.zone
+     */
+    newLeader : function (o) {
+        if ( o.S.phase == 'shutdown'
+             && o.Known[o.Accordance[o.card]].type  == 'N' 
+             && o.Known[o.Accordance[o.card]].owner == o.pX 
+             && o.S[o.pX][o.zone].team[o.team]
+             && arraySearch(o.S[o.pX][o.zone].team[o.team], o.card) !== null
+        ){
+            return true;
+        }
+        console.log(o.S.phase == 'shutdown'
+             , o.Known[o.Accordance[o.card]].type  == 'N' 
+             , o.Known[o.Accordance[o.card]].owner == o.pX 
+             , o.S[o.pX][o.zone].team[o.team]
+             , arraySearch(o.S[o.pX][o.zone].team[o.team], o.card) !== null
+        )
+        console.log(o.card, o.team, o.zone, o.pX);
+        console.log(o.S[o.pX][o.zone].team)
+        return false;
+    },
+    /**
+     * Можно ли поменять местами с этой картой
+     * @param  {[type]} o [description]
+     * @param  {[type]} o.S
+     * @param  {[type]} o.Known
+     * @param  {[type]} o.Accordance
      * @param  {[type]} o.c1.card - первая выбранная
      * @param  {[type]} o.c2.card - вторая выбранная
      * @param  {[type]} o.pX
