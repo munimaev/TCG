@@ -504,6 +504,20 @@ var Actions = {
 		result += o.Known[o.Accordance[o.cardID]].si;
 		return result;
 	},
+	'newLeader' : function(o) {
+		var team = o.S[o.pX][o.zone].team[o.team]; 
+		if ( team[0]== o.card) return;
+		for (var i in team) {
+			if (team[i] == o.card) {
+				team.splice(0,0,team.splice(i,1)[0]); // Вырезает итый элемент и вставляет в начало массива
+				break;
+			}
+		}
+		if (!module) {
+			AN.stop = false;
+			AnimationNext();
+		}
+	},
 	'log' : function() { console.log('msg')}
 };
 if (module) {
