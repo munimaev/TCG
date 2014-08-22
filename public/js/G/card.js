@@ -8,7 +8,16 @@
 function Card( o ) {
 
     this.id = o.id;
-
+    /**
+     * Возвращает параметр name для карты из массива upd,
+     * если такойго параметра не было (напрмер при создании карты), 
+     * то данные будут барться из объекта o (переданного в конструктор класса).
+     * Если и там его не окжется, то функция попытаеться взять значение, у текущего экземпляра объекта Card.
+     * Если все же икомое значение не найдено возвращаеться занчение пременной alternative.
+     * @param {[type]} name        имя параметра
+     * @param {[type]} alternative альтернативаное значение
+     * @param {[type]} upd         объект из которого будут браться значнеия
+     */
     this.setParam = function( name, alternative, upd ) {
         var o = upd || o || {};
         if ('faceUp' in o && !o.faceUp == true
@@ -21,6 +30,10 @@ function Card( o ) {
         if ( alternative ) return alternative;
         return null;
     }
+    /**
+     * Устанавливает параметры для объекта для большинства используеться this.setParam.
+     * @param {[type]} upd Необязательныей аргумент, в содержаться пармаетры которые необходимо одновить.
+     */
     this.setAllParams = function(upd){
         var upd = upd || null;
         this.params = {
