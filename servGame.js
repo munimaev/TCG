@@ -138,7 +138,7 @@ function lobby_join(req) {
 				StartedGames[id].sesA = req.ses;
 				SesssionTable[req.ses] = id;
 			}
-			this.emit('startGame',{"key":'alert'})
+			//this.emit('startGame',{"key":'alert'})
 			io.sockets.in(Tables[req.toTable].sokA).emit('startGame',{"key":'alert'});
 		}
 		req.table = req.toTable;
@@ -322,7 +322,7 @@ function getStartSnapshot(table) {
 	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
-	    phase: "attack",
+	    phase: "block",
 	    stop: false,
 	    turnNumber: 0,
 	    counters : {
@@ -355,7 +355,7 @@ function getStartSnapshot(table) {
 	        }
 	    },
 	    battlefield : {
-	    	2:null
+	    	2:5
 	    },
 	    stack : {
 
@@ -373,7 +373,6 @@ function getStartSnapshot(table) {
 	        village : {
 	            team : {
 	            	// 4:['c005'],
-	            	5:['c002','c003','c005'],
 	            	6:['c001','c004','c006']
 	        	}
 	        },
@@ -381,7 +380,9 @@ function getStartSnapshot(table) {
 	            team : {}
 	        },
 	        block : {
-	            team : {}
+	            team : {
+	            	5:['c002','c003','c005'],
+	            }
 	        }
 	    },
 	    statuses : {
@@ -583,8 +584,12 @@ function pressNextBtn(d) {
 			&& table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
 		)){
 			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
-			Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
-			data.acts.push({'arg':{S:'get_S', Stadies:'get_Stadies', Known:'get_Known', Accordance:'get_Accordance'}, 'act' : 'toNextPhase'})
+			var actReuslt = Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
+			console.log(actReuslt);
+			for (var i in actReuslt) {
+				data.acts.push(actReuslt[i]/*{ 'arg':actReuslt.arg, 'act' : actReuslt.act }*/)
+			}
+			//data.acts.push({'arg':{S:'get_S', Stadies:'get_Stadies', Known:'get_Known', Accordance:'get_Accordance'}, 'act' : 'toNextPhase'})
 		} 
 		else {
 			table.meta.toNextPhase[d.u.opp] = false;
@@ -854,7 +859,6 @@ function getUniversalObject(tableID, obj) {
 function newLeader(d) {
 	console.log('on newLeader')
 	var table = StartedGames[d.u.table];
-	var additionalArg = 
 	if (Can.newLeader( getUniversalObject(d.u.table, d.arg))) {
 		var arg = {
 			card : d.arg.cardId,
