@@ -22,7 +22,7 @@ socket.on('C_init', function(d){
 	Client.opp = opp = d.opp;
 	Client.table = d.table
 	Client.ses = ses;
-	S = d.snapshot;
+	S = d.Snapshot;
 	updAllCount();
     if (S && ready) {
 		socket.emit('imJoined',Client)
@@ -61,8 +61,8 @@ function updAllCount() {
 }
 
 socket.on('bothIsJoin', function(d) {
-	Accordance = d.accordance;
-	Known = d.known;
+	Accordance = d.Accordance;
+	Known = d.Known;
 	console.log(d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
@@ -87,12 +87,12 @@ function get_arg(txt) {
 
 function applyUpd(d) {
 	if (d.upd) {
-//		console.log("↳ upd ",d.upd)
-		if (d.upd.known) for (var i in d.upd.known) {
-			Known[i] = d.upd.known[i];
+		console.log("↳ upd ",d.upd)
+		if (d.upd.Known) for (var i in d.upd.Known) {
+			Known[i] = d.upd.Known[i];
 		}
-		if (d.upd.accordance) for (var i in d.upd.accordance) {
-			Accordance[i] = d.upd.accordance[i];
+		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
+			Accordance[i] = d.upd.Accordance[i];
 		}
 		if (d.upd.meta) for (var i in d.upd.meta) {
 			Meta[i] = d.upd.meta[i];
@@ -109,7 +109,7 @@ socket.on('action',function(d) {
 
 function applyAct(d) {
 	if (d.acts) {
-//		console.log("↳ acts ",d.acts)
+		console.log("↳ acts ",d.acts)
 		for (var i in d.acts) {
 			for (var i2 in d.acts[i].arg) {
 				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
