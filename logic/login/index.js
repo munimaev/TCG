@@ -34,7 +34,6 @@ function create(request, response) {
  */
 function processPost(request, response) {
   //console.log('processing POST request: ', request.query.login, request.query.password, request.query.remember);
-
   var nextLocation = '/login' ;
 
   if ((request.query.login==='Thor')&&(request.query.password==='111') ||
