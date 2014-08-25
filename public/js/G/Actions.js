@@ -59,13 +59,14 @@ var Actions = {
 
     	//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
     	o.S.phase = o.Stadies.order[newKey];
-
-    	if (o.S.phase+'AtStart' in Actions) {
-    		Actions[o.S.phase+'AtStart'](o);
-    	}
-    	if (!module) {
-    		updTable(); 
+    	if (module) {
+	    	if (o.S.phase+'AtStart' in Actions) {
+	    		return Actions[o.S.phase+'AtStart'](o);
+	    	}
 	    }
+    	// if (!module) {
+    	// 	updTable(); 
+	    // }
 	},
 	'moveCardToZone' : function (o) {
 		// o.from 
@@ -267,8 +268,14 @@ var Actions = {
 	},
 	'comebackAtStart' : function(o) {
 	},
+	'applyToReult' : function(o) {
+
+	},
 	'shutdownAtStart' : function(o) {
+		var result = [];//{'arg':{}, 'act':{}};
+		var step1 = null, step2 = null;
         for (var attackID in o.S.battlefield) {
+        	step1 = step2 = null;
 			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
 			var blockID     = o.S.battlefield[attackID];
 			var blocker     = o.blocker = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
@@ -280,55 +287,54 @@ var Actions = {
 				var blockPower  = Actions.getTeamPower(blockTeam, o);
 				if (attackPower > blockPower) {
 					if (attackPower - blockPower >= 5) {
-						Actions.completeDefeat(blockTeam, o);
-						Actions.completeWin(attackTeam, o);
+						step1 = Actions.completeDefeat(blockTeam, o);
+						step2 = Actions.completeWin(attackTeam, o);
 					} 
 					else {
-						Actions.normalDefeat(blockTeam, o);
-						Actions.normalWin(attackTeam, o);
+						step1 = Actions.normalDefeat(blockTeam, o);
+						step2 = Actions.normalWin(attackTeam, o);
 					}
 				}
 				else if (attackPower < blockPower) {
 					if (blockPower - attackPower >= 5) {
-						Actions.completeDefeat(attackTeam, o);
-						Actions.completeWin(blockTeam, o);
+						step1 = Actions.completeDefeat(attackTeam, o);
+						step2 = Actions.completeWin(blockTeam, o);
 					} 
 					else {
-						Actions.normalDefeat(attackTeam, o);
-						Actions.normalWin(blockTeam, o);
+						step1 = Actions.normalDefeat(attackTeam, o);
+						step2 = Actions.normalWin(blockTeam, o);
 					}
 				}
 				else {
-					Actions.drawBattle(attackTeam, o);
-					Actions.drawBattle(blockTeam, o);
+					step1 = Actions.drawBattle(attackTeam, o);
+					step2 = Actions.drawBattle(blockTeam, o);
 				}
 			}
 			else {
 				if (attackPower >= 5) {
 					o.rewardToPlayer = o.S.activePlayer;
-					Actions.completeReward(attackTeam, o);
+					step1 = Actions.completeReward(attackTeam, o);
 				}
 				else {
 					o.rewardToPlayer = o.S.activePlayer;
-					Actions.normalReward(attackTeam, o);
+					step1 = Actions.normalReward(attackTeam, o);
 				}
+			}
+			if (step1) {
+				result.push(step1);
+			}
+			if (step2) {
+				result.push(step1);
 			}
         }
 
-		var pXs = ['pA','pB'];
-		var zones = ['attack','block'];
-		for (var pX in pXs) {
-			for (var zone in zones) {
-				var z = o.S[pXs[pX]][zones[zone]];
-				for (var t in z.team) {
-					o.S[pXs[pX]].village.team[t] = o.S[pXs[pX]][zones[zone]].team[t];
-					delete o.S[pXs[pX]][zones[zone]].team[t];
-				}
-			}
-		}
-		o.S.battlefield = {};
+        Actions.retrunTeamToVillage(o)
+		
+
 		if (!module) {
 			updTable();
+		} else {
+			return result;
 		}
 	},
 	'winnerAtStart' : function(o) {
@@ -353,6 +359,8 @@ var Actions = {
 		o.S.stop = true;
 	},
 	'completeDefeat' : function(team, o) {
+		console.log('completeDefeat')
+		var result = {};
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'completeDefeat';
@@ -361,36 +369,71 @@ var Actions = {
 		}
 		o.damage = 2;
 		Actions.giveDamage(team[0],o);
+		if (module) {
+			result = {'completeDefeat':{},act:'completeDefeat'};
+			return result;
+		}
 	},
 	'normalDefeat' : function(team, o) {
+		var result = {};
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'normalDefeat';
 		Actions.giveDamage(team[0],o);
+		if (module) {
+			result = {'arg':{},act:'normalDefeat'};
+			return result;
+		}
 	},
 	'completeWin' : function(team, o) {
+		console.log('completeWin')
+		var result = {};
 		if (!team) return;
+		if (module) {
+			result = {'arg':{},act:'completeWin'};
+			return result;
+		}
 	},
 	'normalWin' : function(team, o) {
+		var result = {};
 		if (!team) return;
+		if (module) {
+			result = {'arg':{},act:'normalWin'};
+			return result;
+		}
 	},
 	'normalReward' : function(team, o) {
+		var result = {};
 		if (!team) return;
 		o.rewardsCount = 1;
 		o.causeOfReward = 'normalReward';
 		Actions.giveReward(team[0],o);
+		if (module) {
+			result = {'arg':{},act:'normalReward'};
+			return result;
+		}
 	},
 	'completeReward' : function(team, o) {
+		var result = {};
 		if (!team) return;
 		o.rewardsCount = 2;
 		o.causeOfReward = 'completeReward';
 		Actions.giveReward(team[0],o);
+		if (module) {
+			result = {'arg':{},act:'completeReward'};
+			return result;
+		}
 	},
 	'drawBattle' : function(team, o) {
+		var result = {};
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'drawBattle';
 		Actions.giveDamage(team[0],o);
+		if (module) {
+			result = {'arg':{},act:'drawBattle'};
+			return result;
+		}
 	},
 	'giveDamage' : function(cardID, o) {
 		if (!module) {
@@ -463,6 +506,20 @@ var Actions = {
 				}
 			}
 		}
+	},
+	'retrunTeamToVillage'  : function (o) {
+		var pXs = ['pA','pB'];
+		var zones = ['attack','block'];
+		for (var pX in pXs) {
+			for (var zone in zones) {
+				var z = o.S[pXs[pX]][zones[zone]];
+				for (var t in z.team) {
+					o.S[pXs[pX]].village.team[t] = o.S[pXs[pX]][zones[zone]].team[t];
+					delete o.S[pXs[pX]][zones[zone]].team[t];
+				}
+			}
+		}
+		o.S.battlefield = {};
 	},
 	'getTeamPower' : function(team, o) {
 		var result = 0;
