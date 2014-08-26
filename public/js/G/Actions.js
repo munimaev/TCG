@@ -272,8 +272,13 @@ var Actions = {
 
 	},
 	'shutdownAtStart' : function(o) {
-		var result = [];//{'arg':{}, 'act':{}};
+		var result = {};//{'arg':{}, 'act':{}};
 		var step1 = null, step2 = null;
+		var adWinnerAndLoser = [];
+		function adWinnerAndLoserPush(pX, zone, team, ad) {
+			adWinnerAndLoser.push({pX : pX, zone: zone, team: team, ad: ad})
+		}
+		var blockResult = {};
         for (var attackID in o.S.battlefield) {
         	step1 = step2 = null;
 			var attackTeam  = o.S[o.S.activePlayer].attack.team[attackID];
@@ -282,58 +287,76 @@ var Actions = {
 			var attackPower = Actions.getTeamPower(attackTeam, o);
 			// если атакующая команда заюблокирована
 			if (blockID) {
-
 				var blockTeam   = o.S[blocker].block.team[blockID];
 				var blockPower  = Actions.getTeamPower(blockTeam, o);
 				if (attackPower > blockPower) {
 					if (attackPower - blockPower >= 5) {
-						step1 = Actions.completeDefeat(blockTeam, o);
-						step2 = Actions.completeWin(attackTeam, o);
+
+						adWinnerAndLoserPush( blocker, 'block', blockID, 'completeDefeat');
+						//blockResult = Actions.completeDefeat(blockTeam, o, blockID);
+
+						adWinnerAndLoserPush( o.S.activePlayer, 'attack', attackID, 'completeWin');
+						//blockResult = Actions.completeWin(attackTeam, o, attackID);
 					} 
 					else {
-						step1 = Actions.normalDefeat(blockTeam, o);
-						step2 = Actions.normalWin(attackTeam, o);
+
+						adWinnerAndLoser.push(blocker, 'block', blockID, 'normalDefeat');
+						//blockResult = Actions.normalDefeat(blockTeam, o, blockID);
+
+						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID, 'normalWin');
+						//blockResult = Actions.normalWin(attackTeam, o, attackID);
 					}
 				}
 				else if (attackPower < blockPower) {
 					if (blockPower - attackPower >= 5) {
-						step1 = Actions.completeDefeat(attackTeam, o);
-						step2 = Actions.completeWin(blockTeam, o);
+
+						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
+						//blockResult = Actions.completeDefeat(attackTeam, o, attackID);
+
+						adWinnerAndLoser.push(blocker,'block', blockID, 'completeWin');
+						//blockResult = Actions.completeWin(blockTeam, o, blockID);
 					} 
 					else {
-						step1 = Actions.normalDefeat(attackTeam, o);
-						step2 = Actions.normalWin(blockTeam, o);
+
+						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
+						//blockResult = Actions.normalDefeat(attackTeam, o, attackID);
+
+						adWinnerAndLoser.push(blocker,'block', blockID, 'completeWin');
+						//blockResult = Actions.normalWin(blockTeam, o, blockID);
 					}
 				}
 				else {
-					step1 = Actions.drawBattle(attackTeam, o);
-					step2 = Actions.drawBattle(blockTeam, o);
+
+					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'drawBattle');
+					//blockResult = Actions.drawBattle(attackTeam, o, attackID);
+
+					adWinnerAndLoser.push(blocker,'block', blockID, 'drawBattle');
+					//blockResult = Actions.drawBattle(blockTeam, o, blockID);
 				}
 			}
 			else {
 				if (attackPower >= 5) {
+
+					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeReward');
 					o.rewardToPlayer = o.S.activePlayer;
-					step1 = Actions.completeReward(attackTeam, o);
+					//blockResult = Actions.completeReward(attackTeam, o, attackID);
 				}
 				else {
+
+					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'normalReward');
 					o.rewardToPlayer = o.S.activePlayer;
-					step1 = Actions.normalReward(attackTeam, o);
+					//blockResult = Actions.normalReward(attackTeam, o, attackID);
 				}
-			}
-			if (step1) {
-				result.push(step1);
-			}
-			if (step2) {
-				result.push(step1);
 			}
         }
 
-        Actions.retrunTeamToVillage(o)
+        //Actions.retrunTeamToVillage(o)
 		
 
 		if (!module) {
 			updTable();
 		} else {
+			result.adWinnerAndLoser = adWinnerAndLoser;
 			return result;
 		}
 	},
@@ -359,18 +382,21 @@ var Actions = {
 		o.S.stop = true;
 	},
 	'completeDefeat' : function(team, o) {
-		console.log('completeDefeat')
-		var result = {};
+		console.log('completeDefeat' , team)
+		var result = {'givingDamage':[]};
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'completeDefeat';
+		var damgeResult1 = {}, damgeResult2 = {};
 		for (var i=1; i <= team.length - 1; i++) {
-			Actions.giveDamage(team[i],o);
+			result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[i], damage: o.damage, type: 'fire'})
+			//damgeResult1 = Actions.giveDamage(team[i],o);
 		}
 		o.damage = 2;
-		Actions.giveDamage(team[0],o);
-		if (module) {
-			result = {'completeDefeat':{},act:'completeDefeat'};
+		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: o.damage, type: 'fire'})
+		//damgeResult2 = Actions.giveDamage(team[0],o);
+		if (module) { 
+			console.log('completeDefeat')
 			return result;
 		}
 	},
@@ -379,18 +405,19 @@ var Actions = {
 		if (!team) return;
 		o.damage = 1;
 		o.causeOfDamage = 'normalDefeat';
-		Actions.giveDamage(team[0],o);
+
+		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'})
+		//Actions.giveDamage(team[0],o);
+
 		if (module) {
-			result = {'arg':{},act:'normalDefeat'};
 			return result;
 		}
 	},
 	'completeWin' : function(team, o) {
-		console.log('completeWin')
+		console.log('completeWin',team)
 		var result = {};
 		if (!team) return;
 		if (module) {
-			result = {'arg':{},act:'completeWin'};
 			return result;
 		}
 	},
@@ -436,6 +463,7 @@ var Actions = {
 		}
 	},
 	'giveDamage' : function(cardID, o) {
+		var result = {damageResult:[]};
 		if (!module) {
 			AnimationPush({func:function() {
 				AN.damage(cardID,o);
@@ -443,14 +471,18 @@ var Actions = {
 		}
 		if (o.damage == 1) {
 			if (Actions.getHealtStatus(cardID, o)) {
-				Actions.injureTarget(cardID, o);
+				result.damageResult.push({pX:o.pX, team:o.team, zone:o.zone, card: o.card, result: 'injured'});
+				//Actions.injureTarget(cardID, o);
 			}
 			else {
-				Actions.killTarget(cardID, o);
+				result.damageResult.push({pX:o.pX, team:o.team, zone:o.zone, card: o.card, result: 'death'});
+				//Actions.killTarget(cardID, o);
 			}
 		} else if (o.damage >=2) {
-			Actions.killTarget(cardID, o);
+			result.damageResult.push({pX:o.pX, team:o.team, zone:o.zone, card: o.card, result: 'death'});
+			//Actions.killTarget(cardID, o);
 		}
+		return result;
 	},
 	'giveReward' : function(cardID, o) {
 		if (!module) {
@@ -574,6 +606,54 @@ var Actions = {
 			AN.stop = false;
 			AnimationNext();
 		}
+	},
+	'preStackDone' : function(preStack, o) {
+		var results = [];
+		var result = {};
+		for (var func in preStack) {
+			for (var args in preStack[func]) {
+				results.push(Actions[func]( preStack[func][args], o));
+			}
+		}
+		for (var i in results) {
+			if (results[i]) {
+				for (var name in results[i]) {
+					if (!(name in result)) result[name] = [];
+					for (var act in results[i][name]) {
+						result[name].push(results[i][name][act])
+					}
+				}
+			}
+		}
+		return result;
+	},
+	'adWinnerAndLoser' : function(args, o) {
+		console.log('\nadWinnerAndLoser')
+		o.pX = args.pX;
+		o.zone =args.zone;
+		o.team = args.team;
+		var team = o.S[args.pX][args.zone].team[args.team];
+		return Actions[args.ad](team, o);
+	},
+	'givingDamage' : function(args, o) {
+		console.log('\ngivingDamage')
+		o.pX = args.pX;
+		o.zone =args.zone;
+		o.team = args.team;
+		o.card = args.card;
+		o.damage = args.damage;
+		return Actions.giveDamage(args.card,o);
+	},
+	'damageResult' : function(args, o) {
+		console.log('\ndamageResult')
+		o.pX = args.pX;
+		o.zone =args.zone;
+		o.team = args.team;
+		o.card = args.card;
+		o.result = args.result;
+		if (args.result == 'death')   return Actions.killTarget(args.card,o);
+		if (args.result == 'injured') return Actions.injureTarget(args.card,o);
+		return {};
 	},
 	'log' : function() { console.log('msg')}
 };
