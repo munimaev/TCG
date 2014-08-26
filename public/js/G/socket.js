@@ -87,7 +87,7 @@ function get_arg(txt) {
 
 function applyUpd(d) {
 	if (d.upd) {
-		console.log("↳ upd ",d.upd)
+		//console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
 			Known[i] = d.upd.Known[i];
 		}
@@ -109,7 +109,7 @@ socket.on('action',function(d) {
 
 function applyAct(d) {
 	if (d.acts) {
-		console.log("↳ acts ",d.acts)
+		//console.log("↳ acts ",d.acts)
 		for (var i in d.acts) {
 			for (var i2 in d.acts[i].arg) {
 				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
@@ -118,7 +118,24 @@ function applyAct(d) {
 		}
 	}
 }
+
+function applyStackPrep(d) {
+	if (d.stackPrep) {
+		//console.log("↳ acts ",d.acts)
+		for (var func in d.stackPrep) {
+			for (var args in d.stackPrep[func]) {
+				AN.preStack.count++;
+				AN.preStack[func](d.stackPrep[func][args]);
+			}	
+		}
+	}
+}
+
+
+
 socket.on('updact',function(d) {
+	console.log("↳ updact ",d)
 	 applyUpd(d);
 	 applyAct(d);
+	 applyStackPrep(d);
 })
