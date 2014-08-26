@@ -395,5 +395,49 @@ var AN = {
 		        // startTable();
 		    }
 		}
+	},
+	preStack : {
+		count : 0,
+		adWinnerAndLoser : function(args) {
+			console.log(args)
+			setTimeout(function(){
+					AN.preStack.count--;
+					if (AN.preStack.count < 1) {
+						socket.emit('preStackDone',{u:Client})
+					}
+				}, 500
+			)
+		},
+		givingDamage : function(args) {
+			console.log(args)
+			C[args.card].effect({
+				type : 'simple',
+				target : 'one',
+				afterFunc : function(){
+					AN.preStack.count--;
+					if (AN.preStack.count < 1) {
+						socket.emit('preStackDone',{u:Client})
+					}}
+			})
+		},
+		'damageResult' : function(args) {
+			console.log(args)
+			if (args.result == 'death')  {
+				C[args.card].effect({
+					type : 'simple',
+					target : 'one',
+					pic : "public/pics/death.jpg",
+					afterFunc : function(){
+						AN.preStack.count--;
+						if (AN.preStack.count < 1) {
+							socket.emit('preStackDone',{u:Client})
+						}}
+				})
+			}
+			else if(args.result == 'injured'){
+				Actions.injureTarget(cardID, getUniversalObject());
+			}
+
+		}
 	}
 }
