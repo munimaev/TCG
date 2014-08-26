@@ -46,6 +46,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('player:unsit', playerUnsit);
     gameSocket.on('imJoined',imJoined);
     gameSocket.on('newLeader',newLeader);
+    gameSocket.on('preStackDone',preStackDone);
     //-----------------------------------------
     gameSocket.on('initGame', S_init);
     gameSocket.on('startDrawHand', S_startDrawHand);
@@ -138,7 +139,7 @@ function lobby_join(req) {
 				StartedGames[id].sesA = req.ses;
 				SesssionTable[req.ses] = id;
 			}
-			//this.emit('startGame',{"key":'alert'})
+			this.emit('startGame',{"key":'alert'})
 			io.sockets.in(Tables[req.toTable].sokA).emit('startGame',{"key":'alert'});
 		}
 		req.table = req.toTable;
@@ -573,8 +574,9 @@ function pressNextBtn(d) {
 		table.meta.toNextPhase[d.u.you] = true;
 		var data = {
 			upd:{meta:table.meta},
-			acts : []
-		};
+			acts : [],
+			stackPrep : {}
+ 		};
 		if ((Stadies[table.Snapshot.phase].party == 'both' 
 			&& table.meta.toNextPhase.pA 
 			&& table.meta.toNextPhase.pB
@@ -586,9 +588,9 @@ function pressNextBtn(d) {
 			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
 			var actReuslt = Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
 			console.log(actReuslt);
-			for (var i in actReuslt) {
-				data.acts.push(actReuslt[i]/*{ 'arg':actReuslt.arg, 'act' : actReuslt.act }*/)
-			}
+			data.stackPrep = actReuslt;
+			table.stackPrep = actReuslt;
+			table.stackPreppA = table.stackPreppB = null;
 			//data.acts.push({'arg':{S:'get_S', Stadies:'get_Stadies', Known:'get_Known', Accordance:'get_Accordance'}, 'act' : 'toNextPhase'})
 		} 
 		else {
@@ -844,10 +846,9 @@ function drawCardAtStartTurn(d) {
 function getUniversalObject(tableID, obj) {
 	var table = StartedGames[tableID];
     var res = {
-        Accordance : Accordance,
-        Known : Known,
-        S : S,
-        pX : you
+        Accordance : table.Accordance,
+        Known : table.Known,
+        S : table.Snapshot,
     }
     var obj = obj || {};
     for (var i in obj) {
@@ -878,4 +879,17 @@ function newLeader(d) {
 		console.log('bad newLeader')
 	}
 	// TODO возможно надо реагировать
+}
+
+function preStackDone(d) {
+	console.log('on preStackDone')
+	var table = StartedGames[d.u.table];
+	table['stackPrep' + d.u.you] = true;
+	if (table.stackPreppA && table.stackPreppB) {
+		var actReuslt = Actions.preStackDone( table.stackPrep, getUniversalObject(d.u.table, {pX:d.u.you}));
+		console.log(actReuslt)
+		table.stackPrep = actReuslt;
+		table.stackPreppA = table.stackPreppB = null;
+		io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
+	}
 }
