@@ -88,8 +88,8 @@ var Can = {
      * @param  {[type]} o.zone
      */
     newLeader : function (o) {
-        if ( o.S.phase == 'shutdown'
-             && o.Known[o.Accordance[o.card]].type  == 'N' 
+        if ( /*o.S.phase == 'shutdown' TODO  Перенести переход в новую фазу как первую ступень preStack
+             &&*/ o.Known[o.Accordance[o.card]].type  == 'N' 
              && o.Known[o.Accordance[o.card]].owner == o.pX 
              && o.S[o.pX][o.zone].team[o.team]
              && arraySearch(o.S[o.pX][o.zone].team[o.team], o.card) !== null
