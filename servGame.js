@@ -47,6 +47,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('imJoined',imJoined);
     gameSocket.on('newLeader',newLeader);
     gameSocket.on('preStackDone',preStackDone);
+    gameSocket.on('addAnswers',addAnswers);
     //-----------------------------------------
     gameSocket.on('initGame', S_init);
     gameSocket.on('startDrawHand', S_startDrawHand);
@@ -881,13 +882,32 @@ function newLeader(d) {
 	// TODO возможно надо реагировать
 }
 
+
+function addAnswers(d) {
+	var table = StartedGames[d.u.table];
+	if (d.answers) {
+		if (!('answers' in table)) table.answers = {'pA':{}, 'pB':{}};
+		for (var i in d.answers) {
+			if (!(i in table.answers[d.u.you])) table.answers[d.u.you][i] = [];
+			table.answers[d.u.you][i] = table.answers[d.u.you][i].concat(d.answers[i])
+		}
+	}
+}
+
 function preStackDone(d) {
 	console.log('on preStackDone')
 	var table = StartedGames[d.u.table];
 	table['stackPrep' + d.u.you] = true;
+
+	addAnswers(d)
+
 	if (table.stackPreppA && table.stackPreppB) {
-		var actReuslt = Actions.preStackDone( table.stackPrep, getUniversalObject(d.u.table, {pX:d.u.you}));
-		console.log(actReuslt)
+		for (var i in table.stackPrep) {
+			if (i == 'afterQuestion') delete table.stackPrep[i];
+		}
+		console.log('\ntable.stackPrep',table.stackPrep)
+		var actReuslt = Actions.preStackDone( table, getUniversalObject(d.u.table, {pX:d.u.you}));
+		console.log('\nactReuslt',actReuslt)
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
 		io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
