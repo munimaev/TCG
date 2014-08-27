@@ -119,13 +119,45 @@ function applyAct(d) {
 	}
 }
 
-function applyStackPrep(d) {
-	if (d.stackPrep) {
+var Answers = {}; Answers[you] = {};
+var stackPrepAfter = {
+	afterQuestion : [],
+	isRun : false,
+};
+
+function applyStackPrep(d, flag) {
+	var stackPrep = {};
+	var flag = flag || null;
+
+	if (!flag) stackPrep = d.stackPrep;
+	else {
+		for (var i in stackPrepAfter) {
+			stackPrep[i] = stackPrepAfter[i];
+		}
+	}
+
+	console.log('++++stackPrep ', flag, stackPrepAfter, stackPrep)
+	if (stackPrep) {
 		//console.log("↳ acts ",d.acts)
-		for (var func in d.stackPrep) {
-			for (var args in d.stackPrep[func]) {
+		if (flag != 'afterQuestion') {
+			Answers[you] = {}
+			stackPrepAfter.afterQuestion = [];
+			for (var func in stackPrep) {
+				if (func == 'afterQuestion') {
+					stackPrepAfter.isRun = true;
+					stackPrepAfter[func] = stackPrepAfter[func].concat(stackPrep[func]);
+					delete stackPrep[func];
+				}
+			}
+		}
+		else {
+			stackPrepAfter.afterQuestion = [];
+		}
+		console.log('--------stackPrep',flag, stackPrepAfter, stackPrep)
+		for (var func in stackPrep) {
+			for (var args in stackPrep[func]) {
 				AN.preStack.count++;
-				AN.preStack[func](d.stackPrep[func][args]);
+				AN.preStack[func](stackPrep[func][args]);
 			}	
 		}
 	}
