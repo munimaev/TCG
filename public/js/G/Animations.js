@@ -191,20 +191,20 @@ var AN = {
 	        {
 	    		var z = G[o.pX == you ? 'you' : 'opp'][o.to];
 	    		//console.log(z)
-				C[o.cardID].setZIndex(825);
-		        C[o.cardID].params.teamPosition = null;
-		        C[o.cardID].removeTeamPower();
+				C[o.card].setZIndex(825);
+		        C[o.card].params.teamPosition = null;
+		        C[o.card].removeTeamPower();
 
-		        C[o.cardID].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
+		        C[o.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
 		        	intoCard: true, 
 		        	incline: false, 
 		        	fadeIn: true, 
 		        	//curveMoving: 'Y', 
 		        	after: { func: function() {
-                        C[o.cardID].destroyCard();
+                        C[o.card].destroyCard();
                         //updateCardCount( { owner: o.owner, area: o.to } );
-                        delete C[o.cardID];
-                        updTable();
+                        delete C[o.card];
+                        //updTable();
                         //startTable();
                     } } } } );
 	        }
@@ -234,7 +234,7 @@ var AN = {
                         C[o.card].destroyCard();
                         //updateCardCount( { owner: o.owner, area: o.to } );
                         delete C[o.card];
-                        updTable();
+                        //updTable();
                         //startTable();
                     } } } } );
             }
@@ -286,9 +286,9 @@ var AN = {
 		                }
 		            })
 	        	}
-			    AnimationPush({func:function() {
-			        updTeams();
-			    }, time:1200, name: 'updTeams'});
+			    // AnimationPush({func:function() {
+			    //     updTeams();
+			    // }, time:1200, name: 'updTeams'});
 	        }
 	    }
 	},
@@ -358,18 +358,19 @@ var AN = {
 		 * @param  {[type]} o.team хлебная крошка в пути до команды
 		 * @return {[type]}   [description]
 		 */
-		newLeader : function(o) {
+		newLeader : function(args, o) {
 
+		    if (!('newLeader' in Answers[you])) Answers[you].newLeader = [];
 		    var condidateCount = 0;
-		    for (var i in S[o.pX][o.zone].team[o.team]) {
-		    	var cardId = S[o.pX][o.zone].team[o.team][i];
+		    for (var i in S[args.pX][args.zone].team[args.team]) {
+		    	var cardId = S[args.pX][args.zone].team[args.team][i];
 		    	if (Can.newLeader({
 			    		Known : Known,
 			    		Accordance : Accordance,
 			    		card : cardId,
-			    		team : o.team,
-			    		zone : o.zone,
-			    		pX : o.pX,
+			    		team : args.team,
+			    		zone : args.zone,
+			    		pX : args.pX,
 			    		S : S
 		    		})
 		    	) {
@@ -381,13 +382,20 @@ var AN = {
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
 		    Context.clickAction = function( card ) {
-		    	alert(1)
-				socket.emit('newLeader', {u:Client, arg:{
+		    	Answers[you].newLeader.push({
+		    		pX   : you,
+			    	zone : args.zone,
+		    		team : args.team,
 		    		card : cardId,
-		    		team : o.team,
-		    		zone : o.zone,
-		    		pX : o.pX,
-				}});
+		    	});
+		    	AN.preStack.countDown()
+		  //   	alert(1)
+				// socket.emit('newLeader', {u:Client, arg:{
+		  //   		card : cardId,
+		  //   		team : args.team,
+		  //   		zone : args.zone,
+		  //   		pX : args.pX,
+				// }});
 		        //makeAsLeader( card );
 		        Context.workingUnit = null;
 		        Context.clickAction = null;
@@ -398,6 +406,20 @@ var AN = {
 	},
 	preStack : {
 		count : 0,
+		countDown : function() {
+			
+			console.log('--')
+			AN.preStack.count--;
+			if (AN.preStack.count < 1) {
+				if (stackPrepAfter.isRun) {
+					stackPrepAfter.isRun = false;
+					applyStackPrep({}, 'afterQuestion')
+				}
+				else {
+					socket.emit('preStackDone',{u:Client, answers: Answers})
+				}
+			}
+		},
 		adWinnerAndLoser : function(args) {
 			console.log(args)
 			setTimeout(function(){
@@ -409,35 +431,37 @@ var AN = {
 			)
 		},
 		givingDamage : function(args) {
-			console.log(args)
 			C[args.card].effect({
 				type : 'simple',
 				target : 'one',
-				afterFunc : function(){
-					AN.preStack.count--;
-					if (AN.preStack.count < 1) {
-						socket.emit('preStackDone',{u:Client})
-					}}
+				afterFunc : AN.preStack.countDown
 			})
 		},
 		'damageResult' : function(args) {
-			console.log(args)
 			if (args.result == 'death')  {
 				C[args.card].effect({
 					type : 'simple',
 					target : 'one',
 					pic : "public/pics/death.jpg",
-					afterFunc : function(){
-						AN.preStack.count--;
-						if (AN.preStack.count < 1) {
-							socket.emit('preStackDone',{u:Client})
-						}}
+					afterFunc : AN.preStack.countDown
 				})
 			}
 			else if(args.result == 'injured'){
-				Actions.injureTarget(cardID, getUniversalObject());
+				Actions.injureTarget(args.card, getUniversalObject());
 			}
 
+		},
+		'moveCardToZone' : function(args) {
+			Actions.moveCardToZone(args, getUniversalObject(args))
+		},
+		'afterQuestion' : function(args) {
+			console.log('afterQuestion', args)
+			if (args.pX === you) {
+				AN.Questions[args.question](args, getUniversalObject());
+			}
+			else {
+				AN.preStack.countDown();
+			}
 		}
 	}
 }
