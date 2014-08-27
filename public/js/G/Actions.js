@@ -68,23 +68,31 @@ var Actions = {
     	// 	updTable(); 
 	    // }
 	},
-	'moveCardToZone' : function (o) {
-		// o.from 
-		// o.to
-		// p.pX
+	'moveCardToZone' : function (args, o) {
+		var result = {
+			updTable : [{players:'all'}],
+		};
+		o.from = args.from; 
+		o.to = args.to;
+		o.pX = args.pX;
+		o.team = args.team;
+		o.cardInArray = args.cardInArray;
+		o.card = args.card;
+
 	    if ( !isZoneSimple(o.from)) 
 	    {
 	        if ( isZoneSimple(o.to) )
 	        {
 	            o.S[o.pX][o.from].team[o.team].splice(o.cardInArray,1);
-	            o.S[o.pX][o.to].push(o.cardID);
-	            o.S.statuses[o.cardsID] = {};
+	            o.S[o.pX][o.to].push(o.card);
+	            o.S.statuses[o.card] = {};
 
 				if (!module) {
-					C[o.cardID].params.zona = o.to;
+					C[o.card].params.zona = o.to;
 					AnimationPush({func:function() {
 						AN.moveCardToZone(o);
 					}, time:1000, name: 'moveCardToZone'});
+					setTimeout(AN.preStack.countDown,1000)
 				}
 	        }
 	        else if ( !isZoneSimple(o.from) )
@@ -109,6 +117,7 @@ var Actions = {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
 						}, time:1000, name: 'moveCardToZone'});
+						setTimeout(AN.preStack.countDown,1000)
 					}
 	            }
 		        else if ( !isZoneSimple(o.to) ) 
@@ -120,10 +129,12 @@ var Actions = {
 							AN.moveCardToZone(o);
 							AN.moveToHand(o);
 						}, time:1000, name: 'moveCardToZone'});
+						setTimeout(AN.preStack.countDown,1000)
 					}
 		        }
 	        }
 	    }
+	    return result;
 	},
 	/**
 	 * createTeamFromCard
@@ -499,9 +510,11 @@ var Actions = {
 		o.S.statuses[cardID].injured = true;
 		if (!module) {
 			C[cardID].injure();
+			AN.preStack.countDown();
 		}
 	},
 	'killTarget' : function(cardID, o) {
+		var result = {'moveCardToZone' : [], 'afterQuestion':[]};
 		var pXs = ['pA', 'pB'];
 		var zones = ['village', 'attack','block'];
 		for (var pX in pXs) {
@@ -515,12 +528,21 @@ var Actions = {
 							o.pX = pXs[pX];
 							o.team = team;
 							o.cardInArray = card;
-							o.cardID = cardID;
+							o.card = cardID;
 
 							var o2 = {};
 							for (var i in o) o2[i] = o[i]
-							Actions.moveCardToZone(o2)
+
+							result.moveCardToZone.push({
+								pX:o.pX, from:o.from, team:o.team, card: o.card, to: o.to, cardInArray: o.card
+							});
+							//Actions.moveCardToZone(o2)
+							
+
 							if (card == 0) {
+								result.afterQuestion.push({
+									question: 'newLeader', pX:o.pX, zone:o.zone, team:o.team
+								});
 								if (!module) {
 									AN.stop = true;
 									AN.Questions.newLeader({
@@ -538,6 +560,7 @@ var Actions = {
 				}
 			}
 		}
+		return result;
 	},
 	'retrunTeamToVillage'  : function (o) {
 		var pXs = ['pA','pB'];
@@ -607,12 +630,15 @@ var Actions = {
 			AnimationNext();
 		}
 	},
-	'preStackDone' : function(preStack, o) {
+	'preStackDone' : function(table, o) {
+		console.log('table',table.preStack)
+		o.answers = table.answers;
 		var results = [];
 		var result = {};
-		for (var func in preStack) {
-			for (var args in preStack[func]) {
-				results.push(Actions[func]( preStack[func][args], o));
+		for (var func in table.stackPrep) {
+			for (var args in table.stackPrep[func]) {
+				console.log('stackPrep', func)
+				results.push( Actions[func]( table.stackPrep[func][args], o ) );
 			}
 		}
 		for (var i in results) {
