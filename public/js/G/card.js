@@ -288,8 +288,8 @@ function Card( o ) {
                 if (this.params.elements.length == 1) {
                     return '#'+D.colors[this.params.elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);'
-                         + '-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
+                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)'
+                         //TODO //+ ';background:-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
                 }
             break;
             case 'corner left':
@@ -318,8 +318,8 @@ function Card( o ) {
                 if (this.params.elements.length == 1) {
                     return '#'+D.colors[this.params.elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);'
-                         + '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
+                    return '-webkit-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)'
+                       //TODO  //  + 'background:-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);';
                 }
             break;
             case 'corner bottom':
