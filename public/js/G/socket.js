@@ -119,54 +119,94 @@ function applyAct(d) {
 	}
 }
 
-var Answers = {}; Answers[you] = {};
+var Answers = {};
+var stackPrepArfterIsRun = false;
 var stackPrepAfter = {
-	afterQuestion : [],
-	isRun : false,
+	afterQuestion : []
 };
-
-function applyStackPrep(d, flag) {
-	var stackPrep = {};
-	var flag = flag || null;
-
-	if (!flag) stackPrep = d.stackPrep;
-	else {
-		for (var i in stackPrepAfter) {
-			stackPrep[i] = stackPrepAfter[i];
-		}
+function applyStackAfter() {
+	console.log('applyStackAfter',stackPrepAfter);	
+	var stackPrep = stackPrepAfter;
+	for (var func in stackPrep) {
+		for (var args in stackPrep[func]) {
+				console.log('+++++++++++')
+				console.log('-> ' + func)
+			AN.preStack.count++;
+			AN.preStack[func](stackPrep[func][args]);
+		}	
 	}
+}
 
-	console.log('++++stackPrep ', flag, stackPrepAfter, stackPrep)
+var stackPrepBeforIsRun = false;
+var stackPrepBefor = {};
+
+function applyStackBeafor() {
+	console.log('stackPrepBefor',stackPrepBefor);	
+	var stackPrep = stackPrepBefor;
+	for (var func in stackPrep) {
+		for (var args in stackPrep[func]) {
+				console.log('+++++++++++')
+				console.log('-> ' + func)
+			AN.preStack.count++;
+			AN.preStack[func](stackPrep[func][args]);
+		}	
+	}
+}
+
+var stackPrepNormal = {};
+
+
+function applyStackNormal() {
+	console.log('stackPrepNormal',stackPrepNormal);	
+	var stackPrep = stackPrepNormal;
+	for (var func in stackPrep) {
+		for (var args in stackPrep[func]) {
+			console.log('-----------')
+			AN.preStack.count++;
+			console.log('-> ' + AN.preStack.count +' '+ func)
+			AN.preStack[func](stackPrep[func][args]);
+		}	
+	}
+}
+
+
+function applyStackPrep(d) {
+	var stackPrep = d.stackPrep;
+
 	if (stackPrep) {
-		//console.log("↳ acts ",d.acts)
-		if (flag != 'afterQuestion') {
-			Answers[you] = {}
-			stackPrepAfter.afterQuestion = [];
-			for (var func in stackPrep) {
-				if (func == 'afterQuestion') {
-					stackPrepAfter.isRun = true;
-					stackPrepAfter[func] = stackPrepAfter[func].concat(stackPrep[func]);
-					delete stackPrep[func];
-				}
+		console.log('=================')
+		console.log('stackPrep',stackPrep)
+		stackPrepAfter.afterQuestion = [];
+		stackPrepAfter.befor = [];
+		for (var func in stackPrep) {
+			if (func == 'afterQuestion') {
+				console.log('af')
+				stackPrepArfterIsRun = true;
+				stackPrepAfter[func] = stackPrepAfter[func].concat(stackPrep[func]);
+				delete stackPrep[func];
+			}
+			if ( func == 'befor') {
+				stackPrepBeforIsRun = true;
+				stackPrepBefor = stackPrep.befor;
+				delete stackPrep.befor;
 			}
 		}
-		else {
-			stackPrepAfter.afterQuestion = [];
+
+		stackPrepNormal = stackPrep;
+		
+		if (stackPrepBeforIsRun) {
+			applyStackBeafor();
+		} else {
+			applyStackNormal();
 		}
-		console.log('--------stackPrep',flag, stackPrepAfter, stackPrep)
-		for (var func in stackPrep) {
-			for (var args in stackPrep[func]) {
-				AN.preStack.count++;
-				AN.preStack[func](stackPrep[func][args]);
-			}	
-		}
+
 	}
 }
 
 
 
 socket.on('updact',function(d) {
-	console.log("↳ updact ",d)
+	//console.log("↳ updact ",d)
 	 applyUpd(d);
 	 applyAct(d);
 	 applyStackPrep(d);
