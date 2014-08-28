@@ -341,11 +341,11 @@ var AN = {
 			socket.emit('pressNextBtn',{u:Client})
 		}
 	},
-	changePahseName : function(newName) {
+	changePahseName : function(newName,afterFunc) {
 		if (H.phase.html() !== newName) {
 			H.phase.animate({opacity:0},250, function(){
 				H.phase.html(newName);
-				H.phase.animate({opacity:1},250);	
+				H.phase.animate({opacity:1},250,afterFunc);	
 			})
 		}
 	},
@@ -359,8 +359,8 @@ var AN = {
 		 * @return {[type]}   [description]
 		 */
 		newLeader : function(args, o) {
-
-		    if (!('newLeader' in Answers[you])) Answers[you].newLeader = [];
+				console.log('newLeader')
+		    if (!('newLeader' in Answers)) Answers.newLeader = [];
 		    var condidateCount = 0;
 		    for (var i in S[args.pX][args.zone].team[args.team]) {
 		    	var cardId = S[args.pX][args.zone].team[args.team][i];
@@ -378,25 +378,26 @@ var AN = {
 		    		C[cardId].setZIndex(1202);
 		    	}
 		    }
+		    	console.log(Answers);
 		    if(!condidateCount) return;
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
 		    Context.clickAction = function( card ) {
-		    	Answers[you].newLeader.push({
+		    	// Actions.newLeader( {
+		    	// 	pX   : you,
+			    // 	zone : args.zone,
+		    	// 	team : args.team,
+		    	// 	card : cardId,
+		    	// }, o);
+		    	console.log(cardId, card.id)
+		    	
+		    	Answers.newLeader.push( {
 		    		pX   : you,
 			    	zone : args.zone,
 		    		team : args.team,
-		    		card : cardId,
+		    		card : card.id,
 		    	});
 		    	AN.preStack.countDown()
-		  //   	alert(1)
-				// socket.emit('newLeader', {u:Client, arg:{
-		  //   		card : cardId,
-		  //   		team : args.team,
-		  //   		zone : args.zone,
-		  //   		pX : args.pX,
-				// }});
-		        //makeAsLeader( card );
 		        Context.workingUnit = null;
 		        Context.clickAction = null;
 		        $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
@@ -408,14 +409,22 @@ var AN = {
 		count : 0,
 		countDown : function() {
 			
-			console.log('--')
+					console.log('stackPrepArfterIsRun = ',stackPrepArfterIsRun)
 			AN.preStack.count--;
+			console.log('--',AN.preStack.count)
 			if (AN.preStack.count < 1) {
-				if (stackPrepAfter.isRun) {
-					stackPrepAfter.isRun = false;
-					applyStackPrep({}, 'afterQuestion')
+				if (stackPrepBeforIsRun ) {
+					stackPrepBeforIsRun = false;
+					console.log('b')
+					applyStackNormal();
+				}
+				else if (stackPrepArfterIsRun ) {
+					stackPrepArfterIsRun = false;
+					console.log('a')
+					applyStackAfter();
 				}
 				else {
+					console.log('n', Answers)
 					socket.emit('preStackDone',{u:Client, answers: Answers})
 				}
 			}
@@ -462,6 +471,16 @@ var AN = {
 			else {
 				AN.preStack.countDown();
 			}
+		},
+		'updTable' : function(args) {
+			updTable();
+		},
+		'toNextPhase' : function(args) {
+			Actions.toNextPhase(args, getUniversalObject());
+		},
+		'newLeader' : function(args) {
+			console.log(args);
+			Actions.newLeader(args, getUniversalObject());
 		}
 	}
 }
