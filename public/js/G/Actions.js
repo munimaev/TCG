@@ -41,8 +41,9 @@ var Actions = {
 			}, time:1500, name: 'Draw X cards'});
 		}
 	},
-	'toNextPhase' : function(o) {
+	'toNextPhase' : function(args, o) {
 		var key = -1;
+		for (var i in o.S) console.log('+'+i)
 		for ( var i in o.Stadies.order ) {
 		    if ( o.Stadies.order[i] == o.S.phase ) {
 		        key = i;
@@ -64,6 +65,10 @@ var Actions = {
 	    		return Actions[o.S.phase+'AtStart'](o);
 	    	}
 	    }
+    	else {
+    		AN.changePahseName(Stadies[o.S.phase].rusName, AN.preStack.countDown);
+    	}
+    	//
     	// if (!module) {
     	// 	updTable(); 
 	    // }
@@ -510,7 +515,7 @@ var Actions = {
 		o.S.statuses[cardID].injured = true;
 		if (!module) {
 			C[cardID].injure();
-			AN.preStack.countDown();
+			setTimeout( AN.preStack.countDown, 500);
 		}
 	},
 	'killTarget' : function(cardID, o) {
@@ -616,18 +621,20 @@ var Actions = {
 		result += o.Known[o.Accordance[o.cardID]].si;
 		return result;
 	},
-	'newLeader' : function(o) {
-		var team = o.S[o.pX][o.zone].team[o.team]; 
-		if ( team[0]== o.card) return;
+	'newLeader' : function(args, o) {
+		var result = {}
+		var team = o.S[args.pX][args.zone].team[args.team]; 
 		for (var i in team) {
-			if (team[i] == o.card) {
+			if (team[i] == args.card) {
 				team.splice(0,0,team.splice(i,1)[0]); // Вырезает итый элемент и вставляет в начало массива
+				result.newLeader = [args];
 				break;
 			}
 		}
 		if (!module) {
-			AN.stop = false;
-			AnimationNext();
+			setTimeout(AN.preStack.countDown, 25);
+		} else {
+			return result;
 		}
 	},
 	'preStackDone' : function(table, o) {
@@ -641,12 +648,29 @@ var Actions = {
 				results.push( Actions[func]( table.stackPrep[func][args], o ) );
 			}
 		}
+		var befor = [];
+		for (var ans in table.answers) {
+			for (var args in table.answers[ans]) {
+				befor.push(Actions[ans](table.answers[ans][args], o));
+			}
+		}
 		for (var i in results) {
 			if (results[i]) {
 				for (var name in results[i]) {
 					if (!(name in result)) result[name] = [];
 					for (var act in results[i][name]) {
 						result[name].push(results[i][name][act])
+					}
+				}
+			}
+		}
+		if (befor.length) {
+			result.befor = {};
+			for (var arr in befor) {
+				for (var act in befor[arr]) {
+					if (!(act in result.befor))  result.befor[act] = [];
+					for (var args in befor[arr][act]) {
+						result.befor[act].push(befor[arr][act][args])
 					}
 				}
 			}
