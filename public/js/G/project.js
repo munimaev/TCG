@@ -1702,7 +1702,8 @@ function getUniversalObject(obj) {
         Accordance : Accordance,
         Known : Known,
         S : S,
-        pX : you
+        pX : you,
+        Stadies : Stadies
     }
     var obj = obj || {};
     for (var i in obj) {
