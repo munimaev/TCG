@@ -587,7 +587,8 @@ function pressNextBtn(d) {
 			&& table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
 		)){
 			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
-			var actReuslt = Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
+			var actReuslt =  {'toNextPhase':[{phase:'next'}]};
+			//Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
 			console.log(actReuslt);
 			data.stackPrep = actReuslt;
 			table.stackPrep = actReuslt;
@@ -850,6 +851,7 @@ function getUniversalObject(tableID, obj) {
         Accordance : table.Accordance,
         Known : table.Known,
         S : table.Snapshot,
+        Stadies : Stadies,
     }
     var obj = obj || {};
     for (var i in obj) {
@@ -886,10 +888,10 @@ function newLeader(d) {
 function addAnswers(d) {
 	var table = StartedGames[d.u.table];
 	if (d.answers) {
-		if (!('answers' in table)) table.answers = {'pA':{}, 'pB':{}};
+		if (!('answers' in table)) table.answers = {};
 		for (var i in d.answers) {
-			if (!(i in table.answers[d.u.you])) table.answers[d.u.you][i] = [];
-			table.answers[d.u.you][i] = table.answers[d.u.you][i].concat(d.answers[i])
+			if (!(i in table.answers)) table.answers[i] = [];
+			table.answers[i] = table.answers[i].concat(d.answers[i])
 		}
 	}
 }
@@ -906,6 +908,8 @@ function preStackDone(d) {
 			if (i == 'afterQuestion') delete table.stackPrep[i];
 		}
 		console.log('\ntable.stackPrep',table.stackPrep)
+				for (var i in getUniversalObject(d.u.table, {pX:d.u.you}).S) console.log('+'+i)
+
 		var actReuslt = Actions.preStackDone( table, getUniversalObject(d.u.table, {pX:d.u.you}));
 		console.log('\nactReuslt',actReuslt)
 		table.stackPrep = actReuslt;
