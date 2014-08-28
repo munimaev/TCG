@@ -1570,7 +1570,6 @@ Card.prototype = {
     effect : function(o) {
         var _this = this;
         var afterFunc = o.afterFunc || function(){};
-        console.log(4,afterFunc);
         if (o.type == 'simple') {
             if (o.target == 'one') {
                 var pic = o.pic || "public/pics/damage.png"; 
