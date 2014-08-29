@@ -15,7 +15,8 @@ function arraySearch(array, value) {
 }
 var Actions = {
 	'Draw Card': function(o) {
-		//for (var i in o) console.log(i)
+		//for (var i in o) 
+		//console.log(i)
 		var S = o.S;
 		var pX = o.pX;
 		var draedCards = [];
@@ -43,7 +44,9 @@ var Actions = {
 	},
 	'toNextPhase' : function(args, o) {
 		var key = -1;
-		for (var i in o.S) console.log('+'+i)
+		for (var i in o.S) {
+			//console.log('+'+i)
+		}
 		for ( var i in o.Stadies.order ) {
 		    if ( o.Stadies.order[i] == o.S.phase ) {
 		        key = i;
@@ -154,7 +157,9 @@ var Actions = {
 		o.S[o.pX][o.to].team[o.teamCounter] = [o.card]
 	},
 	'updTable' : function(o) {
-		updTable();
+		if (!module) {
+			updTable();
+		}
 	},
 	/**
 	 * remove card from team
@@ -289,6 +294,7 @@ var Actions = {
 	},
 	'shutdownAtStart' : function(o) {
 		var result = {};//{'arg':{}, 'act':{}};
+		var toStack = {};
 		var step1 = null, step2 = null;
 		var adWinnerAndLoser = [];
 		function adWinnerAndLoserPush(pX, zone, team, ad) {
@@ -351,15 +357,18 @@ var Actions = {
 				}
 			}
 			else {
+				if (!('adWinnerAndLoser' in toStack)) {
+					toStack.adWinnerAndLoser = [];
+				}
 				if (attackPower >= 5) {
-
-					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeReward');
+					console.log('++')
+					toStack.adWinnerAndLoser.push({pX:o.S.activePlayer, zone:'attack', team:attackID , ad:'completeReward'});
 					o.rewardToPlayer = o.S.activePlayer;
 					//blockResult = Actions.completeReward(attackTeam, o, attackID);
 				}
 				else {
-
-					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'normalReward');
+					console.log('++')
+					toStack.adWinnerAndLoser.push({pX:o.S.activePlayer, zone:'attack', team:attackID , ad:'normalReward'});
 					o.rewardToPlayer = o.S.activePlayer;
 					//blockResult = Actions.normalReward(attackTeam, o, attackID);
 				}
@@ -372,6 +381,7 @@ var Actions = {
 		if (!module) {
 			updTable();
 		} else {
+			result.toStack = toStack;
 			result.adWinnerAndLoser = adWinnerAndLoser;
 			return result;
 		}
@@ -398,7 +408,7 @@ var Actions = {
 		o.S.stop = true;
 	},
 	'completeDefeat' : function(team, o) {
-		console.log('completeDefeat' , team)
+		//console.log('completeDefeat' , team)
 		var result = {'givingDamage':[]};
 		if (!team) return;
 		o.damage = 1;
@@ -412,7 +422,7 @@ var Actions = {
 		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: o.damage, type: 'fire'})
 		//damgeResult2 = Actions.giveDamage(team[0],o);
 		if (module) { 
-			console.log('completeDefeat')
+			//console.log('completeDefeat')
 			return result;
 		}
 	},
@@ -422,15 +432,14 @@ var Actions = {
 		o.damage = 1;
 		o.causeOfDamage = 'normalDefeat';
 
-		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'})
 		//Actions.giveDamage(team[0],o);
-
+		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'})
 		if (module) {
 			return result;
 		}
 	},
 	'completeWin' : function(team, o) {
-		console.log('completeWin',team)
+		//console.log('completeWin',team)
 		var result = {};
 		if (!team) return;
 		if (module) {
@@ -446,24 +455,26 @@ var Actions = {
 		}
 	},
 	'normalReward' : function(team, o) {
-		var result = {};
+		var result = {givingReward:[]};
 		if (!team) return;
 		o.rewardsCount = 1;
 		o.causeOfReward = 'normalReward';
-		Actions.giveReward(team[0],o);
+		//Actions.giveReward(team[0],o);
+		result.givingReward.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'}) //TODO
+		TODO;
 		if (module) {
-			result = {'arg':{},act:'normalReward'};
 			return result;
 		}
 	},
 	'completeReward' : function(team, o) {
-		var result = {};
+		var result = {givingReward:[]};
 		if (!team) return;
 		o.rewardsCount = 2;
 		o.causeOfReward = 'completeReward';
-		Actions.giveReward(team[0],o);
+		
+		//Actions.giveReward(team[0],o);
+		result.givingReward.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'}) //TODO
 		if (module) {
-			result = {'arg':{},act:'completeReward'};
 			return result;
 		}
 	},
@@ -638,25 +649,37 @@ var Actions = {
 		}
 	},
 	'preStackDone' : function(table, o) {
-		console.log('table',table.preStack)
+		console.log('table',table.stackPrep)
 		o.answers = table.answers;
 		var results = [];
 		var result = {};
 		for (var func in table.stackPrep) {
 			for (var args in table.stackPrep[func]) {
-				console.log('stackPrep', func)
+				//console.log('stackPrep', func)
 				results.push( Actions[func]( table.stackPrep[func][args], o ) );
 			}
 		}
 		var befor = [];
+		console.log('\ntable.answers');
+		console.log(table.answers)
 		for (var ans in table.answers) {
 			for (var args in table.answers[ans]) {
 				befor.push(Actions[ans](table.answers[ans][args], o));
 			}
 		}
+		console.log("------------------------");
+		console.log(results);
+		console.log("------------------------");
+		var toStack = [];
 		for (var i in results) {
 			if (results[i]) {
 				for (var name in results[i]) {
+					if (name == 'toStack') {
+						toStack.push(results[i][name]);
+						console.log(results[i][name])
+						console.log("------------------------");
+						continue;
+					}
 					if (!(name in result)) result[name] = [];
 					for (var act in results[i][name]) {
 						result[name].push(results[i][name][act])
@@ -664,6 +687,7 @@ var Actions = {
 				}
 			}
 		}
+		if (toStack) result.toStack = toStack;
 		if (befor.length) {
 			result.befor = {};
 			for (var arr in befor) {
@@ -678,7 +702,7 @@ var Actions = {
 		return result;
 	},
 	'adWinnerAndLoser' : function(args, o) {
-		console.log('\nadWinnerAndLoser')
+		//console.log('\nadWinnerAndLoser')
 		o.pX = args.pX;
 		o.zone =args.zone;
 		o.team = args.team;
@@ -686,7 +710,7 @@ var Actions = {
 		return Actions[args.ad](team, o);
 	},
 	'givingDamage' : function(args, o) {
-		console.log('\ngivingDamage')
+		//console.log('\ngivingDamage')
 		o.pX = args.pX;
 		o.zone =args.zone;
 		o.team = args.team;
@@ -695,7 +719,7 @@ var Actions = {
 		return Actions.giveDamage(args.card,o);
 	},
 	'damageResult' : function(args, o) {
-		console.log('\ndamageResult')
+		//console.log('\ndamageResult')
 		o.pX = args.pX;
 		o.zone =args.zone;
 		o.team = args.team;
@@ -705,7 +729,9 @@ var Actions = {
 		if (args.result == 'injured') return Actions.injureTarget(args.card,o);
 		return {};
 	},
-	'log' : function() { console.log('msg')}
+	'log' : function() { 
+		console.log('msg')
+	}
 };
 if (module) {
 		module.exports = Actions;
