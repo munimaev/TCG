@@ -349,7 +349,8 @@ function getStartSnapshot(table) {
 	        },
 	        attack : {
 	            team : {
-	            	2:['c102','c101','c103'],
+	            	2:['c102','c101'],
+	            	7: ['c103']
 	            }
 	        },
 	        block : {
@@ -357,7 +358,8 @@ function getStartSnapshot(table) {
 	        }
 	    },
 	    battlefield : {
-	    	2:5
+	    	2:null,
+	    	7:6
 	    },
 	    stack : {
 
@@ -375,7 +377,7 @@ function getStartSnapshot(table) {
 	        village : {
 	            team : {
 	            	// 4:['c005'],
-	            	6:['c001','c004','c006']
+	            	5:['c002','c003','c005'],
 	        	}
 	        },
 	        attack : {
@@ -383,7 +385,7 @@ function getStartSnapshot(table) {
 	        },
 	        block : {
 	            team : {
-	            	5:['c002','c003','c005'],
+	            	6:['c006','c001','c004']
 	            }
 	        }
 	    },
@@ -590,6 +592,7 @@ function pressNextBtn(d) {
 			var actReuslt =  {'toNextPhase':[{phase:'next'}]};
 			//Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
 			console.log(actReuslt);
+
 			data.stackPrep = actReuslt;
 			table.stackPrep = actReuslt;
 			table.stackPreppA = table.stackPreppB = null;
@@ -895,6 +898,14 @@ function addAnswers(d) {
 		}
 	}
 }
+function addStack(table, actReuslt ) {
+	if ('toStack' in actReuslt) {
+		if (!('stack' in table)) table.stack = [];
+		table.stack = table.stack.concat(actReuslt.toStack);
+		delete actReuslt.toStack;
+	} 
+	return actReuslt;
+}
 
 function preStackDone(d) {
 	console.log('on preStackDone')
@@ -904,14 +915,35 @@ function preStackDone(d) {
 	addAnswers(d)
 
 	if (table.stackPreppA && table.stackPreppB) {
+		var count = 0;
 		for (var i in table.stackPrep) {
-			if (i == 'afterQuestion') delete table.stackPrep[i];
+			if (i == 'afterQuestion' || i == 'befor' || i == 'updTable' ) {
+				delete table.stackPrep[i];
+				continue;
+			}
+			count++;
 		}
-		console.log('\ntable.stackPrep',table.stackPrep)
-				for (var i in getUniversalObject(d.u.table, {pX:d.u.you}).S) console.log('+'+i)
+
+		if (!count) {
+			table.stackPrep = table.stack.pop();
+		}
+		console.log("\n================")
+		console.log('\ntable.stackPrep')
+		console.log(table.stackPrep)
+
+		for (var i in getUniversalObject(d.u.table, {pX:d.u.you}).S) {
+			//console.log('+'+i)
+		}
 
 		var actReuslt = Actions.preStackDone( table, getUniversalObject(d.u.table, {pX:d.u.you}));
-		console.log('\nactReuslt',actReuslt)
+		table.answers = {}
+		console.log('\nactReuslt');
+		console.log(actReuslt)
+		actReuslt = addStack(table,actReuslt);
+		console.log('\ntable.stack');
+		console.log(table.stack)
+		console.log("\n================")
+		
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
 		io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
