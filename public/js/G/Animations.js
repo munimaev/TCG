@@ -3,13 +3,13 @@ dateObj = new Date()
 var Animations = [];
 var AnimationIsRun = false;
 function AnimationPush(o) {
-	// console.log('push ' + o.name + ' - ' + o.time)
+	//console.log('push ' + o.name + ' - ' + o.time)
 	Animations.push(o);
-	// console.log('-----------');
+	//console.log('-----------');
 	// for (var i in Animations) {
-	// 	console.log(i, Animations[i].name);
+	//console.log(i, Animations[i].name);
 	// }
-	// console.log('-----------');
+	//console.log('-----------');
 	AnimationNext();
 }
 
@@ -43,7 +43,7 @@ var AN = {
 	    var position = $deck.offset();
 	    for (var i in o.cards) {
 	    	var id = o.cards[i];
-	    	console.log(o, you)
+	    	//console.log(o, you)
 	    	var construct = {};
 			if (you == o.pX) {
 				Y =  I.H * 2 / 3 - I.card.W / 2;
@@ -162,7 +162,9 @@ var AN = {
 			Y = /*I.hand.Y +*/ 0 // + I.card.W /*- margin / 2*/ - bottomMargin
 		}
 	    for ( var i in S[o.pX].hand ) {
-	    	if (!C[S[o.pX].hand[i]]) {console.log('!card') ;continue;}
+	    	if (!C[S[o.pX].hand[i]]) {
+	    		//console.log('!card') ;continue;
+	    	}
 	        bottomMargin = (Math.ceil( (Number( i ) + 1) / cardInRow ) - 1) * (I.card.W + margin);
 	        C[S[o.pX].hand[i]].animation( {
 	            X: sideMargin / 2 + (margin + I.card.W) * (Number( i ) % cardInRow),
@@ -278,7 +280,9 @@ var AN = {
 						        	additional: { 
 						        		outCard:true,
 						        		after : {
-						        			func: function(){console.log(C[o.card].params.incline)}
+						        			func: function(){
+						        				//console.log(C[o.card].params.incline)
+						        			}
 						        		}
 						        	} 
 						        });
@@ -359,9 +363,10 @@ var AN = {
 		 * @return {[type]}   [description]
 		 */
 		newLeader : function(args, o) {
-				console.log('newLeader')
+			AN.stop = true;
+			//console.log('newLeader')
 		    if (!('newLeader' in Answers)) Answers.newLeader = [];
-		    var condidateCount = 0;
+		    var condidateCount = [];
 		    for (var i in S[args.pX][args.zone].team[args.team]) {
 		    	var cardId = S[args.pX][args.zone].team[args.team][i];
 		    	if (Can.newLeader({
@@ -374,12 +379,12 @@ var AN = {
 			    		S : S
 		    		})
 		    	) {
-		    		condidateCount++;
+		    		condidateCount.push(cardId);
 		    		C[cardId].setZIndex(1202);
 		    	}
 		    }
-		    	console.log(Answers);
-		    if(!condidateCount) return;
+		    //console.log(Answers);
+		    if(!condidateCount.length) return;
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
 		    Context.clickAction = function( card ) {
@@ -389,7 +394,7 @@ var AN = {
 		    	// 	team : args.team,
 		    	// 	card : cardId,
 		    	// }, o);
-		    	console.log(cardId, card.id)
+		    	//console.log(cardId, card.id)
 		    	
 		    	Answers.newLeader.push( {
 		    		pX   : you,
@@ -400,8 +405,12 @@ var AN = {
 		    	AN.preStack.countDown()
 		        Context.workingUnit = null;
 		        Context.clickAction = null;
+		        for (var i in condidateCount) {
+		        	C[condidateCount[i]].setZIndex(200);
+		        }
 		        $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
-		        // startTable();
+				AN.stop = false;
+				AnimationNext();
 		    }
 		}
 	},
@@ -409,28 +418,30 @@ var AN = {
 		count : 0,
 		countDown : function() {
 			
-					console.log('stackPrepArfterIsRun = ',stackPrepArfterIsRun)
+			//console.log('stackPrepArfterIsRun = ',stackPrepArfterIsRun)
 			AN.preStack.count--;
-			console.log('--',AN.preStack.count)
+			//console.log('--',AN.preStack.count)
 			if (AN.preStack.count < 1) {
 				if (stackPrepBeforIsRun ) {
 					stackPrepBeforIsRun = false;
-					console.log('b')
+					//console.log('b')
 					applyStackNormal();
 				}
 				else if (stackPrepArfterIsRun ) {
 					stackPrepArfterIsRun = false;
-					console.log('a')
+					//console.log('a')
 					applyStackAfter();
 				}
 				else {
-					console.log('n', Answers)
-					socket.emit('preStackDone',{u:Client, answers: Answers})
+					//console.log('n', Answers)
+					console.log(Answers);
+					socket.emit('preStackDone',{u:Client, answers: Answers});
+					Answers = {};
 				}
 			}
 		},
 		adWinnerAndLoser : function(args) {
-			console.log(args)
+			//console.log(args)
 			setTimeout(function(){
 					AN.preStack.count--;
 					if (AN.preStack.count < 1) {
@@ -464,9 +475,13 @@ var AN = {
 			Actions.moveCardToZone(args, getUniversalObject(args))
 		},
 		'afterQuestion' : function(args) {
-			console.log('afterQuestion', args)
+			//console.log('afterQuestion', args)
 			if (args.pX === you) {
-				AN.Questions[args.question](args, getUniversalObject());
+
+			    AnimationPush({func:function() {
+					AN.Questions[args.question](args, getUniversalObject());
+			    }, time:1200, name: 'Questions - ' + args.question });
+				
 			}
 			else {
 				AN.preStack.countDown();
@@ -474,12 +489,14 @@ var AN = {
 		},
 		'updTable' : function(args) {
 			updTable();
+			setTimeout(AN.preStack.countDown,1100);
 		},
 		'toNextPhase' : function(args) {
+	        
 			Actions.toNextPhase(args, getUniversalObject());
 		},
 		'newLeader' : function(args) {
-			console.log(args);
+			//console.log(args);
 			Actions.newLeader(args, getUniversalObject());
 		}
 	}
