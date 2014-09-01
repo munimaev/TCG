@@ -302,7 +302,7 @@ var AN = {
 	reward : function(cardID, o) {
 		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/reward.png"})
 	},
-	uturn : function(o) {
+	uturn : function(args, o) {
 		var o = o || {};
 		o.bigBannerPics = "public/pics/uturn.png";
 		AN.bigBanner(o);
@@ -498,6 +498,22 @@ var AN = {
 		'newLeader' : function(args) {
 			//console.log(args);
 			Actions.newLeader(args, getUniversalObject());
+		},
+		'givingReward' : function(args) {
+			console.log(args);
+			Actions.giveReward(args, getUniversalObject());
+		},
+		'returnToVillaje' : function(args) {
+			console.log(args);
+			Actions.retrunTeamToVillage(args, getUniversalObject());
+		},
+		'adNewTurn' : function(args) {
+			console.log(args, getUniversalObject());
+			AN.uturn(args, getUniversalObject())
+			setTimeout (AN.preStack.countDown, 1210)
+		},
+		'drawCard' : function(args) {
+			console.log(args)
 		}
 	}
 }
