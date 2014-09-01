@@ -274,17 +274,41 @@ var Actions = {
 	},
 	'startAtStart' : function(o) {
 		o.S.turnNumber = o.S.turnNumber + 1;
-		if (!module) {
-			AnimationPush({func:function() {
-				AN.uturn(o);
-			}, time:1210, name: 'startAtStart '});
-		}
+		// if (!module) {
+		// 	AnimationPush({func:function() {
+		// 		AN.uturn(o);
+		// 	}, time:1210, name: 'startAtStart '});
+		// } else {
+			return { 
+				'returnToVillaje' : [{team:'all', }],
+				'updTable' : [{players : 'all'}],
+				'adNewTurn' : [{}],
+				//'order' : ['returnToVillaje', 'updTable'] //TODO обработчик порядка
+			 };
+		//}
 	},
 	'missionAtStart' : function(o) {
-		if (!module) {
-			o.count = 1;
-			o.pX = o.S.activePlayer;
-			socket.emit('drawCardAtStartTurn', {u:Client});
+		var args = {
+			drawCardCause : 'start turn',
+			number : 1,
+			player : o.S.activePlayer
+		}
+		return Actions.prepareDrawCard(args, o);
+	},
+	/**
+	 * Должен возвращать обект для preStack
+	 * @return {[type]} [description]
+	 */
+	'prepareDrawCard' : function(args,o) {
+		if (o.S[o.S.activePlayer].deck.length) {
+			return { 
+				'drawCard' : [{player:  args.player, numberOfCard: args.number, drawCardCause: args.drawCardCause}],
+				'applyUpd' : [{forPlayer: args.player, cards : [o.S[args.player].deck[0]]}]
+			};
+		} else {
+			return {
+				'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
+			}
 		}
 	},
 	'comebackAtStart' : function(o) {
@@ -457,11 +481,11 @@ var Actions = {
 	'normalReward' : function(team, o) {
 		var result = {givingReward:[]};
 		if (!team) return;
-		o.rewardsCount = 1;
-		o.causeOfReward = 'normalReward';
 		//Actions.giveReward(team[0],o);
-		result.givingReward.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'}) //TODO
-		TODO;
+		result.givingReward.push(
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], rewardsCount : 1, causeOfReward : 'normalReward'}
+			)
+		//TODO;
 		if (module) {
 			return result;
 		}
@@ -469,11 +493,12 @@ var Actions = {
 	'completeReward' : function(team, o) {
 		var result = {givingReward:[]};
 		if (!team) return;
-		o.rewardsCount = 2;
-		o.causeOfReward = 'completeReward';
-		
+		// o.rewardsCount = 2;
+		// o.causeOfReward = 'completeReward';
 		//Actions.giveReward(team[0],o);
-		result.givingReward.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'}) //TODO
+		result.givingReward.push(
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], rewardsCount : 2, causeOfReward : 'completeReward'}
+			)
 		if (module) {
 			return result;
 		}
@@ -511,15 +536,19 @@ var Actions = {
 		}
 		return result;
 	},
-	'giveReward' : function(cardID, o) {
+	'giveReward' : function(args, o) {
 		if (!module) {
-			for (var i = 1; i <= o.rewardsCount; i++) {
+			for (var i = 1; i <= args.rewardsCount; i++) {
 				AnimationPush({func:function() {
-					AN.reward(cardID,o);
+					AN.reward(args.card,o);
 				}, time:610, name: 'giveReward'});
 			}
+			setTimeout(AN.preStack.countDown, args.rewardsCount * 611);
 		}
-		o.S[o.rewardToPlayer].rewards += o.rewardsCount;
+		o.S[args.pX].rewards += args.rewardsCount;
+		if (module) {
+			return {'updTable':[{players:'all'}]}
+		}
 	},
 	'injureTarget' : function(cardID, o) {
 		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
@@ -578,19 +607,26 @@ var Actions = {
 		}
 		return result;
 	},
-	'retrunTeamToVillage'  : function (o) {
-		var pXs = ['pA','pB'];
-		var zones = ['attack','block'];
-		for (var pX in pXs) {
-			for (var zone in zones) {
-				var z = o.S[pXs[pX]][zones[zone]];
-				for (var t in z.team) {
-					o.S[pXs[pX]].village.team[t] = o.S[pXs[pX]][zones[zone]].team[t];
-					delete o.S[pXs[pX]][zones[zone]].team[t];
+	'retrunTeamToVillage'  : function (args, o) {
+		if (args.team == 'all') {
+			var pXs = ['pA','pB'];
+			var zones = ['attack','block'];
+			for (var pX in pXs) {
+				for (var zone in zones) {
+					var z = o.S[pXs[pX]][zones[zone]];
+					for (var t in z.team) {
+						o.S[pXs[pX]].village.team[t] = o.S[pXs[pX]][zones[zone]].team[t];
+						delete o.S[pXs[pX]][zones[zone]].team[t];
+					}
 				}
 			}
+			o.S.battlefield = {};
 		}
-		o.S.battlefield = {};
+		if (!module) {
+			setTimeout( AN.preStack.countDown, 50);
+		} else {
+			return {};
+		}
 	},
 	'getTeamPower' : function(team, o) {
 		var result = 0;
@@ -727,6 +763,15 @@ var Actions = {
 		o.result = args.result;
 		if (args.result == 'death')   return Actions.killTarget(args.card,o);
 		if (args.result == 'injured') return Actions.injureTarget(args.card,o);
+		return {};
+	},
+	'givingReward' : function(args, o) {
+		return Actions.giveReward(args,o);
+	},
+	'returnToVillaje' : function(args, o) {
+		return Actions.retrunTeamToVillage(args, o);
+	},
+	'adNewTurn' : function(args, o) {
 		return {};
 	},
 	'log' : function() { 
