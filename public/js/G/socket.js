@@ -206,7 +206,7 @@ function applyStackPrep(d) {
 
 
 socket.on('updact',function(d) {
-	//console.log("↳ updact ",d)
+	console.log("↳ updact ",d)
 	 applyUpd(d);
 	 applyAct(d);
 	 applyStackPrep(d);
