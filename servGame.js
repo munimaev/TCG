@@ -324,7 +324,7 @@ function getStartSnapshot(table) {
 	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
-	    phase: "block",
+	    phase: "shutdown",
 	    stop: false,
 	    turnNumber: 0,
 	    counters : {
@@ -344,13 +344,13 @@ function getStartSnapshot(table) {
 	        village : {
 	            team : {
 	            	1:['c106'],
-	            	3:['c104','c105']
+	            	3:['c104','c105'],
+	            	2:['c102','c101'],
+	            	7: ['c103']
 	            }
 	        },
 	        attack : {
 	            team : {
-	            	2:['c102','c101'],
-	            	7: ['c103']
 	            }
 	        },
 	        block : {
@@ -358,8 +358,6 @@ function getStartSnapshot(table) {
 	        }
 	    },
 	    battlefield : {
-	    	2:null,
-	    	7:6
 	    },
 	    stack : {
 
@@ -377,7 +375,6 @@ function getStartSnapshot(table) {
 	        village : {
 	            team : {
 	            	// 4:['c005'],
-	            	5:['c002','c003','c005'],
 	        	}
 	        },
 	        attack : {
@@ -385,6 +382,7 @@ function getStartSnapshot(table) {
 	        },
 	        block : {
 	            team : {
+	            	5:['c002','c003','c005'],
 	            	6:['c006','c001','c004']
 	            }
 	        }
@@ -907,6 +905,29 @@ function addStack(table, actReuslt ) {
 	return actReuslt;
 }
 
+function getUpdatesForPlayers(table, actReuslt) {
+	var result = {};
+	if (!actReuslt.applyUpd) return null;
+	console.log('\ngetUpdatesForPlayers');
+	console.log(actReuslt.applyUpd);
+	var obj = {};
+	for ( var i in actReuslt.applyUpd) {
+		obj = actReuslt.applyUpd[i];
+		if (!(obj.forPlayer in result)) result[obj.forPlayer] = {Accordance : {}, Known:{}};
+		for (var card in obj.cards) {
+
+			result[obj.forPlayer].Accordance[obj.cards[card]] 
+				= table[obj.forPlayer].Accordance[obj.cards[card]] 
+				= table.Accordance[obj.cards[card]];
+
+			result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+				= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+				= table.Known[table.Accordance[obj.cards[card]]];
+		}
+	}
+	return result;
+}
+
 function preStackDone(d) {
 	console.log('on preStackDone')
 	var table = StartedGames[d.u.table];
@@ -942,10 +963,22 @@ function preStackDone(d) {
 		actReuslt = addStack(table,actReuslt);
 		console.log('\ntable.stack');
 		console.log(table.stack)
+		var upds = getUpdatesForPlayers(table,actReuslt);
+		delete actReuslt.applyUpd;
+		console.log('\nupds');
+		console.log(upds);
 		console.log("\n================")
 		
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
-		io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
+		if (upds) {
+			console.log(' -> 1', upds.pB)
+			lajha();
+			io.sockets.in(table.roomA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
+			io.sockets.in(table.roomB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
+		} else {
+			console.log(' -> 2')
+			io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
+		}
 	}
 }
