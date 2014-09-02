@@ -621,7 +621,7 @@ function addToTeam(d) {
         })) 
 	{
 		d.arg.S = table.Snapshot;
-		Actions['addToTeam'](d.arg);
+		Actions['addToTeam'](d.arg, getUniversalObject(d.u.table));
 		d.arg.S = 'get_S';
 		var data = {
 			acts : [{'arg':d.arg, 'act' : 'addToTeam'}]
@@ -644,7 +644,7 @@ function changeInTeam(d) {
         })) 
 	{
 		d.arg.S = table.Snapshot;
-		Actions['organisation'](d.arg);
+		Actions['organisation'](d.arg, getUniversalObject(d.u.table));
 		d.arg.S = 'get_S';
 		var data = {
 			acts : [{'arg':d.arg, 'act' : 'organisation'}]
@@ -666,41 +666,30 @@ function putInPlay(d) {
             pX:d.u.you,
             S:table.Snapshot,
         })) {
-		var arg = {
-			card:d.arg.card,
-			from:d.arg.from,
-			owner:d.arg.owner,
-			pX:d.u.you,
-			S: table.Snapshot,
-			to:'village',
+		var args = {
+			from : 'hand',
+			to : 'village',
+			pX : d.u.you,
+			team : null,
+			cardInArray : null,
+			card : d.arg.card,
+			cause : 'play'
 		}
-		arg.teamCounter = ++table.meta.teamCounter;
-		Actions['moveCardToZone'](arg);
-		arg.S = 'get_S';
-		var data = {
-			acts : [{'arg':arg, 'act' : 'moveCardToZone'}]
-		}
-		
-		// Информация для противиника о новой карте
-		var updA = {}
-		var updK = {}
-		table[d.u.opp].Accordance[arg.card] 
-			= updA[arg.card] 
-			= table.Accordance[arg.card];
-		table[d.u.opp].Known[table.Accordance[arg.card]] 
-			= updK[table.Accordance[arg.card]] 
-			= table.Known[table.Accordance[arg.card]];
-		io.sockets.in(table['room'+d.u.opp])
-			.emit('update', {
-				upd:{
-					Accordance:updA,
-					Known:updK
-				}
-			});
-		
-		io.sockets.in(table.room).emit('updact', data);
+		var data = {};
+		args.teamCounter = ++table.meta.teamCounter;
+		var actReuslt =  Actions.preparePutCardinPlay(args, getUniversalObject(d.u.table));
+		data.stackPrep = actReuslt;
+		table.stackPrep = actReuslt;
+		table.stackPreppA = table.stackPreppB = null;
+		var upds = getUpdatesForPlayers(table,actReuslt);
+		delete actReuslt.applyUpd;		
+
+		io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
+		io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
+
+		//io.sockets.in(table.room).emit('updact', data);
 	} else {
-		console.log('bad')
+		console.log('bad putInPlay')
 	}
 	// TODO возможно надо реагировать
 }
@@ -718,7 +707,7 @@ function removeFromTeam(d) {
 	{
 		d.arg.teamCounter = ++table.meta.teamCounter;
 		d.arg.S = table.Snapshot;
-		Actions['removeFromTeam'](d.arg);
+		Actions['removeFromTeam'](d.arg, getUniversalObject(d.u.table));
 		d.arg.S = 'get_S';
 		var data = {
 			acts : [{'arg':d.arg, 'act' : 'removeFromTeam'}]
@@ -973,12 +962,11 @@ function preStackDone(d) {
 		table.stackPreppA = table.stackPreppB = null;
 		if (upds) {
 			console.log(' -> 1', upds.pB)
-			lajha();
-			io.sockets.in(table.roomA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
-			io.sockets.in(table.roomB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
+			io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, ket:1,upd : upds.pA});
+			io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, ket:2, upd : upds.pB});
 		} else {
 			console.log(' -> 2')
-			io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt});
+			io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt, ket:3});
 		}
 	}
 }
