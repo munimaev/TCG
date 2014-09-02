@@ -114,7 +114,7 @@ function applyAct(d) {
 			for (var i2 in d.acts[i].arg) {
 				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
 			}
-			Actions[d.acts[i].act](d.acts[i].arg)
+			Actions[d.acts[i].act](d.acts[i].arg, getUniversalObject())
 		}
 	}
 }
