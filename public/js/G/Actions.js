@@ -14,32 +14,37 @@ function arraySearch(array, value) {
     return null
 }
 var Actions = {
-	'Draw Card': function(o) {
+	'Draw Card': function(args, o) {
 		//for (var i in o) 
 		//console.log(i)
 		var S = o.S;
-		var pX = o.pX;
+		var pX = args.player;
 		var draedCards = [];
 		if (S[pX].deck.length) {
 			var id = S[pX].deck.splice(0,1)[0]
 			S[pX].hand.push(id);
 			return id;
 		};
+		console.log('hand',o.S[pX].hand)
 	},
-	'Draw X cards' : function(obj) {
-		obj.count = obj.count || 6;
-		var o = {
-			pX : obj.pX,
+	'Draw X cards' : function(args, o) {
+		args.numberOfCard = args.numberOfCard || 1;
+		var o2 = {
+			pX : args.player,
 			cards:[]
 		};
-		for (var i = 1; i <= obj.count; i++) {
-			o.cards.push(Actions['Draw Card'](obj));
+		for (var i = 1; i <= args.numberOfCard; i++) {
+			o2.cards.push(Actions['Draw Card'](args, o));
 		}
-		obj.S[obj.pX].isNewGame = false;
+		o.S[args.player].isNewGame = false;
 		if (!module) {
 			AnimationPush({func:function() {
-				AN.playerDrawCards(o);
+				AN.playerDrawCards(o2);
 			}, time:1500, name: 'Draw X cards'});
+			setTimeout(AN.preStack.countDown, 1510);
+		}
+		return {
+			//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
 		}
 	},
 	'toNextPhase' : function(args, o) {
@@ -69,7 +74,13 @@ var Actions = {
 	    	}
 	    }
     	else {
+    		//updCurrentPhase();
     		AN.changePahseName(Stadies[o.S.phase].rusName, AN.preStack.countDown);
+		    if (Can.pressNextBtn({pX:you,S:S,meta:Meta,Stadies:Stadies})) {
+		        H.next.removeClass('selectedZone');
+		    } else {
+		        H.next.addClass('selectedZone');
+		    }
     	}
     	//
     	// if (!module) {
@@ -80,61 +91,55 @@ var Actions = {
 		var result = {
 			updTable : [{players:'all'}],
 		};
-		o.from = args.from; 
-		o.to = args.to;
-		o.pX = args.pX;
-		o.team = args.team;
-		o.cardInArray = args.cardInArray;
-		o.card = args.card;
 
-	    if ( !isZoneSimple(o.from)) 
+	    if ( !isZoneSimple(args.from)) 
 	    {
-	        if ( isZoneSimple(o.to) )
+	        if ( isZoneSimple(args.to) )
 	        {
-	            o.S[o.pX][o.from].team[o.team].splice(o.cardInArray,1);
-	            o.S[o.pX][o.to].push(o.card);
-	            o.S.statuses[o.card] = {};
+	            o.S[args.pX][args.from].team[args.team].splice(args.cardInArray,1);
+	            o.S[args.pX][args.to].push(args.card);
+	            o.S.statuses[args.card] = {};
 
 				if (!module) {
-					C[o.card].params.zona = o.to;
+					C[args.card].params.zona = args.to;
 					AnimationPush({func:function() {
-						AN.moveCardToZone(o);
+						AN.moveCardToZone(args, o);
 					}, time:1000, name: 'moveCardToZone'});
 					setTimeout(AN.preStack.countDown,1000)
 				}
 	        }
-	        else if ( !isZoneSimple(o.from) )
+	        else if ( !isZoneSimple(args.from) )
 	        {
 
 	            
 
 	        }
 	    } 
-	    else if ( isZoneSimple(o.from) ) 
+	    else if ( isZoneSimple(args.from) ) 
 	    {
-	        var ind = arraySearch(o.S[o.pX][o.from], o.card);
+	        var ind = arraySearch(o.S[args.pX][args.from], args.card);
 	        if (ind !== null) {
-	            o.S[o.pX][o.from].splice(ind,1)
-		        if ( isZoneSimple(o.to) ) 
+            o.S[args.pX][args.from].splice(ind,1)
+		        if ( isZoneSimple(args.to) ) 
 		        {
-	            	o.S[o.pX][o.to].push(o.card)
+	            	o.S[args.pX][args.to].push(args.card)
 
-					if (!module) {
-						C[o.card].params.zona = o.to;
+				if (!module) {
+						C[args.card].params.zona = args.to;
 						AnimationPush({func:function() {
-							AN.moveCardToZone(o);
+							AN.moveCardToZone(args, o);
 							AN.moveToHand(o);
 						}, time:1000, name: 'moveCardToZone'});
 						setTimeout(AN.preStack.countDown,1000)
 					}
 	            }
-		        else if ( !isZoneSimple(o.to) ) 
+		        else if ( !isZoneSimple(args.to) ) 
 		        {	
-		        	Actions.createTeamFromCard(o);
+		        	Actions.createTeamFromCard(args, o);
 					if (!module) {
-						C[o.card].params.zona = o.to;
+						C[args.card].params.zona = args.to;
 						AnimationPush({func:function() {
-							AN.moveCardToZone(o);
+							AN.moveCardToZone(args, o);
 							AN.moveToHand(o);
 						}, time:1000, name: 'moveCardToZone'});
 						setTimeout(AN.preStack.countDown,1000)
@@ -143,6 +148,13 @@ var Actions = {
 	        }
 	    }
 	    return result;
+	},
+
+	'preparePutCardinPlay' : function(args,o) {	
+		return { 
+			'putCardInPlay' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : args.cause, teamCounter:args.teamCounter}],
+			'applyUpd' : [{forPlayer: 'pB', cards : [args.card]},{forPlayer: 'pA', cards : [args.card]}]
+		};	
 	},
 	/**
 	 * createTeamFromCard
@@ -153,8 +165,8 @@ var Actions = {
 	 * @param  {[Object]} o.teamCounter
 	 * @param  {[Object]} o.to
 	 */
-	'createTeamFromCard' : function(o) {
-		o.S[o.pX][o.to].team[o.teamCounter] = [o.card]
+	'createTeamFromCard' : function(args, o) {
+		o.S[args.pX][args.to].team[args.teamCounter] = [args.card]
 	},
 	'updTable' : function(o) {
 		if (!module) {
@@ -171,45 +183,50 @@ var Actions = {
 	 * @param  {[Object]} o.teamCounter
 	 * @param  {[Object]} o.to
 	 */
-	'removeFromTeam' : function(o) {
-		var key = arraySearch(o.S[o.pX][o.from].team[o.team] , 	o.card );
-		o.S[o.pX][o.from].team[o.team].splice(key,1);
-		Actions.createTeamFromCard(o)
+	'removeFromTeam' : function(args, o) {
+		var key = arraySearch(o.S[args.pX][args.from].team[args.team] , args.card );
+		o.S[args.pX][args.from].team[args.team].splice(key,1);
+		Actions.createTeamFromCard(args, o)
 		if (!module) {
 			updTable();
 		}
 	},
-	'addToTeam' : function(o) {
-        Actions.organisation(o, true);
+	'addToTeam' : function(args, o) {
+		args.nochange = true;
+        Actions.organisation(args, o);
 	},
-	'organisation' : function(o, nochange) {
+	'organisation' : function(args, o) {
+		console.log('nochange',nochange)
+	    var nochange = args.nochange || false;
+	    var card1pos = args.c1.position;
+	    var card2pos = nochange ? 'support' : args.c2.position;
+	    var owner = args.c1.owner;
+	    var zone = args.c1.zone;
+	    var team1 = args.c1.team;
+	    var team2 = args.c2.team;
+	    var Team1 = args.S[owner][zone].team[team1];
+	    var Team2 = args.S[owner][zone].team[team2];
 
-	    var nochange = nochange || false;
-	    var card1pos = o.c1.position;
-	    var card2pos = nochange ? 'support' : o.c2.position;
-	    var owner = o.c1.owner;
-	    var zone = o.c1.zone;
-	    var team1 = o.c1.team;
-	    var team2 = o.c2.team;
-	    var Team1 = o.S[owner][zone].team[team1];
-	    var Team2 = o.S[owner][zone].team[team2];
+	    // В соотвеввущем массиве команщды удаляеться элемент с номером карты
+	    Actions.removeSelfFromTeam(o.S, args.c1 );
 
-	    Actions.removeSelfFromTeam(o.S, o.c1 );
+	    // Если карта-назначение лидер, то карта-источник встает на ее место (присоединяется в начало), 
+	    // иначе присоединеться в конец
+	    if (card2pos == 'leader') Team2.splice(0,0,args.c1.card );
+	    else Team2.push( args.c1.card );
 
-	    if (card2pos == 'leader') Team2.splice(0,0,o.c1.card );
-	    else Team2.push( o.c1.card );
 
 	    if ( !nochange ) {
-	        Actions.removeSelfFromTeam(o.S, o.c2 );
-	        if (card1pos == 'leader') Team1.splice(0,0,o.c2.card );
-	        else Team1.push( o.c2.card );
+	        Actions.removeSelfFromTeam(o.S, args.c2 );
+	        if (card1pos == 'leader') Team1.splice(0,0,args.c2.card );
+	        else Team1.push( args.c2.card );
 	    } else {
             if (!Team1.length) {
             	delete o.S[owner][zone].team[team1];
             }
 	    }
 		if (!module) {
-			if (o.pX == you) {
+			if (args.pX == you) {
 		        Card.prototype.hideActionCircle();
                 G.selectedCard.select(false);
                 G.selectedCard = null;
@@ -346,37 +363,37 @@ var Actions = {
 					} 
 					else {
 
-						adWinnerAndLoser.push(blocker, 'block', blockID, 'normalDefeat');
+						adWinnerAndLoserPush(blocker, 'block', blockID, 'normalDefeat');
 						//blockResult = Actions.normalDefeat(blockTeam, o, blockID);
 
-						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID, 'normalWin');
+						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'normalWin');
 						//blockResult = Actions.normalWin(attackTeam, o, attackID);
 					}
 				}
 				else if (attackPower < blockPower) {
 					if (blockPower - attackPower >= 5) {
 
-						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
+						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
 						//blockResult = Actions.completeDefeat(attackTeam, o, attackID);
 
-						adWinnerAndLoser.push(blocker,'block', blockID, 'completeWin');
+						adWinnerAndLoserPush(blocker,'block', blockID, 'completeWin');
 						//blockResult = Actions.completeWin(blockTeam, o, blockID);
 					} 
 					else {
 
-						adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
+						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
 						//blockResult = Actions.normalDefeat(attackTeam, o, attackID);
 
-						adWinnerAndLoser.push(blocker,'block', blockID, 'completeWin');
+						adWinnerAndLoserPush(blocker,'block', blockID, 'completeWin');
 						//blockResult = Actions.normalWin(blockTeam, o, blockID);
 					}
 				}
 				else {
 
-					adWinnerAndLoser.push(o.S.activePlayer, 'attack', attackID ,'drawBattle');
+					adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'drawBattle');
 					//blockResult = Actions.drawBattle(attackTeam, o, attackID);
 
-					adWinnerAndLoser.push(blocker,'block', blockID, 'drawBattle');
+					adWinnerAndLoserPush(blocker,'block', blockID, 'drawBattle');
 					//blockResult = Actions.drawBattle(blockTeam, o, blockID);
 				}
 			}
@@ -435,15 +452,19 @@ var Actions = {
 		//console.log('completeDefeat' , team)
 		var result = {'givingDamage':[]};
 		if (!team) return;
-		o.damage = 1;
-		o.causeOfDamage = 'completeDefeat';
-		var damgeResult1 = {}, damgeResult2 = {};
+		// o.damage = 1;
+		// o.causeOfDamage = 'completeDefeat';
+		// var damgeResult1 = {}, damgeResult2 = {};
 		for (var i=1; i <= team.length - 1; i++) {
-			result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[i], damage: o.damage, type: 'fire'})
+			result.givingDamage.push(
+				{pX:o.pX, team:o.team, zone:o.zone, card: team[i], damage: o.damage, type: 'fire', causeOfDamage : 'completeDefeat'}
+			)
 			//damgeResult1 = Actions.giveDamage(team[i],o);
 		}
 		o.damage = 2;
-		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: o.damage, type: 'fire'})
+		result.givingDamage.push(
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: o.damage, type: 'fire', causeOfDamage : 'completeDefeat'}
+		)
 		//damgeResult2 = Actions.giveDamage(team[0],o);
 		if (module) { 
 			//console.log('completeDefeat')
@@ -451,13 +472,14 @@ var Actions = {
 		}
 	},
 	'normalDefeat' : function(team, o) {
-		var result = {};
+		var result = {'givingDamage':[]};
 		if (!team) return;
-		o.damage = 1;
-		o.causeOfDamage = 'normalDefeat';
-
+		// o.damage = 1;
+		// o.causeOfDamage = 'normalDefeat';
 		//Actions.giveDamage(team[0],o);
-		result.givingDamage.push({pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: damage, type: 'fire'})
+		result.givingDamage.push(
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: 1, type: 'fire', causeOfDamage : 'normalDefeat'}
+		)
 		if (module) {
 			return result;
 		}
@@ -465,16 +487,15 @@ var Actions = {
 	'completeWin' : function(team, o) {
 		//console.log('completeWin',team)
 		var result = {};
-		if (!team) return;
+		if (!team) return result;
 		if (module) {
 			return result;
 		}
 	},
 	'normalWin' : function(team, o) {
 		var result = {};
-		if (!team) return;
+		if (!team) return result;
 		if (module) {
-			result = {'arg':{},act:'normalWin'};
 			return result;
 		}
 	},
@@ -504,13 +525,17 @@ var Actions = {
 		}
 	},
 	'drawBattle' : function(team, o) {
-		var result = {};
+		var result = {'givingDamage':[]};
 		if (!team) return;
-		o.damage = 1;
-		o.causeOfDamage = 'drawBattle';
-		Actions.giveDamage(team[0],o);
+		// o.damage = 1;
+		// o.causeOfDamage = 'drawBattle';
+		//Actions.giveDamage(team[0],o);
+		
+
+		result.givingDamage.push(
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: 1, type: 'fire', causeOfDamage : 'drawBattle'}
+		)
 		if (module) {
-			result = {'arg':{},act:'drawBattle'};
 			return result;
 		}
 	},
@@ -773,6 +798,12 @@ var Actions = {
 	},
 	'adNewTurn' : function(args, o) {
 		return {};
+	},
+	'drawCard' : function(args, o) {
+		return Actions['Draw X cards'](args, o);
+	},
+	'putCardInPlay' : function(args, o) {
+		return Actions.moveCardToZone(args, o)
 	},
 	'log' : function() { 
 		console.log('msg')
