@@ -184,20 +184,20 @@ var AN = {
 	    }
 	    Log( -1, 'moveToPreview' );
 	},
-	moveCardToZone : function(o) {
-	    //console.log('>--', o.cardID)
+	moveCardToZone : function(args, o) {
+	    console.log('>--', o)
 	    
-	    if ( !isZoneSimple(o.from)) 
+	    if ( !isZoneSimple(args.from)) 
 	    {
-	        if ( isZoneSimple(o.to) )
+	        if ( isZoneSimple(args.to) )
 	        {
-	    		var z = G[o.pX == you ? 'you' : 'opp'][o.to];
+	    		var z = G[args.pX == you ? 'you' : 'opp'][args.to];
 	    		//console.log(z)
-				C[o.card].setZIndex(825);
-		        C[o.card].params.teamPosition = null;
-		        C[o.card].removeTeamPower();
+				C[args.card].setZIndex(825);
+		        C[args.card].params.teamPosition = null;
+		        C[args.card].removeTeamPower();
 
-		        C[o.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
+		        C[args.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
 		        	intoCard: true, 
 		        	incline: false, 
 		        	fadeIn: true, 
@@ -210,41 +210,41 @@ var AN = {
                         //startTable();
                     } } } } );
 	        }
-	        else if ( !isZoneSimple(o.from) )
+	        else if ( !isZoneSimple(args.from) )
 	        {
 
 	            
 
 	        }
 	    } 
-	    else if ( isZoneSimple(o.from) ) 
+	    else if ( isZoneSimple(args.from) ) 
 	    {
-	        if ( isZoneSimple(o.to) ) 
+	        if ( isZoneSimple(args.to) ) 
 	        {
-				if (you == o.owner) var z = G.you[o.to]
-	    		else var z = G.opp[o.to];
-				C[o.card].setZIndex(825);
-		        C[o.card].params.teamPosition = null;
-		        C[o.card].removeTeamPower();
+				if (you == args.pX) var z = G.you[args.to]
+	    		else var z = G.opp[args.to];
+				C[args.card].setZIndex(825);
+		        C[args.card].params.teamPosition = null;
+		        C[args.card].removeTeamPower();
 
-		        C[o.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
+		        C[args.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
 		        	intoCard: true, 
 		        	incline: false, 
 		        	fadeIn: true, 
 		        	curveMoving: 'Y', 
 		        	after: { func: function() {
-                        C[o.card].destroyCard();
+                        C[args.card].destroyCard();
                         //updateCardCount( { owner: o.owner, area: o.to } );
-                        delete C[o.card];
+                        delete C[args.card];
                         //updTable();
                         //startTable();
                     } } } } );
             }
-	        else if ( !isZoneSimple(o.to) ) 
+	        else if ( !isZoneSimple(args.to) ) 
 	        {
-	        	if (you == o.owner) {
-					C[o.card].setZIndex(825);
-		        	C[o.card].animation( { 
+	        	if (you == args.pX) {
+					C[args.card].setZIndex(825);
+		        	C[args.card].animation( { 
 			        	X: I.table.W / 2 + I.table.Y - I.card.W, 
 			        	Y: I.table.H / 2 - I.card.W, 
 			        	H: I.card.W * 2, 
@@ -253,9 +253,9 @@ var AN = {
 			        	}
 		            })
 	            }
-	        	else if  (you != o.owner) {
-					C[o.card].setZIndex(825);
-		        	C[o.card].animation( { 
+	        	else if  (you != args.pX) {
+					C[args.card].setZIndex(825);
+		        	C[args.card].animation( { 
 			        	X: I.table.W / 2 + I.table.Y - I.card.W, 
 			        	Y: I.table.H / 2 - I.card.W, 
 			        	H: I.card.W * 2, 
@@ -265,15 +265,15 @@ var AN = {
 			        	additional: { 
 			        		incline: true,  
 			        		after: { func: function() {
-			        			C[o.card].setNewParams(Known[Accordance[o.card]]);
-			        			C[o.card].params.incline.y = -1;
-			        			C[o.card].params.incline.deg = 90;
-			        			C[o.card].params.W = I.card.W * 2 ;
-		                        C[o.card].$id.empty();
-		                        C[o.card].fillAsFaceUp( C[o.card].$id );
-		                        C[o.card].updateLinks();
-		                        C[o.card].updateMouse();
-		                        C[o.card].animation({
+			        			C[args.card].setNewParams(Known[Accordance[args.card]]);
+			        			C[args.card].params.incline.y = -1;
+			        			C[args.card].params.incline.deg = 90;
+			        			C[args.card].params.W = I.card.W * 2 ;
+		                        C[args.card].$id.empty();
+		                        C[args.card].fillAsFaceUp( C[args.card].$id );
+		                        C[args.card].updateLinks();
+		                        C[args.card].updateMouse();
+		                        C[args.card].animation({
 		                        	y:0,
 						        	deg:0,
 						        	duration:600,
@@ -513,7 +513,11 @@ var AN = {
 			setTimeout (AN.preStack.countDown, 1210)
 		},
 		'drawCard' : function(args) {
-			console.log(args)
+			console.log(args);
+			Actions['Draw X cards'](args, getUniversalObject())
+		},
+		'putCardInPlay' : function(args) {
+			Actions.moveCardToZone(args, getUniversalObject())
 		}
 	}
 }
