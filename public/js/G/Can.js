@@ -232,7 +232,13 @@ var Can = {
         }
         else {
             console.log(  
-              /*o.Known[o.Accordance[o.card]].owner , o.pX*/ )
+             o.S.phase == 'mission' 
+             , arraySearch(o.S[o.pX].hand, o.card) !== null
+             , o.Known[o.Accordance[o.card]].type == 'N' 
+             , o.Known[o.Accordance[o.card]].owner == o.pX 
+             ,  o.S.counters.playedNinjaActivePlayer == 0  
+             , o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec
+             )
         }
     },
     removeFromTeam : function(o){
@@ -242,11 +248,19 @@ var Can = {
         ){
             for (var i in o.S[o.pX].village.team) {
                 if (arraySearch(o.S[o.pX].village.team[i], o.card) !== null) {
-                    if (o.S[o.pX].village.team[i].length < 2) return false;  
+                    if (o.S[o.pX].village.team[i].length < 2) {
+                        console.log('bad 2')
+                        console.log(o.S[o.pX].village.team)
+                        return false;  
+                    }
+                        console.log('good 2')
                     return true;
                 }
             }
         }
+        console.log(o.S.phase == 'organisation'
+             , o.Known[o.Accordance[o.card]].type == 'N' 
+             , o.Known[o.Accordance[o.card]].owner == o.pX)
         return false;
     },
 }
