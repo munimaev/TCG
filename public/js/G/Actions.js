@@ -27,6 +27,14 @@ var Actions = {
 		};
 		console.log('hand',o.S[pX].hand)
 	},
+	/**
+	 * Возврашает обект с приготовленными дейстиями
+	 * @param  {[type]} args обект с а аргументами
+	 * @param  {[type]} args.numberOfCard 
+	 * @param  {[type]} args.player 
+	 * @param  {[type]} o    стандартный объект
+	 * @return {[type]}      [description]
+	 */
 	'Draw X cards' : function(args, o) {
 		args.numberOfCard = args.numberOfCard || 1;
 		var o2 = {
@@ -114,6 +122,14 @@ var Actions = {
 	            
 
 	        }
+	        if (!o.S[args.pX][args.from].team[args.team].length) {
+	        	delete o.S[args.pX][args.from].team[args.team];
+	        	for (var i in o.S.battlefield) {
+	        		if (i == args.team || o.S.battlefield[i] == args.team) {
+	        			delete o.S.battlefield[i];
+	        		}
+	        	}
+	        }
 	    } 
 	    else if ( isZoneSimple(args.from) ) 
 	    {
@@ -153,6 +169,12 @@ var Actions = {
 	'preparePutCardinPlay' : function(args,o) {	
 		return { 
 			'putCardInPlay' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : args.cause, teamCounter:args.teamCounter}],
+			'applyUpd' : [{forPlayer: 'pB', cards : [args.card]},{forPlayer: 'pA', cards : [args.card]}]
+		};	
+	},
+	'prepareCharge' : function(args,o) {	
+		return { 
+			'charge' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : args.cause}],
 			'applyUpd' : [{forPlayer: 'pB', cards : [args.card]},{forPlayer: 'pA', cards : [args.card]}]
 		};	
 	},
@@ -296,12 +318,30 @@ var Actions = {
 		// 		AN.uturn(o);
 		// 	}, time:1210, name: 'startAtStart '});
 		// } else {
+		
+		if (o.S.pA.rewards >= 10 || o.S.pB.rewards >= 10 ) {
+			var winner = '';
+			if (o.S.pA.rewards >= 10 && o.S.pB.rewards < 10) {
+				winner = 'pA';
+			}
+			else if (o.S.pB.rewards >= 10 && o.S.pA.rewards < 10) {
+				winner = 'pB';
+			}
+			else {
+				winner = o.S.activePlayer;
+			}
+			var loser = winner == 'pA' ? 'pB' : 'pA';
+			
 			return { 
-				'returnToVillaje' : [{team:'all', }],
-				'updTable' : [{players : 'all'}],
-				'adNewTurn' : [{}],
-				//'order' : ['returnToVillaje', 'updTable'] //TODO обработчик порядка
+				'winner' : [{winner:winner,loser:loser, cause:'10 rewards'  }]
 			 };
+		}
+		return { 
+			'returnToVillaje' : [{team:'all', }],
+			'updTable' : [{players : 'all'}],
+			'adNewTurn' : [{}],
+			//'order' : ['returnToVillaje', 'updTable'] //TODO обработчик порядка
+		 };
 		//}
 	},
 	'missionAtStart' : function(o) {
@@ -324,7 +364,12 @@ var Actions = {
 			};
 		} else {
 			return {
-				'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
+				//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}] //TODO почистить
+				'winner' : [{
+					winner: args.player == 'pA' ? 'pB' : 'pA',
+					loser:args.player, 
+					cause:'empty deck'
+				}]
 			}
 		}
 	},
@@ -438,15 +483,19 @@ var Actions = {
 			}
 		}
 	},
-	'winner' : function(o) {
+	'winner' : function(args,o) {
+		Actions.stopGame(args, o);
 		if (!module) {
 			AnimationPush({func:function() {
-				AN.winner(o);
+				AN.winner(args,o);
 			}, time:1200, name: 'winner'});
 		}
 	},
-	'stopGame' : function(o) {
+	'stopGame' : function(args, o) {
 		o.S.stop = true;
+	},
+	'actionLock' : function(arg) {
+		actionLock = arg.lock;
 	},
 	'completeDefeat' : function(team, o) {
 		//console.log('completeDefeat' , team)
@@ -457,13 +506,12 @@ var Actions = {
 		// var damgeResult1 = {}, damgeResult2 = {};
 		for (var i=1; i <= team.length - 1; i++) {
 			result.givingDamage.push(
-				{pX:o.pX, team:o.team, zone:o.zone, card: team[i], damage: o.damage, type: 'fire', causeOfDamage : 'completeDefeat'}
+				{pX:o.pX, team:o.team, zone:o.zone, card: team[i], damage: 1, type: 'fire', causeOfDamage : 'completeDefeat'}
 			)
 			//damgeResult1 = Actions.giveDamage(team[i],o);
 		}
-		o.damage = 2;
 		result.givingDamage.push(
-			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: o.damage, type: 'fire', causeOfDamage : 'completeDefeat'}
+			{pX:o.pX, team:o.team, zone:o.zone, card: team[0], damage: 2, type: 'fire', causeOfDamage : 'completeDefeat'}
 		)
 		//damgeResult2 = Actions.giveDamage(team[0],o);
 		if (module) { 
@@ -804,6 +852,12 @@ var Actions = {
 	},
 	'putCardInPlay' : function(args, o) {
 		return Actions.moveCardToZone(args, o)
+	},
+	'charge' : function(args, o) {
+		return Actions.moveCardToZone(args, o)
+	},
+	'startDrawHand' : function(args, o) {
+		return Actions['Draw X cards'](args, o);
 	},
 	'log' : function() { 
 		console.log('msg')
