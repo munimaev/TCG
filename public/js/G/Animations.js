@@ -384,7 +384,11 @@ var AN = {
 		    	}
 		    }
 		    //console.log(Answers);
-		    if(!condidateCount.length) return;
+		    if(!condidateCount.length) {
+				AN.stop = false;
+		    	AN.preStack.countDown();
+		    	return;
+		    }
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
 		    Context.clickAction = function( card ) {
@@ -518,6 +522,16 @@ var AN = {
 		},
 		'putCardInPlay' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
+		},
+		'winner' : function(args) {
+			Actions.winner(args, getUniversalObject())
+		},
+		'winner' : function(args) {
+			Actions.winner(args, getUniversalObject())
+		},
+		'startDrawHand' : function(args) {
+			console.log('startDrawHand')
+			AN.preStack.countDown();
 		}
 	}
 }
