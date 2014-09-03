@@ -1151,6 +1151,7 @@ function removeSelfFromTeamJSON( card ) {
 
 
 function updTeams() {
+    console.log('updTeams');
     var maxSqrSize =(I.table.H - 2*(I.card.W/2 - I.table.Y/2)) / 50;
     var maxSqrWidth = I.table.W / maxSqrSize;
     var position = {
