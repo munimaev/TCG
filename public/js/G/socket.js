@@ -3,6 +3,7 @@ var socket = io();
 });
 
 var Client = {};
+var actionLock = false;
 var you = "pX";
 var opp = "pX";
 var Animation = [];
@@ -127,6 +128,7 @@ var stackPrepAfter = {
 function applyStackAfter() {
 	console.log('applyStackAfter',stackPrepAfter);	
 	var stackPrep = stackPrepAfter;
+	AN.preStack.count++;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 				console.log('+++++++++++')
@@ -135,6 +137,7 @@ function applyStackAfter() {
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
+	AN.preStack.countDown();
 }
 
 var stackPrepBeforIsRun = false;
@@ -143,6 +146,7 @@ var stackPrepBefor = {};
 function applyStackBeafor() {
 	console.log('stackPrepBefor',stackPrepBefor);	
 	var stackPrep = stackPrepBefor;
+	AN.preStack.count++;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 				console.log('+++++++++++')
@@ -151,6 +155,7 @@ function applyStackBeafor() {
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
+	AN.preStack.countDown();
 }
 
 var stackPrepNormal = {};
@@ -159,6 +164,7 @@ var stackPrepNormal = {};
 function applyStackNormal() {
 	console.log('stackPrepNormal',stackPrepNormal);	
 	var stackPrep = stackPrepNormal;
+	AN.preStack.count++;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 			console.log('-----------')
@@ -167,6 +173,7 @@ function applyStackNormal() {
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
+	AN.preStack.countDown();
 }
 
 
@@ -211,3 +218,6 @@ socket.on('updact',function(d) {
 	 applyAct(d);
 	 applyStackPrep(d);
 })
+
+
+
