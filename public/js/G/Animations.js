@@ -130,7 +130,10 @@ var AN = {
 
 		                    return function() {
 		                        card.changeZone( 'hand' );
-		                        card.setZIndex( 400 )
+		                        card.setZIndex( 400 );
+				                card.$id.
+				                    css( '-webkit-transform', 'rotate3d(0,0,0,0deg)' ).
+				                    css( '-moz-transform', 'rotate3d(0,0,0,0deg)' );
 		                    };
 		                })()
 		            }
@@ -521,6 +524,9 @@ var AN = {
 			Actions['Draw X cards'](args, getUniversalObject())
 		},
 		'putCardInPlay' : function(args) {
+			Actions.moveCardToZone(args, getUniversalObject())
+		},
+		'charge' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
 		},
 		'winner' : function(args) {
