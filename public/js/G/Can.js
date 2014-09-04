@@ -21,6 +21,7 @@ var Can = {
     },
     charge : function(o) {
         if ( o.S.phase == 'mission' 
+             && o.S.activePlayer == o.pX  
              && arraySearch(o.S[o.pX].hand, o.card) !== null
              && o.Known[o.Accordance[o.card]]
              && o.Known[o.Accordance[o.card]].owner == o.pX) 
@@ -223,6 +224,8 @@ var Can = {
 	},
 	putInPlay : function(o) {
         if ( o.S.phase == 'mission' 
+             && o.S.activePlayer == o.pX  
+             && o.S.counters.playedNinjaActivePlayer == 0
         	 && arraySearch(o.S[o.pX].hand, o.card) !== null
         	 && o.Known[o.Accordance[o.card]].type == 'N' 
         	 && o.Known[o.Accordance[o.card]].owner == o.pX 
