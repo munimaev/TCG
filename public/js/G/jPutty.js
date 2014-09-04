@@ -271,11 +271,18 @@ function areaClick(o){
 function fillScroll(o){
     var G = S[Client[o.owner]][o.area];
     var faceUp = false;
-    if (o.area == 'chackra') {
+    if (o.area == 'chackra' || o.area == 'discard') {
         faceUp = true;
     }
+    var params = {};
     for (var i in G) {
-        C[G[i]] = new Card({'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp, zindex:350});
+        params = {'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp, zindex:600};
+        var preparams = Known[Accordance[G[i]]];
+        for (var i in preparams) {
+            params[i] = preparams[i];
+        }
+        C[G[i]] = new Card(params);
+        console.log('++++', Known[Accordance[G[i]]])
         C[G[i]].$id.css('position','relative').css('display','inline-block').css('margin','0 1.1% 1.1% 0');
         $('.scrollCards','#' + o.owner + '_' + o.area + '_' + o.clicker).append(C[G[i]].$id);
     }
