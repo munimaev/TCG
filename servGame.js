@@ -7,7 +7,7 @@ var preGamesLobbi = {
 }
 var StartedGames = {
 };
-var Testing = true;
+var Testing = false;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
@@ -564,8 +564,8 @@ function S_startDrawHand(d) {
 	var actReuslt =  {'startDrawHand':[{player:d.u.you,numberOfCard:6}]};
 	data.stackPrep = actReuslt;
 	table.stackPrep = actReuslt;
-	table.stackPreppA = table.stackPreppB = null;
-	io.sockets.in(table.room).emit('updact', data);
+	table['stackPrep'+d.u.you] = null;
+	//io.sockets.in(table.room).emit('updact', data);
 
 	// Actions['Draw X cards']({S:table.Snapshot, pX:d.u.you});
 	io.sockets.in(table['room' + d.u.you]).emit('updact', data);
@@ -943,8 +943,8 @@ function getUpdatesForPlayers(table, actReuslt) {
 }
 
 function preStackDone(d) {
-	console.log('on preStackDone')
 	var table = StartedGames[d.u.table];
+	console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
