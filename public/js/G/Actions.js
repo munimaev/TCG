@@ -100,6 +100,10 @@ var Actions = {
 			updTable : [{players:'all'}],
 		};
 
+		if (args.cause == 'play' && o.Known[o.Accordance[args.card]].type == 'N') {
+			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
+		}
+
 	    if ( !isZoneSimple(args.from)) 
 	    {
 	        if ( isZoneSimple(args.to) )
@@ -318,7 +322,7 @@ var Actions = {
 		// 		AN.uturn(o);
 		// 	}, time:1210, name: 'startAtStart '});
 		// } else {
-		
+		o.S.counters.playedNinjaActivePlayer = 0;
 		if (o.S.pA.rewards >= 10 || o.S.pB.rewards >= 10 ) {
 			var winner = '';
 			if (o.S.pA.rewards >= 10 && o.S.pB.rewards < 10) {
@@ -857,7 +861,12 @@ var Actions = {
 		return Actions.moveCardToZone(args, o)
 	},
 	'startDrawHand' : function(args, o) {
-		return Actions['Draw X cards'](args, o);
+		return {
+			'drawCard' : [
+				{player: 'pA' , numberOfCard : 6 , cause : 'startGame'},
+				{player: 'pB' , numberOfCard : 6 , cause : 'startGame'},
+			]
+		}
 	},
 	'log' : function() { 
 		console.log('msg')
