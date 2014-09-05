@@ -394,15 +394,7 @@ var AN = {
 		    }
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
 		    Context.workingUnit = 'card';
-		    Context.clickAction = function( card ) {
-		    	// Actions.newLeader( {
-		    	// 	pX   : you,
-			    // 	zone : args.zone,
-		    	// 	team : args.team,
-		    	// 	card : cardId,
-		    	// }, o);
-		    	//console.log(cardId, card.id)
-		    	
+		    Context.clickAction = function( card ) {		    	
 		    	Answers.newLeader.push( {
 		    		pX   : you,
 			    	zone : args.zone,
@@ -419,6 +411,9 @@ var AN = {
 				AN.stop = false;
 				AnimationNext();
 		    }
+		},
+		discardExcess : function(args, o) {
+
 		}
 	},
 	preStack : {
@@ -484,13 +479,14 @@ var AN = {
 		'afterQuestion' : function(args) {
 			//console.log('afterQuestion', args)
 			if (args.pX === you) {
-
+				console.log('!!!!!!!!!!!!!!!!')
 			    AnimationPush({func:function() {
 					AN.Questions[args.question](args, getUniversalObject());
 			    }, time:1200, name: 'Questions - ' + args.question });
 				
 			}
 			else {
+				console.log('?????????????????????')
 				AN.preStack.countDown();
 			}
 		},
