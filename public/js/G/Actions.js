@@ -338,14 +338,20 @@ var Actions = {
 			
 			return { 
 				'winner' : [{winner:winner,loser:loser, cause:'10 rewards'  }]
-			 };
+			};
 		}
-		return { 
+		var result = { 
 			'returnToVillaje' : [{team:'all', }],
 			'updTable' : [{players : 'all'}],
-			'adNewTurn' : [{}],
-			//'order' : ['returnToVillaje', 'updTable'] //TODO обработчик порядка
-		 };
+			'toStack' : {'adNewTurn' : [{}]},
+		};
+		if (o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].hand.length > 6) {
+
+			result.afterQuestion = [{
+				question: 'discardExcess', pX:o.S.activePlayer
+			}]
+		}
+		return result;
 		//}
 	},
 	'missionAtStart' : function(o) {
@@ -405,45 +411,26 @@ var Actions = {
 					if (attackPower - blockPower >= 5) {
 
 						adWinnerAndLoserPush( blocker, 'block', blockID, 'completeDefeat');
-						//blockResult = Actions.completeDefeat(blockTeam, o, blockID);
-
 						adWinnerAndLoserPush( o.S.activePlayer, 'attack', attackID, 'completeWin');
-						//blockResult = Actions.completeWin(attackTeam, o, attackID);
 					} 
 					else {
-
 						adWinnerAndLoserPush(blocker, 'block', blockID, 'normalDefeat');
-						//blockResult = Actions.normalDefeat(blockTeam, o, blockID);
-
 						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'normalWin');
-						//blockResult = Actions.normalWin(attackTeam, o, attackID);
 					}
 				}
 				else if (attackPower < blockPower) {
 					if (blockPower - attackPower >= 5) {
-
 						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
-						//blockResult = Actions.completeDefeat(attackTeam, o, attackID);
-
 						adWinnerAndLoserPush(blocker,'block', blockID, 'completeWin');
-						//blockResult = Actions.completeWin(blockTeam, o, blockID);
 					} 
 					else {
-
 						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'completeDefeat');
-						//blockResult = Actions.normalDefeat(attackTeam, o, attackID);
-
 						adWinnerAndLoserPush(blocker,'block', blockID, 'completeWin');
-						//blockResult = Actions.normalWin(blockTeam, o, blockID);
 					}
 				}
 				else {
-
 					adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID ,'drawBattle');
-					//blockResult = Actions.drawBattle(attackTeam, o, attackID);
-
 					adWinnerAndLoserPush(blocker,'block', blockID, 'drawBattle');
-					//blockResult = Actions.drawBattle(blockTeam, o, blockID);
 				}
 			}
 			else {
@@ -451,22 +438,15 @@ var Actions = {
 					toStack.adWinnerAndLoser = [];
 				}
 				if (attackPower >= 5) {
-					console.log('++')
 					toStack.adWinnerAndLoser.push({pX:o.S.activePlayer, zone:'attack', team:attackID , ad:'completeReward'});
 					o.rewardToPlayer = o.S.activePlayer;
-					//blockResult = Actions.completeReward(attackTeam, o, attackID);
 				}
 				else {
-					console.log('++')
 					toStack.adWinnerAndLoser.push({pX:o.S.activePlayer, zone:'attack', team:attackID , ad:'normalReward'});
 					o.rewardToPlayer = o.S.activePlayer;
-					//blockResult = Actions.normalReward(attackTeam, o, attackID);
 				}
 			}
         }
-
-        //Actions.retrunTeamToVillage(o)
-		
 
 		if (!module) {
 			updTable();
