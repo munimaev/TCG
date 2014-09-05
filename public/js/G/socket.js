@@ -19,6 +19,7 @@ var S = null; // snapshot
 var C = {}; // cards
 
 socket.on('C_init', function(d){
+	console.log('C_init', d)
 	Client.you = you = d.you;
 	Client.opp = opp = d.opp;
 	Client.table = d.table
