@@ -7,12 +7,13 @@ var preGamesLobbi = {
 }
 var StartedGames = {
 };
-var Testing = false;
+var Testing = true;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
+var fs = require('fs');
 
 //console.log(Stadies)
 
@@ -320,12 +321,22 @@ function bothIsJoin(d) {
 			Known:table.pB.Known
 		});
 		// TODO нужна комната для наблюдателя
+	} else {
+		io.sockets.in(table['room'+d.you]).emit('bothIsJoin', {
+			isNewGame: table.Snapshot[d.you].isNewGame, 
+			Accordance:table[d.you].Accordance,
+			Known:table[d.you].Known
+		});
 	}
 }
 
 function getStartSnapshot(table) {
 	if (table.Snapshot) {
 		return table.Snapshot;
+	}
+	if (Testing) {
+		var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
+		return obj.S;
 	}
 	var result = { // as Snapshot
 	    activePlayer: 'pA',
@@ -337,7 +348,7 @@ function getStartSnapshot(table) {
 	    },
 	    pA : {
 	    	isDrawCardAtStartTurn : false,
-	    	isNewGame : true,
+	    	isNewGame : false,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -348,6 +359,7 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
+	            	1:['c105']
 	            }
 	        },
 	        attack : {
@@ -365,7 +377,7 @@ function getStartSnapshot(table) {
 
 	    },
 	    pB : {
-	    	isNewGame : true,
+	    	isNewGame : false,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -437,8 +449,7 @@ function getStartCards() {
 	    c023: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 0, si: 3, img: 'n1484' , elements: 'W', name : "Temari" },
 	    c024: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 2, si: 3, img: 'n1420' , elements: 'W', name : "Sasori" },
 	    c025: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 1, ai: 3, si: 1, img: 'n130' , elements: 'W', name : "Баки" },
-	    c026: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },
-	    
+	    c026: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },	    
 	    
 	    c121: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
 	    c122: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
@@ -499,7 +510,13 @@ function getStartAccordiance(S) {
 			values.push(i < 10 ? '0' + i : ''+i)
 		}
 
-		if (!Testing) values.sort(  function() { return Math.random()-0.5} )
+		if (!Testing) {
+			values.sort(  function() { return Math.random()-0.5} )
+		} else {
+			var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
+			return obj.Accordance;
+		}
+
 		
 		for (var i in keys) {
 			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
@@ -915,7 +932,16 @@ function addStack(table, actReuslt ) {
 		if (!('stack' in table)) table.stack = [];
 		table.stack = table.stack.concat(actReuslt.toStack);
 		delete actReuslt.toStack;
-	} 
+	}
+	for ( var i = table.stack.length; i >= 0 ; i-- ) {
+		var isEmpty = true;
+		for (var j in table.stack[i]) {
+			isEmpty = false; break;
+		}
+		if (isEmpty) {
+			table.stack.splice(i,1);
+		}
+	}
 	return actReuslt;
 }
 
@@ -951,11 +977,14 @@ function preStackDone(d) {
 
 	if (table.stackPreppA && table.stackPreppB) {
 		var count = 0;
+
+		console.log("\n================")
 		for (var i in table.stackPrep) {
 			if (i == 'afterQuestion' 
 				|| i == 'befor' 
 				|| i == 'updTable' 
 				|| !table.stackPrep[i].length) {
+				console.log('del ' + i)
 				delete table.stackPrep[i];
 				continue;
 			}
@@ -965,7 +994,6 @@ function preStackDone(d) {
 		if (!count) {
 			table.stackPrep = table.stack.pop();
 		}
-		console.log("\n================")
 		console.log('\ntable.stackPrep')
 		console.log(table.stackPrep)
 
@@ -998,9 +1026,19 @@ function preStackDone(d) {
 			stackPrepIsEmpty = false;
 		}
 
+
+		if (stackPrepIsEmpty && table.stack.length) {
+			table.stackPrep = table.stack.pop();
+			actReuslt = table.stackPrep;
+			stackPrepIsEmpty = true;
+		} 
+
+		console.log('\ntoClient2');
+		console.log(actReuslt);
+
 		if (stackPrepIsEmpty) {
-			table.actionLock = true;
-			io.sockets.in(table.room).emit('updact', {acts:[{'arg':{lock:false}, 'act' : 'actionLock'}]});
+				table.actionLock = true;
+				io.sockets.in(table.room).emit('updact', {acts:[{'arg':{lock:false}, 'act' : 'actionLock'}]});
 		}
 		else {
 			if (upds) {
@@ -1015,13 +1053,11 @@ function preStackDone(d) {
 	}
 }
 
-var fs = require('fs');
 function saveGame(d) {
 	var table = StartedGames[d.u.table];
 	var outputFilename = __dirname + '/tmp/my.json';
 	var toSave = {
 		S : table.Snapshot,
-		Known : table.Known,
 		Accordance : table.Accordance
 	}
 	fs.writeFile(outputFilename, JSON.stringify(toSave, null, 4), function(err) {
