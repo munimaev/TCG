@@ -6,7 +6,6 @@
  * @returns {Card} Объект Card.
  */
 function Card( o ) {
-
     this.id = o.id;
     /**
      * Возвращает параметр name для карты из массива upd,
