@@ -55,27 +55,48 @@ var Actions = {
 			//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
 		}
 	},
+	/**
+	 * [description]
+	 * @param  {[type]} args Объект с аргументами
+	 * @param  {[type]} args.phase Значение может быть либо "next" либо название фазы в которую надо перейти.
+	 * @param  {[type]} o    Универсальный объект
+	 * @return {[type]}      [description]
+	 */
 	'toNextPhase' : function(args, o) {
-		var key = -1;
-		for (var i in o.S) {
-			//console.log('+'+i)
-		}
-		for ( var i in o.Stadies.order ) {
-		    if ( o.Stadies.order[i] == o.S.phase ) {
-		        key = i;
-		        break;
+			var key = -1;
+			for ( var i in o.Stadies.order ) {
+			    if ( o.Stadies.order[i] == o.S.phase ) {
+			        key = i;
+			        break;
+			    }
+			}
+		    var newKey = Number( key ) + 1;
+
+
+		    if ( newKey >= o.Stadies.order.length ) {
+		        newKey = 0;
+		        o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
+		        o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+		        o.S.counters.playedNinjaActivePlayer = 0;
 		    }
-		}
-	    var newKey = Number( key ) + 1;
-	    if ( newKey >= o.Stadies.order.length ) {
-	        newKey = 0;
-	        o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
-	        o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-	        o.S.counters.playedNinjaActivePlayer = 0;
+	    	//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
+	    	o.S.phase = o.Stadies.order[newKey];
+	    if (o.S.phase == 'attack') {
+	    	var count = 0;
+	    	for (var i in o.S[o.S.activePlayer].village.team) {
+	    		count++;
+	    	}
+	    	if (!count) return Actions.toNextPhase(args, o);
+
+	    }
+	    if (o.S.phase == 'block') {	    	
+	    	var count = 0;
+	    	for (var i in o.S[o.S.activePlayer =='pA' ? 'pB' : 'pA'].village.team) {
+	    		count++;
+	    	}
+	    	if (!count) return Actions.toNextPhase(args, o);
 	    }
 
-    	//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
-    	o.S.phase = o.Stadies.order[newKey];
     	if (module) {
 	    	if (o.S.phase+'AtStart' in Actions) {
 	    		return Actions[o.S.phase+'AtStart'](o);
@@ -90,14 +111,23 @@ var Actions = {
 		        H.next.addClass('selectedZone');
 		    }
     	}
-    	//
-    	// if (!module) {
-    	// 	updTable(); 
-	    // }
 	},
+	/**
+	 * [description]
+	 * @param  {[type]} args [description]
+	 * @param  {[type]} args.pX [description]
+	 * @param  {[type]} args.card [description]
+	 * @param  {[type]} args.cause [description]
+	 * @param  {[type]} args.from [description]
+	 * @param  {[type]} args.to [description]
+	 * @param  {[type]} args.team [description]
+	 * @param  {[type]} o    [description]
+	 * @return {[type]}      [description]
+	 */
 	'moveCardToZone' : function (args, o) {
+		console.log(args)
 		var result = {
-			updTable : [{players:'all'}],
+			updTable : [],
 		};
 
 		if (args.cause == 'play' && o.Known[o.Accordance[args.card]].type == 'N') {
@@ -108,8 +138,13 @@ var Actions = {
 	    {
 	        if ( isZoneSimple(args.to) )
 	        {
+	        	console.log('h->s')
 	            o.S[args.pX][args.from].team[args.team].splice(args.cardInArray,1);
-	            o.S[args.pX][args.to].push(args.card);
+	            if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+	            	o.S[args.pX][args.to].splice(0,0,args.card)
+	            } else {
+	            	o.S[args.pX][args.to].push(args.card);
+	        	}
 	            o.S.statuses[args.card] = {};
 
 				if (!module) {
@@ -123,7 +158,7 @@ var Actions = {
 	        else if ( !isZoneSimple(args.from) )
 	        {
 
-	            
+	        	console.log('h->h')
 
 	        }
 	        if (!o.S[args.pX][args.from].team[args.team].length) {
@@ -142,7 +177,14 @@ var Actions = {
             o.S[args.pX][args.from].splice(ind,1)
 		        if ( isZoneSimple(args.to) ) 
 		        {
-	            	o.S[args.pX][args.to].push(args.card)
+	        	console.log('s->s')
+
+		            if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+		            	o.S[args.pX][args.to].splice(0,0,args.card)
+		            } else {
+		            	o.S[args.pX][args.to].push(args.card);
+		        	}
+
 
 				if (!module) {
 						C[args.card].params.zona = args.to;
@@ -155,6 +197,7 @@ var Actions = {
 	            }
 		        else if ( !isZoneSimple(args.to) ) 
 		        {	
+	        	console.log('s->h')
 		        	Actions.createTeamFromCard(args, o);
 					if (!module) {
 						C[args.card].params.zona = args.to;
@@ -167,9 +210,29 @@ var Actions = {
 		        }
 	        }
 	    }
+	    if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
+	    if (!result.updTable.length) delete result.updTable;
 	    return result;
 	},
-
+	'addConditionalEffect' : function (result,  trigger, args, o) {
+	},
+	'addTriggerEffect' : function (result,  trigger, args, o) {
+		for (var i in o.Known) {
+			if (o.Known[i].effect 
+				&& o.Known[i].effect.trigger 
+				&& o.Known[i].effect.trigger[trigger]
+			) {
+				console.log('card >-< ' + i)
+				for (var i2 in o.Known[i].effect.trigger[trigger]) {
+					if (o.Known[i].effect.trigger[trigger][i2].condition(args, o)) {
+						console.log('effect >-< '+ i2)
+						result = o.Known[i].effect.trigger[trigger][i2].result(result, args, o)
+					}
+				}
+			}
+		}
+		return result;
+	},
 	'preparePutCardinPlay' : function(args,o) {	
 		return { 
 			'putCardInPlay' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : args.cause, teamCounter:args.teamCounter}],
@@ -345,12 +408,16 @@ var Actions = {
 			'updTable' : [{players : 'all'}],
 			'toStack' : {'adNewTurn' : [{}]},
 		};
-		if (o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].hand.length > 6) {
-
-			result.afterQuestion = [{
-				question: 'discardExcess', pX:o.S.activePlayer
-			}]
+		//Активный игрок сменился в фцнкции atstart
+		var oldActivePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+		if (!('afterQuestion' in result)) result.afterQuestion = [];
+		for (var i = o.S[oldActivePlayer].hand.length; i > 6; i--) {
+			result.afterQuestion.push({
+				question: 'discardExcess', pX:oldActivePlayer
+			})
 		}
+
+
 		return result;
 		//}
 	},
@@ -636,12 +703,12 @@ var Actions = {
 							for (var i in o) o2[i] = o[i]
 
 							result.moveCardToZone.push({
-								pX:o.pX, from:o.from, team:o.team, card: o.card, to: o.to, cardInArray: o.card
+								pX:o.pX, from:o.from, team:o.team, card: o.card, to: o.to, cardInArray: o.card, cause : 'resultOfshutdown'
 							});
 							//Actions.moveCardToZone(o2)
 							
 
-							if (card == 0) {
+							if (card == 0 && teams[team].length > 1) {
 								result.afterQuestion.push({
 									question: 'newLeader', pX:o.pX, zone:o.zone, team:o.team
 								});
@@ -662,6 +729,7 @@ var Actions = {
 				}
 			}
 		}
+		if (!result.afterQuestion.length) delete result.afterQuestion;
 		return result;
 	},
 	'retrunTeamToVillage'  : function (args, o) {
@@ -741,8 +809,30 @@ var Actions = {
 			return result;
 		}
 	},
+	'discardExcess' : function(args, o) {
+		var result = {discardExcess : [args]};
+		console.log('discardExcess', args)
+		for (var i in o.S[args.pX].hand) {
+			if (o.S[args.pX].hand[i] == args.card) {
+				Actions.moveCardToZone({
+					pX : args.pX ,
+					card : args.card ,
+					cause : 'discardExcess' ,
+					from : 'hand' ,
+					to : 'discard' ,
+					team : null } , o
+				)
+				break;
+			}
+		}
+		if (!module) {
+			setTimeout(AN.preStack.countDown, 1000);
+		} else {
+			return result;
+		}
+	},
 	'preStackDone' : function(table, o) {
-		console.log('table',table.stackPrep)
+		// console.log('table',table.stackPrep)
 		o.answers = table.answers;
 		var results = [];
 		var result = {};
@@ -753,24 +843,24 @@ var Actions = {
 			}
 		}
 		var befor = [];
-		console.log('\ntable.answers');
-		console.log(table.answers)
+		// console.log('\ntable.answers');
+		// console.log(table.answers)
 		for (var ans in table.answers) {
 			for (var args in table.answers[ans]) {
 				befor.push(Actions[ans](table.answers[ans][args], o));
 			}
 		}
-		console.log("------------------------");
-		console.log(results);
-		console.log("------------------------");
+		// console.log("------------------------");
+		// console.log(results);
+		// console.log("------------------------");
 		var toStack = [];
 		for (var i in results) {
 			if (results[i]) {
 				for (var name in results[i]) {
 					if (name == 'toStack') {
 						toStack.push(results[i][name]);
-						console.log(results[i][name])
-						console.log("------------------------");
+						// console.log(results[i][name])
+						// console.log("------------------------");
 						continue;
 					}
 					if (!(name in result)) result[name] = [];
@@ -853,5 +943,5 @@ var Actions = {
 	}
 };
 if (module) {
-		module.exports = Actions;
+	module.exports = Actions;
 }
