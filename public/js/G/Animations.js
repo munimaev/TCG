@@ -188,7 +188,7 @@ var AN = {
 	    Log( -1, 'moveToPreview' );
 	},
 	moveCardToZone : function(args, o) {
-	    console.log('>--', o)
+	    //console.log('>--', o)
 	    
 	    if ( !isZoneSimple(args.from)) 
 	    {
@@ -226,22 +226,39 @@ var AN = {
 	        {
 				if (you == args.pX) var z = G.you[args.to]
 	    		else var z = G.opp[args.to];
+
 				C[args.card].setZIndex(825);
 		        C[args.card].params.teamPosition = null;
 		        C[args.card].removeTeamPower();
 
-		        C[args.card].animation( { X: z.X + 4, Y: z.Y + 2, H: z.H, additional: { 
-		        	intoCard: true, 
-		        	incline: false, 
-		        	fadeIn: true, 
-		        	curveMoving: 'Y', 
-		        	after: { func: function() {
-                        C[args.card].destroyCard();
-                        //updateCardCount( { owner: o.owner, area: o.to } );
-                        delete C[args.card];
-                        //updTable();
-                        //startTable();
-                    } } } } );
+		        C[args.card].animation( { 
+		        	X: z.X + z.W/2 - I.card.W / 2, 
+		        	Y:  I.H / 3 * (you == args.pX ? 2 : 1)- I.card.W/2,
+		        	duration: 300, additional: { 
+			        	intoCard: true, 
+			        	curveMoving: 'Y', 
+			        	after: { func: function() {
+			        		setTimeout(
+			        			function() {
+					        		C[args.card].animation( 
+					        			{ X: z.X + 4, Y: z.Y + 2, H: z.H, duration: 300, additional: {
+					        				fadeIn: true, 
+					        				curveMoving: 'Y',
+					        				incline: false, 
+						        			after : {
+						        				func : function() {
+							                        C[args.card].destroyCard();
+							                        delete C[args.card];
+						        				}
+						        			}
+						        		}
+					        		} )
+					        	}
+					        	,200
+			        		)
+	                    } 
+                	}
+                }});
             }
 	        else if ( !isZoneSimple(args.to) ) 
 	        {
@@ -413,7 +430,67 @@ var AN = {
 		    }
 		},
 		discardExcess : function(args, o) {
+			AN.stop = true;
+		    if (!('discardExcess' in Answers)) Answers.discardExcess = [];
+		    var condidateCount = [];
+		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Сбросьте картs с руки до 6.' ); 
+		    AN.moveToPreview( { pX: args.pX } );
+		    Card.moveToPreviewToHandBlocker = true;
 
+		    var condidateCount = [];
+		    for (var i in S[args.pX].hand) {
+		    	var cardId = S[args.pX].hand[i];
+		    	if (true) {
+		    		condidateCount.push(cardId);
+		    		C[cardId].setZIndex(1202);
+		    	}
+		    }
+
+
+		    Context.workingUnit = 'card';
+		    Context.clickAction = function( card ) {
+		    	var change = false;
+		    	for (var i in Answers.discardExcess) {
+		    		if (Answers.discardExcess[i].card == card.id) {
+		    			change = true;
+		    			C[card.id].select(false);
+		    			Answers.discardExcess.splice(i,1);
+		    			console.log( AN.preStack.count, Animations.length)
+					    AnimationPush({func:function() {
+							AN.Questions[args.question](args, getUniversalObject());
+					    }, time:1200, name: 'Questions - ' + args.question });
+					    AnimationPush({func:function() {
+							AN.Questions[args.question](args, getUniversalObject());
+					    }, time:1200, name: 'Questions - ' + args.question });
+
+		    			console.log( AN.preStack.count, Animations.length)
+					    AN.preStack.count++;
+		    			Card.moveToPreviewToHandBlocker = true;
+		    			break;
+		    		}
+		    	}
+		    	if (!change) {
+			    	Answers.discardExcess.push( {
+			    		pX   : you,
+			    		card : card.id,
+			    	});
+		    		C[card.id].select(true);
+		    		AN.preStack.countDown()
+		    		Card.moveToPreviewToHandBlocker = false;
+			    }
+			    console.log('ANSWERS', AN.preStack.count ,Animations.length)
+
+		        Context.workingUnit = null;
+		        Context.clickAction = null;
+		        for (var i in condidateCount) {
+		    		if (C[condidateCount[i]]) {
+			        	C[condidateCount[i]].setZIndex(200);
+			        }
+		        }
+		        $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
+				AN.stop = false;
+				AnimationNext();
+		    }
 		}
 	},
 	preStack : {
@@ -422,7 +499,7 @@ var AN = {
 			
 			//console.log('stackPrepArfterIsRun = ',stackPrepArfterIsRun)
 			AN.preStack.count--;
-			//console.log('--',AN.preStack.count)
+			//console.log('countDown',AN.preStack.count)
 			if (AN.preStack.count < 1) {
 				if (stackPrepBeforIsRun ) {
 					stackPrepBeforIsRun = false;
@@ -435,8 +512,9 @@ var AN = {
 					applyStackAfter();
 				}
 				else {
-					//console.log('n', Answers)
-					console.log(Answers);
+					//console.log('Answers', Answers)
+					//
+					console.log('t2 = ' + (Date.now() - updactTimeStart))
 					socket.emit('preStackDone',{u:Client, answers: Answers});
 					Answers = {};
 				}
@@ -478,15 +556,14 @@ var AN = {
 		},
 		'afterQuestion' : function(args) {
 			//console.log('afterQuestion', args)
+			console.log(args, you)
 			if (args.pX === you) {
-				console.log('!!!!!!!!!!!!!!!!')
 			    AnimationPush({func:function() {
 					AN.Questions[args.question](args, getUniversalObject());
 			    }, time:1200, name: 'Questions - ' + args.question });
 				
 			}
 			else {
-				console.log('?????????????????????')
 				AN.preStack.countDown();
 			}
 		},
@@ -534,6 +611,9 @@ var AN = {
 		'startDrawHand' : function(args) {
 			console.log('startDrawHand')
 			AN.preStack.countDown();
+		},
+		'discardExcess' : function(args) {
+			Actions.discardExcess(args, getUniversalObject())
 		}
 	}
 }
