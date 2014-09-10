@@ -29,7 +29,36 @@
 	      <%-partial('partials/login')%>
 		  <% } %>
 
+      <style>
+        .card {
+          border: 1px solid black;
+          width: 150px;
+          height: 150px;
+          padding: 10px;
 
+        }
+        .center {
+          border: 1px solid black ;
+          width: 130px;
+          height:  130px;
+          -webkit-border-radius: 75% 10%;
+          border-radius: 75% 10%;
+          padding: 3px;
+        }
+        .pic {
+          border: 1px solid black ;
+          background-color: grey;
+          width: 122px;
+          height:  122px;
+          -webkit-border-radius: 77% 10%;
+          border-radius: 77% 10%
+        }
+      </style>
+      <div class="card">
+        <div class="center">
+        <div class="pic"></div>
+        </div>
+      </div>
 
       <script src="/public/vendor/bower_components/jquery/dist/jquery.min.js"></script>
       <script src="/public/vendor/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
