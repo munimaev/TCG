@@ -1151,7 +1151,7 @@ function removeSelfFromTeamJSON( card ) {
 
 
 function updTeams() {
-    console.log('updTeams');
+    //console.log('updTeams');
     var maxSqrSize =(I.table.H - 2*(I.card.W/2 - I.table.Y/2)) / 50;
     var maxSqrWidth = I.table.W / maxSqrSize;
     var position = {
@@ -1385,6 +1385,7 @@ function createteam( o, o2 ) {
         })()
         C[o[0]].animation( { X: posLeft + o2.X,
             Y: posTop + o2.Y + oppMod1, W: 10 * gridCell, x:0, y:0,z:0,deg:0,
+            duration: 500,
             additional: { 
                 outCard: true,
                 after : {
@@ -1437,6 +1438,7 @@ function createteam( o, o2 ) {
             }
         })()
         C[o[i]].animation( { X: posLeft + o2.X, Y: posTop + o2.Y,x:0, y:0,z:0,deg:0,
+            duration: 500,
             W: 8 * gridCell, additional: { outCard: true,
                 after : {
                     func: afterFunc
@@ -1473,7 +1475,7 @@ function updHands() {
 }
 
 function updTable() {
-    console.log('updTable')
+    //console.log('updTable')
     if (G.selectedTeam) {
         G.selectedTeam = null;
     }
@@ -1482,7 +1484,7 @@ function updTable() {
         updAllCount()
         updHands();
         updTeams();
-    }, time:1000, name:'updTable'});
+    }, time:510, name:'updTable'});
 }
 
 function getAttackTeamIdOnBlockTeamId(S,team) {
