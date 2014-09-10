@@ -88,7 +88,10 @@ function Card( o ) {
     this.glossary = {
         colors: {
             card: {
-                bg: { 'N': { r: 176, g: 196, b: 222, a: 0 } }
+                bg: { 
+                    'N': { r: 176, g: 196, b: 222, a: 0 } ,
+                    'J': { r: 176, g: 196, b: 222, a: 0 } 
+                }
             }
         }
     };
@@ -158,10 +161,16 @@ function Card( o ) {
         o._this.$mouse.css( '-moz-transform', 'translate3d(0,0,' + (o._this.params.zindex) + 'px )' );
     };
     this.fillAsFaceUp = function( link ) {
+        //console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
+        if (this.params.type == "N") this.fillAsFaceUpNinja( link )
+        if (this.params.type == "J") this.fillAsFaceUpJutsu( link )
+    };
+
+    this.fillAsFaceUpNinja = function(link) {
         var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
         var currentAttack = this.params.isHealt ? this.params.ah : this.params.ai;
         var currentSupport = this.params.isHealt ? this.params.sh : this.params.si;
-        console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
+
         link
             .append( $( '<div />', { 'class': 'cbg' } ) )
             .append( $( '<div />', { 'class': 'outShell' } )
@@ -215,7 +224,7 @@ function Card( o ) {
                     )
                 .append(
                     $( '<div />', { 'class': 'icon cardIcon' } )
-                    .css( 'left', '11%' )
+                    .css( 'right', '11%' )
                     .css( 'top', '0%' )
                     .css( 'width', '20%' )
                     .css( 'height', '20%' )
@@ -228,7 +237,7 @@ function Card( o ) {
                     )
                 .append(
                     $( '<div />', { 'class': 'icon cardIcon' } )
-                    .css( 'left', '0%' )
+                    .css( 'right', '0%' )
                     .css( 'top', '11%' )
                     .css( 'width', '20%' )
                     .css( 'height', '20%' )
@@ -241,7 +250,7 @@ function Card( o ) {
                     )
                 .append(
                     $( '<div />', { 'class': 'icon cardIcon' } )
-                    .css( 'right', '8%' )
+                    .css( 'left', '8%' )
                     .css( 'top', '-3%' )
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
@@ -251,7 +260,7 @@ function Card( o ) {
                     )
                 .append(
                     $( '<div />', { 'class': 'icon cardIcon' } )
-                    .css( 'right', '-3%' )
+                    .css( 'left', '-3%' )
                     .css( 'top', '9%' )
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
@@ -264,6 +273,75 @@ function Card( o ) {
                     )
                 )
             .append( $( '<div />', { 'class': 'mouseControle' } ) );
+
+    };
+    this.fillAsFaceUpJutsu = function(link) {
+        link
+            .append( $( '<div />', { 'class': 'cbg' } ) )
+            .append( $( '<div />', { 'class': 'outShell' } )
+                .css( 'width', '92%' )
+                .css( 'height', '92%' )
+                .css( 'top', '4%' )
+                .css( 'left', '4%' )
+                .append(
+                    $( '<div />', {
+                        'class': 'limon'
+                    } ) // end create 'limon'
+                    .css('background', this.getBG('side bottom right'))
+                    .append(
+                        $( '<div />', { 'class': 'limon_image' } )
+                            .css( 'background-image', 'url(public/pics/' + this.params.img + '.jpg)' )
+                        )
+                    ) // end append 'limon'
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'right', '11%' )
+                    .css( 'bottom', '0%' )
+                    .css( 'width', '20%' )
+                    .css( 'height', '20%' )
+                    .append(
+                        $( '<div />', { 'class': 'blur' } )
+                        )
+                    .append(
+                        $( '<div />', { 'class': 'fire' } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'right', '0%' )
+                    .css( 'bottom', '11%' )
+                    .css( 'width', '20%' )
+                    .css( 'height', '20%' )
+                    .append(
+                        $( '<div />', { 'class': 'blur' } )
+                        )
+                    .append(
+                        $( '<div />', { 'class': 'void' } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'left', '8%' )
+                    .css( 'top', '-3%' )
+                    .css( 'width', '25%' )
+                    .css( 'height', '25%' )
+                    .append(
+                        $( '<div />', { 'class': 'handcost' + this.params.hc } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'left', '-3%' )
+                    .css( 'top', '9%' )
+                    .css( 'width', '25%' )
+                    .css( 'height', '25%' )
+                    .append(
+                        $( '<div />', { 'class': 'turncost' + this.params.ec } )
+                        )
+                    )
+                )
+            .append( $( '<div />', { 'class': 'mouseControle' } ) );
+
     };
 
     this.getBG = function(str) {
@@ -380,7 +458,7 @@ function Card( o ) {
             (function() {
                 var id = ido;
                 return function() {
-                    if ( C[id].params.zona === 'hand' ) {
+                    if ( C[id].params.zona === 'hand' && !Card.moveToPreviewToHandBlocker) {
                         window.clearTimeout( G.timers.youHandHover );
                         AN.moveToPreview( { pX: C[id].params.owner } );
                     }
@@ -401,7 +479,7 @@ function Card( o ) {
             (function() {
                 var id = ido;
                 return function() {
-                    if ( C[id].params.zona === 'hand' ) {
+                    if ( C[id].params.zona === 'hand' && !Card.moveToPreviewToHandBlocker ) {
                         G.timers.youHandHover = setTimeout(
                             function() {
                                 AN.moveToHand( { pX: C[id].params.owner } );
@@ -1085,13 +1163,15 @@ function Card( o ) {
                 .css( 'left', Y + 'px' )
         }
         $( '#prewiev' ).append( $prew );
-        $prew
+        var known = Known[Accordance[this.id]];
+        var $prewContent = $('<div />');
+        $prewContent
         .append(
             $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':3, 'width':'100%'}).append(
                 $('<tbody />', {'valign':'top'}).append(
                     $('<tr />', {}).append(
                         $('<td />', {'colspan':8}).append(
-                            $('<h3 />', {'text':this.params.name})
+                            $('<h3 />', {'text': this.id + ' ' + this.params.name})
                         )
                     ).append(
                         $('<td />', {'width':'2em'}).append(
@@ -1106,9 +1186,32 @@ function Card( o ) {
             )
             
         )
-        .append(
-            $('<p>',{'text':' '})
-        )
+        if (known.effectText ) {
+            if ( known.effectText.effectName) {
+                $prewContent.append(
+                    $('<p>',{'text': known.effectText.effectName})
+                );
+            } else {
+                $prewContent.append(
+                    $('<p>',{'text': ' '})
+                );
+            }
+            if (known.effectText.effects) {
+                for (var i in known.effectText.effects) {
+                    var effect = '';
+                    if (known.effectText.effects[i].effect) {
+                        effect = known.effectText.effects[i].effect;
+                    }
+                    if (known.effectText.effects[i].valid) {
+                        effect = "Дйствительный: " + effect;
+                    }
+                    $prewContent.append(
+                        $('<p>',{'text': effect})
+                    );
+                }
+            }
+        }
+        $prewContent
         .append(
             $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':9, 'width':'100%'}).append(
                 $('<tbody />', {'valign':'top'}).append(
@@ -1143,6 +1246,11 @@ function Card( o ) {
             )
             
         )
+        $prew.append( $prewContent );
+        if ($prewContent.height() > H - 20)  {
+            var r = $prewContent.height() - H + 20
+            $prew.css('height', H + r).css('top', topPrew - r)
+        }
         this.params.prewiev = true;
     };
 
@@ -1544,6 +1652,7 @@ function Card( o ) {
 
 Card.prototype = {
     displayedActionCircle: null,
+    moveToPreviewToHandBlocker : false,
     hideActionCircle : function() {
         if ( Card.prototype.displayedActionCircle ) {
             Card.prototype.displayedActionCircle.hideAction();
@@ -1585,17 +1694,22 @@ Card.prototype = {
                         height :  _this.params.H,
                     }))
                 H.animate.append(sprite);
-                sprite.animate({
-                        opacity: 1,
-                    }, 500, 
+                sprite.animate(
+                    {opacity: 1,}, 
+                    200, 
                     function() {
-                        sprite.animate({
-                                opacity: 0,
-                            }, 500, 
+                        setTimeout(
                             function() {
-                                sprite.remove();
-                                afterFunc();
-                            });
+                                sprite.animate({
+                                    opacity: 0,
+                                }, 200, 
+                                function() {
+                                    sprite.remove();
+                                    afterFunc();
+                                })
+                            }
+                            ,200
+                        )
                     });
             }
         }
