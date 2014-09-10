@@ -7,7 +7,8 @@ var preGamesLobbi = {
 }
 var StartedGames = {
 };
-var Testing = true;
+var Testing = false;
+var Load = true;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
@@ -300,8 +301,9 @@ function imJoined(d) {
 function bothIsJoin(d) {
 	console.log('\nbothIsJoin')
 	var table = StartedGames[d.table]
-	console.log('table.socketA && table.socketB', table.socketA , table.socketB)
+	console.log('table.socketA && table.socketB', table.socketA , table.socketB, table.bothIsJoin, Testing)
 	if (table.socketA && table.socketB && !table.bothIsJoin) {
+		console.log("Otdal kajdomu")
 		table.bothIsJoin = true;
 		table.Accordance = getStartAccordiance(table);
 		table.Known = getStartCards();
@@ -310,18 +312,25 @@ function bothIsJoin(d) {
 		getStartAccordanceKnown(table,'pA');
 		getStartAccordanceKnown(table,'pB');
 		table.meta = getStartMeta(table);
-		io.sockets.in(table.roompA).emit('bothIsJoin', {
+		var dataTopA = {
 			isNewGame: table.Snapshot.pA.isNewGame, 
 			Accordance:table.pA.Accordance,
-			Known:table.pA.Known
-		});
-		io.sockets.in(table.roompB).emit('bothIsJoin', {
+			Known:table.pA.Known,
+			check : 2
+		}
+		//console.log(dataTopA)
+		io.sockets.in(table.roompA).emit('bothIsJoin', dataTopA);
+		var dataTopB =  {
 			isNewGame: table.Snapshot.pB.isNewGame, 
 			Accordance:table.pB.Accordance,
-			Known:table.pB.Known
-		});
+			Known:table.pB.Known,
+			check : 1
+		}
+		//console.log(dataTopB)
+		io.sockets.in(table.roompB).emit('bothIsJoin',dataTopB);
 		// TODO нужна комната для наблюдателя
-	} else {
+	} else if (Testing || table.bothIsJoin) {
+		console.log("Otdal odnomu",table[d.you].Accordance)
 		io.sockets.in(table['room'+d.you]).emit('bothIsJoin', {
 			isNewGame: table.Snapshot[d.you].isNewGame, 
 			Accordance:table[d.you].Accordance,
@@ -334,7 +343,7 @@ function getStartSnapshot(table) {
 	if (table.Snapshot) {
 		return table.Snapshot;
 	}
-	if (Testing) {
+	if (Load) {
 		var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
 		return obj.S;
 	}
@@ -359,7 +368,6 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
-	            	1:['c105']
 	            }
 	        },
 	        attack : {
@@ -377,6 +385,7 @@ function getStartSnapshot(table) {
 
 	    },
 	    pB : {
+	    	isDrawCardAtStartTurn : false,
 	    	isNewGame : false,
 	    	rewards : 0,
 	    	turnCounter : 0,
@@ -388,7 +397,7 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
-	            	// 4:['c005'],
+	            	 4:['c001'],
 	        	}
 	        },
 	        attack : {
@@ -420,6 +429,8 @@ function getStartSnapshot(table) {
 	}
 	return result;
 }
+
+var CardBase = require('./logic/CardBase.js');
 
 function getStartCards() {
 	var C = { // as Construcors
@@ -476,7 +487,7 @@ function getStartCards() {
 	    c102: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'EF', name : "Yamato"},
 	    c103: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'EF', name : "Yugito Ni'i"},
 	};
-	return C;
+	return CardBase;
 }
 
 function getStartMeta(S) {
@@ -510,7 +521,7 @@ function getStartAccordiance(S) {
 			values.push(i < 10 ? '0' + i : ''+i)
 		}
 
-		if (!Testing) {
+		if (!Load) {
 			values.sort(  function() { return Math.random()-0.5} )
 		} else {
 			var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
@@ -617,13 +628,9 @@ function pressNextBtn(d) {
 		)){
 			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
 			var actReuslt =  {'toNextPhase':[{phase:'next'}]};
-			//Actions['toNextPhase']({S:table.Snapshot, Stadies:Stadies, Known:table.Known, Accordance:table.Accordance});
-			console.log(actReuslt);
-
 			data.stackPrep = actReuslt;
 			table.stackPrep = actReuslt;
 			table.stackPreppA = table.stackPreppB = null;
-			//data.acts.push({'arg':{S:'get_S', Stadies:'get_Stadies', Known:'get_Known', Accordance:'get_Accordance'}, 'act' : 'toNextPhase'})
 		} 
 		else {
 			table.meta.toNextPhase[d.u.opp] = false;
@@ -970,7 +977,7 @@ function getUpdatesForPlayers(table, actReuslt) {
 
 function preStackDone(d) {
 	var table = StartedGames[d.u.table];
-	console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
+	// console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
@@ -978,13 +985,13 @@ function preStackDone(d) {
 	if (table.stackPreppA && table.stackPreppB) {
 		var count = 0;
 
-		console.log("\n================")
+		console.log("\n\n\n================")
 		for (var i in table.stackPrep) {
 			if (i == 'afterQuestion' 
 				|| i == 'befor' 
 				|| i == 'updTable' 
 				|| !table.stackPrep[i].length) {
-				console.log('del ' + i)
+				// console.log('del ' + i)
 				delete table.stackPrep[i];
 				continue;
 			}
@@ -992,7 +999,7 @@ function preStackDone(d) {
 		}
 
 		if (!count) {
-			table.stackPrep = table.stack.pop();
+			//table.stackPrep = table.stack.pop();
 		}
 		console.log('\ntable.stackPrep')
 		console.log(table.stackPrep)
@@ -1016,7 +1023,6 @@ function preStackDone(d) {
 		console.log(upds);
 		console.log('\ntoClient');
 		console.log(actReuslt);
-		console.log("\n================")
 		
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
@@ -1030,11 +1036,13 @@ function preStackDone(d) {
 		if (stackPrepIsEmpty && table.stack.length) {
 			table.stackPrep = table.stack.pop();
 			actReuslt = table.stackPrep;
-			stackPrepIsEmpty = true;
+			stackPrepIsEmpty = false;
 		} 
 
 		console.log('\ntoClient2');
 		console.log(actReuslt);
+		console.log('stackPrepIsEmpty = ',stackPrepIsEmpty);
+		console.log("\n================")
 
 		if (stackPrepIsEmpty) {
 				table.actionLock = true;
@@ -1042,11 +1050,11 @@ function preStackDone(d) {
 		}
 		else {
 			if (upds) {
-				console.log(' -> 1', upds.pB)
+				// console.log(' -> 1', upds.pB)
 				io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
 				io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
 			} else {
-				console.log(' -> 2')
+				// console.log(' -> 2')
 				io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt, ket:3});
 			}
 		}
@@ -1059,6 +1067,7 @@ function saveGame(d) {
 	var toSave = {
 		S : table.Snapshot,
 		Accordance : table.Accordance
+		//K :  table.Known
 	}
 	fs.writeFile(outputFilename, JSON.stringify(toSave, null, 4), function(err) {
 	    if(err) {
