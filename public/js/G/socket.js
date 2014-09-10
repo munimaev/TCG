@@ -19,7 +19,7 @@ var S = null; // snapshot
 var C = {}; // cards
 
 socket.on('C_init', function(d){
-	console.log('C_init', d)
+	//console.log('C_init', d)
 	Client.you = you = d.you;
 	Client.opp = opp = d.opp;
 	Client.table = d.table
@@ -65,7 +65,7 @@ function updAllCount() {
 socket.on('bothIsJoin', function(d) {
 	Accordance = d.Accordance;
 	Known = d.Known;
-	console.log(d)
+	console.log('bothIsJoin',d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
 })
@@ -127,7 +127,7 @@ var stackPrepAfter = {
 	afterQuestion : []
 };
 function applyStackAfter() {
-	console.log('applyStackAfter',stackPrepAfter);	
+	//console.log('applyStackAfter',stackPrepAfter);	
 	var stackPrep = stackPrepAfter;
 	AN.preStack.count++;
 	for (var func in stackPrep) {
@@ -145,13 +145,13 @@ var stackPrepBeforIsRun = false;
 var stackPrepBefor = {};
 
 function applyStackBeafor() {
-	console.log('stackPrepBefor',stackPrepBefor);	
+	// console.log('stackPrepBefor',stackPrepBefor);	
 	var stackPrep = stackPrepBefor;
 	AN.preStack.count++;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
-				console.log('+++++++++++')
-				console.log('-> ' + func)
+				// console.log('+++++++++++')
+				// console.log('-> ' + func)
 			AN.preStack.count++;
 			AN.preStack[func](stackPrep[func][args]);
 		}	
@@ -163,14 +163,14 @@ var stackPrepNormal = {};
 
 
 function applyStackNormal() {
-	console.log('stackPrepNormal',stackPrepNormal);	
+	// console.log('stackPrepNormal',stackPrepNormal);	
 	var stackPrep = stackPrepNormal;
 	AN.preStack.count++;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
-			console.log('-----------')
+			//console.log('-----------')
 			AN.preStack.count++;
-			console.log('-> ' + AN.preStack.count +' '+ func)
+			//console.log('-> ' + AN.preStack.count +' '+ func)
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
@@ -182,13 +182,13 @@ function applyStackPrep(d) {
 	var stackPrep = d.stackPrep;
 
 	if (stackPrep) {
-		console.log('=================')
-		console.log('stackPrep',stackPrep)
+		//console.log('=================')
+		// console.log('stackPrep',stackPrep)
 		stackPrepAfter.afterQuestion = [];
 		stackPrepAfter.befor = [];
 		for (var func in stackPrep) {
 			if (func == 'afterQuestion') {
-				console.log('af')
+				//console.log('af')
 				stackPrepArfterIsRun = true;
 				stackPrepAfter[func] = stackPrepAfter[func].concat(stackPrep[func]);
 				delete stackPrep[func];
@@ -212,9 +212,13 @@ function applyStackPrep(d) {
 }
 
 
-
+var updactTimeStart = 0;
 socket.on('updact',function(d) {
-	console.log("↳ updact ",d)
+	updactTimeStart = Date.now();
+	console.log('t = ' + updactTimeStart)
+	console.log("")
+	console.log("")
+	console.log("↳ updact ",d.stackPrep)
 	 applyUpd(d);
 	 applyAct(d);
 	 applyStackPrep(d);
@@ -222,3 +226,6 @@ socket.on('updact',function(d) {
 
 
 
+function save() {
+		socket.emit('save',{u:Client});
+}
