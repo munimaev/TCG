@@ -94,6 +94,27 @@
     left: 50%;
     margin: -35.461%;
 }
+.limon {
+    width: 98%;
+    height: 98%;
+    -webkit-border-radius: 77% 13%;
+    border-radius: 77% 13%;
+    margin: 1%;
+    border: 1px solid rgba(0,0,0,0.35);
+
+}
+.limon_image {
+    width: 94%;
+    height: 94%;
+    -webkit-border-radius: 80% 13%;
+    border-radius: 80% 13%;
+    margin: 3%;
+    -webkit-box-shadow:0px 0px 0px 1px rgba(0,0,0,0.35);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.35);
+    background-size: 120% auto;
+    background-position: 50% 20%;
+
+}
 .shadow {
     -webkit-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
     -moz-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
