@@ -141,7 +141,6 @@ function moveToHand( o ) {
             }
         } )
     }
-
 }
 
 /**
@@ -226,6 +225,7 @@ function createCard( o ) {
     if ( C[o.id] /*&& !o.condition*/) {/*console.log('Карта ' + o.id + ' уже есть.');*/
         return true;
     }
+
     if ( !o
         || !('id' in o) || !o.id
         || !('zona' in o) || !o.zona
@@ -1152,7 +1152,9 @@ function removeSelfFromTeamJSON( card ) {
 
 function updTeams() {
     //console.log('updTeams');
-    var maxSqrSize =(I.table.H - 2*(I.card.W/2 - I.table.Y/2)) / 50;
+    var numbersOfLine = 50; //Количесвто горизонатльных линий  для сетки
+    if (S.stack.length) numbersOfLine = 58;
+    var maxSqrSize =(I.table.H - 2*(I.card.W/2 - I.table.Y/2)) / numbersOfLine;
     var maxSqrWidth = I.table.W / maxSqrSize;
     var position = {
         you : getPosition(you),
@@ -1164,6 +1166,35 @@ function updTeams() {
     var finalSqr = maxSqrSize;
     updPosition(position,finalSqr);
 }
+/**
+ * [getPosition description]
+ * @param  {[type]} pX [description]
+ * @return {Object}    Объект вида :
+ *                     {
+ *                         village : {
+ *                             W : number,
+ *                             H : number,
+ *                             team : {
+ *                               /teamId/ : {
+ *                                  W : number,
+ *                                  H : number,
+ *                                  S : number
+ *                                } ...
+ *                             }
+ *                         },
+ *                         battle : {
+ *                             W : number,
+ *                             H : number,
+ *                             team : {
+ *                               /teamId/ : {
+ *                                  W : number,
+ *                                  H : number,
+ *                                  S : number
+ *                                } ...
+ *                             }
+ *                         }
+ *                     }
+ */
 function getPosition(pX) {
     var result = {
         village : getPositionVillage(pX),
@@ -1172,6 +1203,22 @@ function getPosition(pX) {
     result.W = result.village.W;
     return result;
 }
+/**
+ * [getPositionVillage description]
+ * @param  {[type]} pX [description]
+ * @return {Object}    Объект вида :
+ *                     {
+ *                         W : number,
+ *                         H : number,
+ *                         team : {
+ *                           /teamId/ : {
+ *                              W : number,
+ *                              H : number,
+ *                              S : number
+ *                            } ...
+ *                         }
+ *                     }
+ */
 function getPositionVillage(pX) {
     var result = {W:0,H:14,team:{}};
     for (var t in S[pX].village.team) {
@@ -1181,6 +1228,23 @@ function getPositionVillage(pX) {
     }
     return result;
 }
+/**
+ * [getPositionBattle description]
+ * @param  {[type]} pX   [description]
+ * @param  {[type]} zone [description]
+ * @return {Object}    Объект вида :
+ *                     {
+ *                         W : number,
+ *                         H : number,
+ *                         team : {
+ *                           /teamId/ : {
+ *                              W : number,
+ *                              H : number,
+ *                              S : number
+ *                            } ...
+ *                         }
+ *                     }
+ */
 function getPositionBattle(pX, zone) {
     var result = {W:0,H:0,team:{}};
     if (pX == S.activePlayer) {
@@ -1198,6 +1262,16 @@ function getPositionBattle(pX, zone) {
     }
     return result;
 }
+/**
+ * [getTeamSize description]
+ * @param  {[type]} team [description]
+ * @return {Object}    Объект вида :
+ *                     {
+ *                         W : number,
+ *                         H : number,
+ *                         S : number
+ *                     }
+ */
 function getTeamSize( team ) {
     var result = { H: 14, W: 0 };
     result.W = 5 + team.length * 5;
@@ -1211,14 +1285,15 @@ function updPosition(position,sqr) {
         || S.phase == 'block' 
         || S.phase == 'jutsu' 
         || S.phase == 'shutdown'
-        || S.phase == 'comeback')  isFight = true
+        || S.phase == 'comeback'
+    )  isFight = true
     if (isFight) msqr = sqr / 2;
 
     var villageWidth = ( position.you.village.W ) * msqr;
     var marginLeft = (I.W - villageWidth) / 2; 
     var o2 = {
         X : marginLeft,
-        Y : (I.H ) / 2 + (isFight ? 17 :6) * sqr,
+        Y : (I.H ) / 2 + (isFight ? (S.stack.length ? 21 : 17) :6) * sqr,
         zona : 'village',
         owner : you,
         player : 'you' ,
@@ -1235,7 +1310,7 @@ function updPosition(position,sqr) {
     var marginLeft = (I.W - villageWidth) / 2;
     var o2 = {
         X : marginLeft,
-        Y : (I.H ) / 2 - (isFight ? 24 : 22) * sqr,
+        Y : (I.H ) / 2 - (isFight ? (S.stack.length ? 28 : 24 ): 22) * sqr,
         zona : 'village',
         owner : opp,
         player : 'opp' ,
@@ -1283,10 +1358,16 @@ function updPosition(position,sqr) {
                 } else {
                     additiinalMargin = (raz / 2)  * 5;
                 }
+            }
+            var upDownMoveYou = 1; 
+            var upDownMoveOpp = -16; 
+            if (S.stack.length) {
+                upDownMoveYou = 5;
+                upDownMoveOpp = -20; 
             } 
             var o2 = {
                 X : comulativeMargin + additiinalMargin * sqr,
-                Y : (I.H ) / 2 +  (attacker == you ? 1 : -16) * sqr,
+                Y : (I.H ) / 2 +  (attacker == you ? upDownMoveYou : upDownMoveOpp) * sqr,
                 zona : 'attack',
                 owner : attacker,
                 player : attackerRole ,
@@ -1312,7 +1393,7 @@ function updPosition(position,sqr) {
                 }
                 var o2 = {
                     X : comulativeMargin + additiinalMargin * sqr,
-                    Y : (I.H ) / 2 +  (blocker == you ? 1 : -16) * sqr,
+                    Y : (I.H ) / 2 +  (blocker == you ? upDownMoveYou : upDownMoveOpp) * sqr,
                     zona : 'block',
                     owner : blocker,
                     player : blockerRole ,
@@ -1323,6 +1404,33 @@ function updPosition(position,sqr) {
                 createteam(o,o2);
             }
             comulativeMargin += (width + 2 ) * sqr;
+        }
+    }
+
+    if (S.stack.length) {
+
+        var stackWidth = S.stack.length * sqr;
+        var marginLeft = (I.W - S.stack.length * sqr * 8) / 2 ; 
+
+        for (var i = S.stack.length - 1; i >= 0 ; i--) {
+
+            createCard({
+                id: S.stack[i].card,
+                zona: 'stack',
+                owner: S.stack[i].owner,
+                team: null,
+                position: null,
+                condition: 'createstack'
+            });
+
+            C[S.stack[i].card].animation({
+                X : marginLeft,
+                Y : I.H / 2 - sqr * 4,
+                W : 8 * sqr,
+                additional : {
+                    outCard: true
+                }
+            });
         }
     }
 }
@@ -1452,7 +1560,6 @@ function createteam( o, o2 ) {
         C[o[0]].addTeamPower(o2.player);
     }
     Log(-1,'createteam');
-
 }
 
 function updCurrentPhase() {
@@ -1691,9 +1798,7 @@ function blockMove(_this) {
             _this.select( true );
         }
     }
-
 }
-
 
 /**
  * Функция возврежащет объет в котором бубут находиться ссылки на все осоновне объекты необъодимые для
