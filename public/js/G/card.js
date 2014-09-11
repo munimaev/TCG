@@ -420,7 +420,15 @@ function Card( o ) {
         this.$id = $( '#' + this.id );
         this.$power = $( '.power', this.$id );
         this.$outShell = $( '.outShell', this.$id );
-        this.$romb = $( '.romb', this.$id );
+        switch (this.params.type) {
+            case 'J' :
+                this.$romb = $( '.limon', this.$id );
+                break;
+            case 'N' :
+            default  :
+                this.$romb = $( '.romb', this.$id );
+                break;
+        }
         this.$icons = $( '.cardIcon', this.$id );
         this.$mouse = $( '.mouseControle', this.$id );
         this.$cbg = $( '.cbg', this.$id );
@@ -1018,7 +1026,7 @@ function Card( o ) {
             }
             this.params.hover = onOrOff;
         }
-        if ( this.params.status == 'N' ) {
+        if ( this.params.status == 'N' ||  this.params.status == 'J' || this.params.status == 'M') {
             switch ( onOrOff ) {
                 case true:
                     this.$romb.css( 'box-shadow', '0px 0px 5px 3px #FFF' );
@@ -1052,6 +1060,9 @@ function Card( o ) {
                     }
                 }
             }
+        }
+        if ( this.params.zona === 'stack' && onOrOff) {
+            this.showUserAndTarget(this.id, onOrOff);
         }
     };
 
@@ -1660,24 +1671,76 @@ Card.prototype = {
     },
     getMainParams : function() {
         var result = {
-                    card : this.id,
-                    zone : this.params.zona,
-                    owner : this.params.owner,
-                    team : this.params.team,
-                    position:this.params.teamPosition
+                    card    : this.id,
+                    zone    : this.params.zona,
+                    owner   : this.params.owner,
+                    team    : this.params.team,
+                    position: this.params.teamPosition
                 };
         return result;
+    },
+    showUserAndTarget : function(id) {
+        var obj = null
+        for (var i in S.stack) {
+            if (S.stack[i].card == id) {
+                obj = S.stack[i];
+                break;
+            }
+        }
+        if (!obj) { debugger; return; }
+        if (typeof(obj.target) === 'string' ) obj.target = [obj.target];
+        if (typeof(obj.user) === 'string' ) obj.user = [obj.user];
+        for (var i in obj.user) {
+            C[obj.user[i]].effect({
+                type:'simple',
+                target:'one', 
+                pic : 'public/pics/change.png', 
+                // cicling: (function() {
+                //     var cardId = obj.user[i];
+                //     return function() {
+                //         if (C[cardId].params.hover) return true;
+                //         return false;
+                //     }
+                // })()
+            });
+        }
+        for (var i in obj.target) {
+            C[obj.target[i]].effect({
+                type:'simple',
+                target:'one', 
+                pic:'public/pics/target.png', 
+                // cicling: (function() {
+                //     var cardId = obj.target[i];
+                //     return function() {
+                //         if (C[cardId].params.hover) return true;
+                //         return false;
+                //     }
+                // })()
+            });
+        }
     },
     /**
      * Анимационный эффект возникающий над полем
      * @param  {[type]} o [description]
      * @param  {String} o.type Тип анимации simple
      * @param  {String} o.target Над какими элементами должен появиться эффект one
+     * @param  {String} o.target Над какими элементами должен появиться эффект one
      * @return {[type]}   [description]
      */
     effect : function(o) {
+        console.log('msg')
         var _this = this;
         var afterFunc = o.afterFunc || function(){};
+        if (o.cicling && !o.afterFunc) {
+            afterFunc = (function() {
+                var __this = _this; 
+                return function() {
+                    console.log(o.cicling())
+                    if (o.cicling()) __this.effect(o);
+                    else return;
+                }
+            })()
+        }
         if (o.type == 'simple') {
             if (o.target == 'one') {
                 var pic = o.pic || "public/pics/damage.png"; 
