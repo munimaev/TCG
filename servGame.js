@@ -537,22 +537,28 @@ function getStartAccordiance(S) {
 	return result;
 }
 
-function getStartAccordanceKnown(S,pX) {
+function getStartAccordanceKnown(Table,pX) {
+	console.log('***getStartAccordanceKnown',!Table.isNewGame)
 	var result = {};
-	if (!S.isNewGame) {
-		var zones = [ S.Snapshot[pX].hand, S.Snapshot.pA.chackra, S.Snapshot.pA.discard, S.Snapshot.pB.chackra, S.Snapshot.pB.discard ]
+	if (!Table.isNewGame) {
+		var zones = [ Table.Snapshot[pX].hand, Table.Snapshot.pA.chackra, Table.Snapshot.pA.discard, Table.Snapshot.pB.chackra, Table.Snapshot.pB.discard ]
 		for (var zone in zones) {
 			for (var card in zones[zone]) {
-				oneCardAccordanceКnown(S, zones[zone][card], pX)
+				oneCardAccordanceКnown(Table, zones[zone][card], pX)
 			}
 		}
-		zones = [S.Snapshot.pA.village, S.Snapshot.pA.block, S.Snapshot.pA.attack, S.Snapshot.pB.village, S.Snapshot.pB.block, S.Snapshot.pB.attack ]
+		zones = [Table.Snapshot.pA.village, Table.Snapshot.pA.block, Table.Snapshot.pA.attack, Table.Snapshot.pB.village, Table.Snapshot.pB.block, Table.Snapshot.pB.attack ]
 		for (var zone in zones) {
 			for (var t in zones[zone].team) {
 				for (var card in zones[zone].team[t]) {
-					oneCardAccordanceКnown(S, zones[zone].team[t][card], pX)
+					oneCardAccordanceКnown(Table, zones[zone].team[t][card], pX)
 				}
 			}
+		}
+			console.log('-> ' + Table.Snapshot.stack )
+		for (var card in Table.Snapshot.stack) {
+			console.log('-> ' + Table.Snapshot.stack[card].card )
+			oneCardAccordanceКnown(Table, Table.Snapshot.stack[card].card)
 		}
 	}
 	return result;
