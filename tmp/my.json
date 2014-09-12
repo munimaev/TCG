@@ -1,7 +1,7 @@
 {
     "S": {
         "activePlayer": "pA",
-        "phase": "block",
+        "phase": "jutsu",
         "stop": false,
         "turnNumber": 2,
         "counters": {
@@ -13,6 +13,7 @@
             "rewards": 0,
             "turnCounter": 1,
             "hand": [
+                "c102",
                 "c103",
                 "c104",
                 "c105"
@@ -58,7 +59,6 @@
             }
         },
         "stack" : [
-            {"card" :"c102", "user":"c107", "target":"c107", "owner":"pA"}
         ],
         "battlefield": {
             "3": "2"
