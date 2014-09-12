@@ -222,13 +222,13 @@ var Can = {
             }
         }
 	},
-	putInPlay : function(o) {
+    putInPlay : function(o) {
         if ( o.S.phase == 'mission' 
              && o.S.activePlayer == o.pX  
              && o.S.counters.playedNinjaActivePlayer == 0
-        	 && arraySearch(o.S[o.pX].hand, o.card) !== null
-        	 && o.Known[o.Accordance[o.card]].type == 'N' 
-        	 && o.Known[o.Accordance[o.card]].owner == o.pX 
+             && arraySearch(o.S[o.pX].hand, o.card) !== null
+             && o.Known[o.Accordance[o.card]].type == 'N' 
+             && o.Known[o.Accordance[o.card]].owner == o.pX 
              && o.S.counters.playedNinjaActivePlayer == 0  
              && o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec) {
             return true;
@@ -241,6 +241,21 @@ var Can = {
              , o.Known[o.Accordance[o.card]].owner == o.pX 
              ,  o.S.counters.playedNinjaActivePlayer == 0  
              , o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec
+             )
+        }
+    },
+    playJutsu : function(o) {
+        if ( o.S.phase == 'jutsu' 
+             && arraySearch(o.S[o.pX].hand, o.card) !== null
+             && o.Known[o.Accordance[o.card]].type == 'J' 
+             && o.Known[o.Accordance[o.card]].owner == o.pX) {
+            return true;
+        }
+        else {
+            console.log(o.S.phase == 'jutsu' 
+             , arraySearch(o.S[o.pX].hand, o.card) !== null
+             , o.Known[o.Accordance[o.card]].type == 'J' 
+             , o.Known[o.Accordance[o.card]].owner == o.pX
              )
         }
     },
