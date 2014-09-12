@@ -1,6 +1,6 @@
 function isZoneSimple(name) {
 	if ( name == 'deck' || name == 'discard' 
-	        	|| name == 'chackra' || name == 'hand') {
+	        	|| name == 'chackra' || name == 'hand' || name == 'jutsu') {
 		return true;
 	}
 	 return false;
@@ -238,6 +238,13 @@ var Actions = {
 			'putCardInPlay' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : args.cause, teamCounter:args.teamCounter}],
 			'applyUpd' : [{forPlayer: 'pB', cards : [args.card]},{forPlayer: 'pA', cards : [args.card]}]
 		};	
+	},
+	'preparePlayJutsu' : function(args, o) {
+		return {
+			'playJutsu' : [{pX: args.pX, from: args.from, to: args.to, card: args.card, cause : 'playJutsu'}],
+			'applyUpd' : [{forPlayer: 'pB', cards : [args.card]},{forPlayer: 'pA', cards : [args.card]}]
+		}
+
 	},
 	'prepareCharge' : function(args,o) {	
 		return { 
@@ -926,6 +933,14 @@ var Actions = {
 	},
 	'putCardInPlay' : function(args, o) {
 		return Actions.moveCardToZone(args, o)
+	},
+	'playJutsu' : function (args, o) {
+		// var cardKey = arraySearch(o.S[args.pX][args.from], args.card);
+
+		// o.S.stack.push(
+		// 	{"card" :args.card, "user":"c107", "target":"c107", "owner":"pA"}
+		// )
+		console.log('!!!!')
 	},
 	'charge' : function(args, o) {
 		return Actions.moveCardToZone(args, o)
