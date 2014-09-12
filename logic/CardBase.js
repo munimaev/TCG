@@ -518,6 +518,9 @@ var CardBase = {
         "elements": "EF",
         "name": "Neji Hyuga",
         "effectText" : "",
+        "condition" : function(card,o) {
+            return true;
+        },
         "effect" : {}
     },
     "c105": {
