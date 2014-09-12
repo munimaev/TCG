@@ -58,6 +58,7 @@ exports.initLobbi = function(sio, socket, session_store_){
     gameSocket.on('charge', charge);
     gameSocket.on('pressNextBtn', pressNextBtn);
     gameSocket.on('putInPlay', putInPlay);
+    gameSocket.on('playJutsu', playJutsu);
     gameSocket.on('removeFromTeam', removeFromTeam);
     gameSocket.on('addToTeam', addToTeam);
     gameSocket.on('changeInTeam', changeInTeam);
@@ -735,6 +736,41 @@ function putInPlay(d) {
 	}
 	// TODO возможно надо реагировать
 }
+
+function playJutsu(d) {
+	var table = StartedGames[d.u.table];
+	//console.log(d.u);
+	if (Can.playJutsu({
+            Accordance : table.Accordance,
+            card: d.arg.card,
+            Known: table.Known,
+            owner:d.arg.owner,
+            pX:d.u.you,
+            S:table.Snapshot,
+    })){
+		var args = {
+			card : d.arg.card,
+			cause : 'play',
+			from : d.arg.from,
+			pX : d.u.you,
+			to : d.arg.to,
+		}
+		var data = {};
+		var actReuslt =  Actions.preparePlayJutsu(args, getUniversalObject(d.u.table));
+		data.stackPrep = actReuslt;
+		table.stackPrep = actReuslt;
+		table.stackPreppA = table.stackPreppB = null;
+		var upds = getUpdatesForPlayers(table,actReuslt);
+		delete actReuslt.applyUpd;		
+
+		io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
+		io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
+    }
+    else {
+    	console.log('bad playJutsu')
+    }
+}
+
 
 function removeFromTeam(d) {
 	var table = StartedGames[d.u.table];
