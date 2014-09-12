@@ -1062,6 +1062,7 @@ function Card( o ) {
             }
         }
         if ( this.params.zona === 'stack' && onOrOff) {
+            console.log('to showUserAndTarget ' , this.id, onOrOff)
             this.showUserAndTarget(this.id, onOrOff);
         }
     };
@@ -1528,6 +1529,16 @@ function Card( o ) {
                 })()
             }))
         }
+        if (Can.playJutsu(obj)) {
+             $c.append( $( '<div />', {
+                class: 'actionIcon n1 putInPlay',
+                'click': (function() {
+                    return function() {
+                        C[id].playJutsu();
+                    }
+                })()
+            }))
+        }
         if (Can.charge(obj)) {
             $c.append( $( '<div />', {
                 class: 'actionIcon n2 charge',
@@ -1583,17 +1594,26 @@ function Card( o ) {
         socket.emit('putInPlay',{
             u:Client, 
             arg:{card: this.id, 
-                from:this.params.zona, 
+                from :this.params.zona, 
                 owner:this.params.owner}
         })
         Log( -1, 'putInPlay' );
+    }
+    this.playJutsu = function() {
+        this.hideAction();
+        socket.emit('playJutsu',{
+            u:Client, 
+            arg:{card: this.id, 
+                from :this.params.zona, 
+                owner:this.params.owner}
+        })        
     }
     this.charge = function() {
         this.hideAction();
         socket.emit('charge',{
             u:Client, 
             arg:{card: this.id, 
-                from:this.params.zona, 
+                from :this.params.zona, 
                 owner:this.params.owner}
         })
     }
@@ -1694,14 +1714,15 @@ Card.prototype = {
             C[obj.user[i]].effect({
                 type:'simple',
                 target:'one', 
-                pic : 'public/pics/change.png', 
-                // cicling: (function() {
-                //     var cardId = obj.user[i];
-                //     return function() {
-                //         if (C[cardId].params.hover) return true;
-                //         return false;
-                //     }
-                // })()
+                pic : 'public/pics/change.png',
+                cicling: (function() {
+                    var cardId = id;
+                    return function() {
+                        console.log(cardId)
+                        if (C[cardId].params.hover) return true;
+                        return false;
+                    }
+                })()
             });
         }
         for (var i in obj.target) {
@@ -1709,13 +1730,13 @@ Card.prototype = {
                 type:'simple',
                 target:'one', 
                 pic:'public/pics/target.png', 
-                // cicling: (function() {
-                //     var cardId = obj.target[i];
-                //     return function() {
-                //         if (C[cardId].params.hover) return true;
-                //         return false;
-                //     }
-                // })()
+                cicling: (function() {
+                    var cardId = id;
+                    return function() {
+                        if (C[cardId].params.hover) return true;
+                        return false;
+                    }
+                })()
             });
         }
     },
@@ -1728,14 +1749,12 @@ Card.prototype = {
      * @return {[type]}   [description]
      */
     effect : function(o) {
-        console.log('msg')
         var _this = this;
         var afterFunc = o.afterFunc || function(){};
         if (o.cicling && !o.afterFunc) {
             afterFunc = (function() {
                 var __this = _this; 
                 return function() {
-                    console.log(o.cicling())
                     if (o.cicling()) __this.effect(o);
                     else return;
                 }
