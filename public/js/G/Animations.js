@@ -491,6 +491,30 @@ var AN = {
 				AN.stop = false;
 				AnimationNext();
 		    }
+		},
+		selectUserForJutsu : function(args, o) {
+			console.log('ARGS', args)
+			AN.stop = true;
+		    if (!('discardExcess' in Answers)) Answers.discardExcess = [];
+		    var condidateCount = [];
+		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите исполльзующнго для техники.' );
+		    var role = args.pX == o.S.activePlayer ? 'attack' : 'block';
+		    for (var i in o.S[args.pX][role].team) {
+		    	for (var c in o.S[args.pX][role].team[i]) {
+
+		    	}
+		    } 
+			AN.stop = false;
+			AnimationNext();
+		},
+		selectTargetForJutsu : function(args, o) {
+			console.log('ARGS', args)
+			AN.stop = true;
+		    if (!('discardExcess' in Answers)) Answers.discardExcess = [];
+		    var condidateCount = [];
+		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите цель для техники.' ); 
+			AN.stop = false;
+			AnimationNext();
 		}
 	},
 	preStack : {
@@ -598,6 +622,14 @@ var AN = {
 		},
 		'putCardInPlay' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
+		},
+		'playJutsu' : function(args) {
+		    AnimationPush({func:function() {
+				AN.Questions.selectUserForJutsu(args, getUniversalObject());
+		    }, time:1000, name: 'Questions - selectUserForJutsu'});
+		    AnimationPush({func:function() {
+				AN.Questions.selectTargetForJutsu(args, getUniversalObject());
+		    }, time:1000, name: 'Questions - selectTargetForJutsu'});
 		},
 		'charge' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
