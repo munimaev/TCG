@@ -219,9 +219,9 @@ socket.on('updact',function(d) {
 	console.log("")
 	console.log("")
 	console.log("↳ updact ",d.stackPrep)
-	 applyUpd(d);
-	 applyAct(d);
-	 applyStackPrep(d);
+	applyUpd(d);
+	applyAct(d);
+	applyStackPrep(d);
 })
 
 
