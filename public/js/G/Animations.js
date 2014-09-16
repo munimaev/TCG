@@ -494,21 +494,44 @@ var AN = {
 		},
 		selectUserForJutsu : function(args, o) {
 			console.log('ARGS', args)
+			var jutsu = Known[Accordance[args.card]];
+			for (var i in  Known[Accordance[args.card]]) {
+				console.log(i,  Known[Accordance[args.card]][i])
+			}
 			AN.stop = true;
-		    if (!('discardExcess' in Answers)) Answers.discardExcess = [];
+		    if (!('selectUserForJutsu' in Answers)) Answers.selectUserForJutsu = [];
 		    var condidateCount = [];
+
 		    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите исполльзующнго для техники.' );
 		    var role = args.pX == o.S.activePlayer ? 'attack' : 'block';
 		    for (var i in o.S[args.pX][role].team) {
 		    	for (var c in o.S[args.pX][role].team[i]) {
-
+		    		var ninja = o.S[args.pX][role].team[i][c];
+		    		// if ( Known[Accordance[args.card]].requirement(C[ninja])) {
+		    		// 	condidateCount.push(ninja);
+		    		// 	C[cardId].setZIndex(1202);
+		    		// }
+		    		new Function('card','o', Known[Accordance[args.card]].requirement)(C[ninja], o);
 		    	}
-		    } 
-			AN.stop = false;
-			AnimationNext();
+		    }
+
+		    Context.workingUnit = 'card';
+		    Context.clickAction = function( card ) {
+		        Context.workingUnit = null;
+		        Context.clickAction = null;
+		        for (var i in condidateCount) {
+		    		if (C[condidateCount[i]]) {
+			        	C[condidateCount[i]].setZIndex(200);
+			        }
+		        }
+		        $( '#noir' ).css( 'width', 0 ).css( 'height', 0 ).html( '' );
+				AN.stop = false;
+				AnimationNext();
+		    }
 		},
 		selectTargetForJutsu : function(args, o) {
 			console.log('ARGS', args)
+			var jutsu = Known[Accordance[args.card]];
 			AN.stop = true;
 		    if (!('discardExcess' in Answers)) Answers.discardExcess = [];
 		    var condidateCount = [];
