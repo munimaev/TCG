@@ -1,6 +1,6 @@
 function isZoneSimple(name) {
 	if ( name == 'deck' || name == 'discard' 
-	        	|| name == 'chackra' || name == 'hand' || name == 'jutsu') {
+	        	|| name == 'chackra' || name == 'hand' || name == 'stack') {
 		return true;
 	}
 	 return false;
@@ -125,7 +125,7 @@ var Actions = {
 	 * @return {[type]}      [description]
 	 */
 	'moveCardToZone' : function (args, o) {
-		console.log(args)
+		console.log(args, isZoneSimple(args.from),args.from)
 		var result = {
 			updTable : [],
 		};
@@ -134,6 +134,7 @@ var Actions = {
 			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
 		}
 
+		console.log(isZoneSimple(args.from))
 	    if ( !isZoneSimple(args.from)) 
 	    {
 	        if ( isZoneSimple(args.to) )
@@ -171,19 +172,25 @@ var Actions = {
 	        }
 	    } 
 	    else if ( isZoneSimple(args.from) ) 
-	    {
+	    {	console.log(args.pX,args.from,args.card)
 	        var ind = arraySearch(o.S[args.pX][args.from], args.card);
+	        console.log('IND', ind)
 	        if (ind !== null) {
-            o.S[args.pX][args.from].splice(ind,1)
-		        if ( isZoneSimple(args.to) ) 
-		        {
-	        	console.log('s->s')
-
-		            if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
-		            	o.S[args.pX][args.to].splice(0,0,args.card)
-		            } else {
-		            	o.S[args.pX][args.to].push(args.card);
-		        	}
+            	o.S[args.pX][args.from].splice(ind,1)
+		        if ( isZoneSimple(args.to) ) {
+	        		console.log('s->s')
+	        		if (args.to == 'stack') {
+	        			o.S.stack.push({
+	        				card: args.card, user: args.user, target:args.target
+	        			})	
+	        		}
+	        		else {
+			            if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+			            	o.S[args.pX][args.to].splice(0,0,args.card)
+			            } else {
+			            	o.S[args.pX][args.to].push(args.card);
+			        	}
+			        }
 
 
 				if (!module) {
@@ -850,8 +857,8 @@ var Actions = {
 			}
 		}
 		var befor = [];
-		// console.log('\ntable.answers');
-		// console.log(table.answers)
+		 console.log('\ntable.answers');
+		 console.log(table.answers)
 		for (var ans in table.answers) {
 			for (var args in table.answers[ans]) {
 				befor.push(Actions[ans](table.answers[ans][args], o));
@@ -952,6 +959,20 @@ var Actions = {
 				{player: 'pB' , numberOfCard : 6 , cause : 'startGame'},
 			]
 		}
+	},
+	'selectUserAndTargetForJutsu' : function(args, o) {
+		return Actions.prepareAddJutsuToStack(args);
+	},
+	'prepareAddJutsuToStack' : function(args, o) {
+		return {
+			'addJutsuToStack' : [
+				args
+			]
+		}
+	},
+	'addJutsuToStack' : function(args, o) {
+		args.team = null;
+		Actions.moveCardToZone(args, o)
 	},
 	'log' : function() { 
 		console.log('msg')
