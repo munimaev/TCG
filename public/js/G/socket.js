@@ -92,6 +92,7 @@ function applyUpd(d) {
 		//console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
 			Known[i] = d.upd.Known[i];
+			Known[i] = CardBase[i];
 		}
 		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
 			Accordance[i] = d.upd.Accordance[i];
