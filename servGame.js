@@ -431,7 +431,7 @@ function getStartSnapshot(table) {
 	return result;
 }
 
-var CardBase = require('./logic/CardBase.js');
+var CardBase = require('./public/js/G/CardBase.js');
 
 function getStartCards() {
 	var C = { // as Construcors
@@ -763,8 +763,8 @@ function playJutsu(d) {
 		var upds = getUpdatesForPlayers(table,actReuslt);
 		delete actReuslt.applyUpd;		
 
-		io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
-		io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
+		io.sockets.in(table.roompA).emit('updact', {'stackPrep' : actReuslt, upd : upds.pA});
+		io.sockets.in(table.roompB).emit('updact', {'stackPrep' : actReuslt, upd : upds.pB});
     }
     else {
     	console.log('bad playJutsu')
@@ -1019,7 +1019,7 @@ function getUpdatesForPlayers(table, actReuslt) {
 
 function preStackDone(d) {
 	var table = StartedGames[d.u.table];
-	// console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
+	 console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
