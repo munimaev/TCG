@@ -199,7 +199,8 @@ function btnNextPhase() {
     if (Can.pressNextBtn({pX:you,S:S,Stadies:Stadies,meta:Meta})) {
        // console.log("↰",{u:Client})
         Card.prototype.hideActionCircle();
-        socket.emit('pressNextBtn',{u:Client})
+        socket.emit('pressNextBtn',{u:Client, transferInitiativeFrom : G.transferInitiative})
+        G.transferInitiative = false;
     }
 }
 
