@@ -19,7 +19,8 @@ var I = {
 var G = {
     timers: { },
     selectedTeam: null,
-    selectedCard: null
+    selectedCard: null,
+    transferInitiative : false
 }
 var D = { // as Dictionary
     names : {
