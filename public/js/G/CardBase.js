@@ -523,7 +523,25 @@ var CardBase = {
         },
         "target" : [{player:'you', zone: 'battle', func: function() {
             return true;
-        }}]
+        }}],
+        "effect" : {
+            "trigger" : {
+                "resolve" : [
+                    {
+                        func : function(result, args, o) {
+                            if (!('toStack' in  result)) result.toStack = {};
+                            if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
+                            result.toStack.increaseNinjaPower.push({
+                                card : args.target[0],
+                                attack : 2,
+                                support : 2,                        
+                            });
+                            return result;
+                        }
+                    }
+                ]
+            }
+        }
     },
     "c105": {
         "owner": "pA",
