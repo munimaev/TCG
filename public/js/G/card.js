@@ -1745,7 +1745,7 @@ Card.prototype = {
      * @param  {[type]} o [description]
      * @param  {String} o.type Тип анимации simple
      * @param  {String} o.target Над какими элементами должен появиться эффект one
-     * @param  {String} o.target Над какими элементами должен появиться эффект one
+     * @param  {String} o.pic Над какими элементами должен появиться эффект one
      * @return {[type]}   [description]
      */
     effect : function(o) {
@@ -1794,6 +1794,63 @@ Card.prototype = {
                         )
                     });
             }
+        }
+        if (o.type == 'increase') {
+            var pic = o.pic || "public/pics/increase.png"; 
+
+            var img = $('<img />',{
+                    src : pic,
+                    width :  _this.params.W * 0.8,
+                    height :  _this.params.H * 0.8,
+                })
+                    .css('position', 'absolute')
+                    .css('top', '20%')
+                    .css('left', '10%')
+
+            var text = $('<div />',{
+                'class' : 'whiteTextblackBorder'
+                })
+                    .css('position', 'absolute')
+                    .css('height', '20%')
+                    .css('line-height', '20%')
+                    .css('fontSize', _this.params.W * 0.35 + 'px')
+                    .css('font-weight', 'bold')
+                    .css('width', '100%')
+                    .css('top', '40%')
+                    .css('left', '0%')
+                    .css('text-align', 'center')
+                    o.text = '+2/+2';
+            if (o.text) {
+                text.append(o.text)
+            }
+
+            var sprite = $('<div />', {})
+                .css('width', _this.params.W)
+                .css('height', _this.params.H)
+                .css('top', _this.params.position.Y)
+                .css('left', _this.params.position.X)
+                .css('position', 'absolute')
+                .css('opacity',0)
+                .append(img)
+                .append(text)
+
+            H.animate.append(sprite);
+            sprite.animate(
+                {opacity: 1,}, 
+                200, 
+                function() {
+                    img.animate(
+                        {top: '0%',}, 
+                        600, 
+                        function() {
+                             sprite.animate(
+                                {opacity: 0,}, 
+                                200
+                            )
+                        }
+                    )
+                }
+                );
         }
     }
 }
