@@ -494,7 +494,7 @@ function getStartCards() {
 function getStartMeta(S) {
 	if (S.meta) return S.meta;
 	var result = {
-		toNextPhase : {pA:false,pB:false}, 
+		toNextPhase : { pA:false, pB:false }, 
 		teamCounter:0,
 	};
 
@@ -611,7 +611,18 @@ function S_startDrawHand(d) {
 	// });
 	//io.sockets.in(table.roomS).emit('updServerInfoPage',table);
 }
-
+/**
+ * [pressNextBtn description]
+ * @param  {[type]} d [description]
+ * @return {[type]} d.u [description]
+ * @return {[type]} d.transferInitiativeFrom Этот элемент указывает на то закончил ли игрок ход или просто передал инициативу.
+ * Содержит игрока последним передавшим инициативу. Если игрок что то делает в свою инициативу то это значение становиться  null
+ * Если что то делает  то pA или pB. Это являеться маркером совершонного действия, если маркер передан, 
+ * то согласие не переход в селдующую фазу у оппонента снимаеться. 
+ * а текущему игроу передаеться ответ на сброс флага передачи инициативы.
+ * Соотвественно необходимо рассмотреть варинаты
+ *
+ */
 function pressNextBtn(d) {
 	if (Can.pressNextBtn({
 		pX:d.u.you, 
@@ -619,6 +630,9 @@ function pressNextBtn(d) {
 		S:StartedGames[d.u.table].Snapshot,
 		meta: StartedGames[d.u.table].meta})) {
 		var table = StartedGames[d.u.table];
+		if (d.transferInitiative) {
+			table.meta.toNextPhase[d.u.opp] = false;	
+		}
 		table.meta.toNextPhase[d.u.you] = true;
 		var data = {
 			upd:{meta:table.meta},
@@ -632,12 +646,24 @@ function pressNextBtn(d) {
 			&& table.meta.toNextPhase[table.Snapshot.activePlayer]
 		) || (Stadies[table.Snapshot.phase].party == 'blocker' 
 			&& table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
-		)){
-			table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
-			var actReuslt =  {'toNextPhase':[{phase:'next'}]};
-			data.stackPrep = actReuslt;
-			table.stackPrep = actReuslt;
-			table.stackPreppA = table.stackPreppB = null;
+		))
+		{	
+			console.log("table.Snapshot.stack", table.Snapshot.stack)
+			if (table.Snapshot.stack.length) {
+				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
+				LoadStack(table);
+				var actReuslt =  {'prepareStartStack':[{}]};
+				data.stackPrep = actReuslt;
+				table.stackPrep = actReuslt;
+				table.stackPreppA = table.stackPreppB = null;
+			}
+			else {
+				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
+				var actReuslt =  {'toNextPhase':[{phase:'next'}]};
+				data.stackPrep = actReuslt;
+				table.stackPrep = actReuslt;
+				table.stackPreppA = table.stackPreppB = null;
+			}
 		} 
 		else {
 			table.meta.toNextPhase[d.u.opp] = false;
@@ -649,6 +675,14 @@ function pressNextBtn(d) {
 	} else {
 	}
 	// TODO возможно надо реагировать
+}
+function LoadStack(table) {
+	for (var j in table.Snapshot.stack) {
+		var jutsuObj = table.Snapshot.stack[j];
+		table.stack.splice(0,0,{resolveJutsuInStack:[jutsuObj]});
+	}
+	console.log("\n\ntable.stack")
+	console.log(table.stack)
 }
 
 function addToTeam(d) {
@@ -1019,7 +1053,8 @@ function getUpdatesForPlayers(table, actReuslt) {
 
 function preStackDone(d) {
 	var table = StartedGames[d.u.table];
-	 console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
+	var logThis = true;
+	 // console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
@@ -1027,7 +1062,7 @@ function preStackDone(d) {
 	if (table.stackPreppA && table.stackPreppB) {
 		var count = 0;
 
-		console.log("\n\n\n================")
+		if (logThis) console.log("\n\n\n================")
 		for (var i in table.stackPrep) {
 			if (i == 'afterQuestion' 
 				|| i == 'befor' 
@@ -1043,8 +1078,8 @@ function preStackDone(d) {
 		if (!count) {
 			//table.stackPrep = table.stack.pop();
 		}
-		console.log('\ntable.stackPrep')
-		console.log(table.stackPrep)
+		if (logThis) console.log('\ntable.stackPrep')
+		if (logThis) console.log(table.stackPrep)
 
 		for (var i in getUniversalObject(d.u.table, {pX:d.u.you}).S) {
 			//console.log('+'+i)
@@ -1052,19 +1087,19 @@ function preStackDone(d) {
 
 		var actReuslt = Actions.preStackDone( table, getUniversalObject(d.u.table, {pX:d.u.you}));
 		table.answers = {}
-		console.log('\nactReuslt');
-		console.log(actReuslt)
+		if (logThis) console.log('\nactReuslt');
+		if (logThis) console.log(actReuslt)
 		actReuslt = addStack(table,actReuslt);
-		console.log('\ntable.stack');
-		console.log(table.stack)
+		if (logThis) console.log('\ntable.stack');
+		if (logThis) console.log(table.stack)
 
 		var upds = getUpdatesForPlayers(table,actReuslt);
 		delete actReuslt.applyUpd;
 
-		console.log('\nupds');
-		console.log(upds);
-		console.log('\ntoClient');
-		console.log(actReuslt);
+		if (logThis) console.log('\nupds');
+		if (logThis) console.log(upds);
+		if (logThis) console.log('\ntoClient');
+		if (logThis) console.log(actReuslt);
 		
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
@@ -1081,10 +1116,10 @@ function preStackDone(d) {
 			stackPrepIsEmpty = false;
 		} 
 
-		console.log('\ntoClient2');
-		console.log(actReuslt);
-		console.log('stackPrepIsEmpty = ',stackPrepIsEmpty);
-		console.log("\n================")
+		if (logThis) console.log('\ntoClient2');
+		if (logThis) console.log(actReuslt);
+		if (logThis) console.log('stackPrepIsEmpty = ',stackPrepIsEmpty);
+		if (logThis) console.log("\n================")
 
 		if (stackPrepIsEmpty) {
 				table.actionLock = true;
@@ -1092,11 +1127,11 @@ function preStackDone(d) {
 		}
 		else {
 			if (upds) {
-				// console.log(' -> 1', upds.pB)
+				if (logThis) console.log(' -> 1', upds.pB)
 				io.sockets.in(table.roompA).emit('updact', {'stackPrep':actReuslt, upd : upds.pA});
 				io.sockets.in(table.roompB).emit('updact', {'stackPrep':actReuslt, upd : upds.pB});
 			} else {
-				// console.log(' -> 2')
+				if (logThis) console.log(' -> 2')
 				io.sockets.in(table.room).emit('updact', {'stackPrep':actReuslt, ket:3});
 			}
 		}
