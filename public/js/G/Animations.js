@@ -224,6 +224,9 @@ var AN = {
 				} 
 				else {
 					AN.moveCardToCenter(args);
+					AnimationPush({func:function() {
+						 updTable();
+					}, time:600, name: 'updTeams'});
 				}
 			}
 			else if ( !isZoneSimple(args.to) ) {
@@ -735,10 +738,20 @@ var AN = {
 			AN.preStack.countDown();
 		},
 		'discardExcess' : function(args) {
-			Actions.discardExcess(args, getUniversalObject())
+			Actions.discardExcess(args, getUniversalObject());
 		},
 		'addJutsuToStack' : function(args) {
-			Actions.addJutsuToStack(args, getUniversalObject())
+			Actions.addJutsuToStack(args, getUniversalObject());
+		},
+		'prepareStartStack' : function(args) {
+			Actions.prepareStartStack(args, getUniversalObject());
+			AN.preStack.countDown();
+		},
+		'resolveJutsuInStack' : function(args) {
+			Actions.resolveJutsuInStack(args, getUniversalObject());
+		},
+		'increaseNinjaPower' : function(args){
+			Actions.increaseNinjaPower(args, getUniversalObject());
 		}
 	}
 }
