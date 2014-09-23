@@ -989,7 +989,6 @@ var Actions = {
 		for (var i in jutsu.effect.trigger.resolve) {
 			if (!module) {
 				AnimationPush({func:function() {
-				alert(args.card)
 					C[args.card].effect({
 						type: 'simple',
 						target : 'one',
@@ -1002,7 +1001,8 @@ var Actions = {
 							pic : "public/pics/spark.png"
 						})
 					}
-				}, time:1500, name: 'Draw X cards'});
+				}, time:1500, name: 'spark.png'});
+				Actions.moveCardToZone(!!!)
 				setTimeout(AN.preStack.countDown, 1510);
 			}
 			else {
@@ -1013,15 +1013,27 @@ var Actions = {
 	},
 	'increaseNinjaPower' : function(args, o) {
 		var result = {};
+		
+		if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+		if (!('atEndOfTurn' in o.S.statuses[args.card])) o.S.statuses[args.card].atEndOfTurn = []; 
+		o.S.statuses[args.card].atEndOfTurn.push({
+			type: 'changePower', attack: args.attack, support: args.support
+		})
+
 		if (!module) {
 			var arr = [];
-			arr.push(args.attack >= 0 ? '+'.args.attack : args.attack) ;
+			arr.push(args.attack >= 0 ? '+' + args.attack : args.attack) ;
+			arr.push(args.support >= 0 ? '+' + args.support : args.support) ;
 			AnimationPush({func:function() {
 				C[args.card].effect({
-					type: 'increaseNinjaPower',
-					text: arr.splice('/')
+					type: 'increase',
+					text: arr.join('/')
 				})
-			}, time:1000, name: 'Draw X cards'});
+			}, time:1000, name: 'increaseNinjaPower'});
+			AnimationPush({func:function() {
+				console.log(S.statuses)
+						 updTable();
+			}, time:600, name: 'updTable'});
 			setTimeout(AN.preStack.countDown, 1010);
 		}
 		else {
@@ -1029,6 +1041,20 @@ var Actions = {
 		}
 		return result;
 
+	},
+	'getAllPowerModificator' : function(card, o) {
+		var result = {attack : 0, support : 0};
+		if (card in o.S.statuses) {
+			if ('atEndOfTurn' in o.S.statuses[card]) {
+				for (var i in o.S.statuses[card].atEndOfTurn) {
+					if (o.S.statuses[card].atEndOfTurn[i].type == 'changePower') {
+						result.attack = o.S.statuses[card].atEndOfTurn[i].attack;
+						result.support = o.S.statuses[card].atEndOfTurn[i].support;
+					}
+				}
+			} 
+		}
+		return result;
 	},
 	'log' : function() { 
 		console.log('msg')
