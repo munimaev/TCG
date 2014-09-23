@@ -1501,9 +1501,11 @@ function createteam( o, o2 ) {
                     func: afterFunc
                 }
             } } );
+
         C[o[0]].changeZone(  o2.zona);
         C[o[0]].params.team = o2.team;
         C[o[0]].params.teamPosition = 'leader';
+        C[o[0]].changePower();
         
     }
     
@@ -1556,6 +1558,7 @@ function createteam( o, o2 ) {
         C[o[i]].params.team = o2.team;
         C[o[i]].params.teamPosition = 'support';
         C[o[i]].removeTeamPower(o2.player);
+        C[o[0]].changePower();
     }
     if (o[0]) {
         C[o[0]].addTeamPower(o2.player);
