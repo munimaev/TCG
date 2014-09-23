@@ -124,6 +124,8 @@ function Card( o ) {
      * o.this - Объект Card.
      */
     this.instPower = function( size, o ) {
+        var o = o || {_this : this};
+        var size = size || this.params.W;
         o._this.$power.css( 'fontSize', size / 4 + 'px' ).
             css( 'lineHeight', size / 4 + 'px' );
     };
@@ -1431,12 +1433,14 @@ function Card( o ) {
     this.getNinjaPower = function() {
         Log( 1, 'getNinjaPower' );
         var result = 0;
+        var mod = Actions.getAllPowerModificator(this.id, getUniversalObject());
+
         switch ( this.params.teamPosition ) {
             case 'leader':
-                result = this.params.isHealt ? this.params.ah : this.params.ai;
+                result = this.getNinjaModPower().attack;
                 break;
             case 'support':
-                result = this.params.isHealt ? this.params.sh : this.params.si;
+                result = this.getNinjaModPower().support;
                 break;
         }
 
@@ -1444,6 +1448,28 @@ function Card( o ) {
         return result;
     };
 
+    this.getNinjaDefaultAttack = function() {
+        return this.params.isHealt ? this.params.ah : this.params.ai;
+    }
+
+    this.getNinjaDefaultSupport = function() {
+        return this.params.isHealt ? this.params.sh : this.params.si;   
+    }
+
+    this.getNinjaDefaultPower = function() {
+        return {
+            attack : this.getNinjaDefaultAttack(),
+            support : this.getNinjaDefaultSupport()
+        }   
+    }
+
+    this.getNinjaModPower = function() {
+        var mod = Actions.getAllPowerModificator(this.id, getUniversalObject());
+        var result = this.getNinjaDefaultPower();
+        result.attack += mod.attack;
+        result.support += mod.support;
+        return result;
+    }
 
     this.injure = function() {
         LogI['injure'] = 0;
@@ -1738,6 +1764,27 @@ Card.prototype = {
                     }
                 })()
             });
+        }
+    },
+    changePower : function (mod) {
+        if (this.params.type == 'N') {
+            var currentPower = (this.$power.html()).split('/');
+            var mod = this.getNinjaModPower();
+            if (parseInt(currentPower[0]) != mod.attack 
+                || parseInt(currentPower[1]) != mod.support 
+            ){
+                var newPower = '';
+                newPower += mod.attack + '/' + mod.support;
+                var cardObj = C[this.id];
+                this.$power.animate(
+                    {'fontSize':"-=90%"},
+                    250, 
+                    function() {
+                        cardObj.$power.html(newPower);
+                        cardObj.instPower();
+                    }
+                )
+            }
         }
     },
     /**
