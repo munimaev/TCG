@@ -125,7 +125,8 @@ var Actions = {
 	 * @return {[type]}	  [description]
 	 */
 	'moveCardToZone' : function (args, o) {
-		console.log(args, isZoneSimple(args.from),args.from)
+		// console.log('moveCardToZone'.red)
+		// console.log(args, isZoneSimple(args.from),args.from)
 		var result = {
 			updTable : [],
 		};
@@ -134,30 +135,29 @@ var Actions = {
 			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
 		}
 
-		console.log(isZoneSimple(args.from))
+		//console.log(isZoneSimple(args.from))
 		if ( !isZoneSimple(args.from)) {
 			if ( isZoneSimple(args.to) ){
-				console.log('h->s')
+				// console.log('h->s')
 			o.S[args.pX][args.from].team[args.team].splice(args.cardInArray,1);
 			if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
 				o.S[args.pX][args.to].splice(0,0,args.card)
 			} else {
 				o.S[args.pX][args.to].push(args.card);
-				}
+			}
 			o.S.statuses[args.card] = {};
 
-					if (!module) {
-						C[args.card].params.zona = args.to;
-						AnimationPush({func:function() {
-							AN.moveCardToZone(args, o);
-						}, time:1000, name: 'moveCardToZone'});
-						setTimeout(AN.preStack.countDown,1000)
-					}
+				if (!module) {
+					C[args.card].params.zona = args.to;
+					AnimationPush({func:function() {
+						AN.moveCardToZone(args, o);
+					}, time:1000, name: 'moveCardToZone'});
+					setTimeout(AN.preStack.countDown,1000)
+				}
 			}
-			else if ( !isZoneSimple(args.from) )
-			{
+			else if ( !isZoneSimple(args.from) ){
 
-				console.log('h->h')
+					// console.log('h->h')
 
 			}
 			if (!o.S[args.pX][args.from].team[args.team].length) {
@@ -170,16 +170,30 @@ var Actions = {
 			}
 		} 
 		else if ( isZoneSimple(args.from) ) {	
-			console.log(args.pX,args.from,args.card)
-			var ind = arraySearch(o.S[args.pX][args.from], args.card);
-			console.log('IND', ind)
+			// console.log(args.pX,args.from,args.card)
+			if  (args.from == 'stack') {
+				var ind = true;
+			} else {
+				var ind = arraySearch(o.S[args.pX][args.from], args.card);
+			}
+			// console.log('IND', ind)
 			if (ind !== null) {
-				o.S[args.pX][args.from].splice(ind,1)
+				if (args.from == 'stack') {
+					for (var i in o.S.stack) {
+						if (o.S.stack[i].card == args.card) {
+							o.S.stack.splice(i,1);
+							break;
+						}
+					}
+				} else {
+					o.S[args.pX][args.from].splice(ind,1)
+				}
+
 				if ( isZoneSimple(args.to) ) {
-					console.log('s->s')
+					// console.log('s->s')
 					if (args.to == 'stack') {
 						o.S.stack.push({
-							card: args.card, user: args.user, target:args.target
+							card: args.card, user: args.user, target:args.target, owner:args.pX
 						})	
 					}
 					else {
@@ -191,6 +205,8 @@ var Actions = {
 					}
 
 
+
+
 					if (!module) {
 						C[args.card].params.zona = args.to;
 						AnimationPush({func:function() {
@@ -199,12 +215,12 @@ var Actions = {
 						}, time:1000, name: 'moveCardToZone'});
 						setTimeout(AN.preStack.countDown,1000)
 					}
-					console.log("\n\n\nSTACK")
-					console.log(o.S.stack)
+					// console.log("\n\n\nSTACK")
+					// console.log(o.S.stack)
 				}
 				else if ( !isZoneSimple(args.to) ) 
 				{	
-				console.log('s->h')
+				// console.log('s->h')
 					Actions.createTeamFromCard(args, o);
 						if (!module) {
 							C[args.card].params.zona = args.to;
@@ -488,6 +504,7 @@ var Actions = {
 			if (blockID) {
 				var blockTeam   = o.S[blocker].block.team[blockID];
 				var blockPower  = Actions.getTeamPower(blockTeam, o);
+				console.log(('attackPower ' + attackPower + ' / blockPower ' + blockPower).red)
 				if (attackPower > blockPower) {
 					if (attackPower - blockPower >= 5) {
 
@@ -777,22 +794,12 @@ var Actions = {
 		return result;
 	},
 	'getLeaderPower' : function(cardID, o) {
-		var card = o.Known[o.Accordance[cardID]];
-		if (Actions.getHealtStatus(cardID, o)) {
-			return card.ah;
-		}
-		else {
-			return card.ai;
-		}
+		var power = Actions.getNinjaModPower(cardID, o)
+		return power.attack;
 	},
 	'getSupportPower' : function(cardID, o) {
-		var card = o.Known[o.Accordance[cardID]];
-		if (Actions.getHealtStatus(cardID, o)) {
-			return card.sh;
-		}
-		else {
-			return card.sh;
-		}
+		var power = Actions.getNinjaModPower(cardID, o)
+		return power.support;
 	},
 	'getHealtStatus' : function(cardID, o) {
 		if (o.S.statuses[cardID] && o.S.statuses[cardID].injured) {
@@ -1002,12 +1009,20 @@ var Actions = {
 						})
 					}
 				}, time:1500, name: 'spark.png'});
-				Actions.moveCardToZone(!!!)
 				setTimeout(AN.preStack.countDown, 1510);
 			}
 			else {
 				jutsu.effect.trigger.resolve[i].func(result, args, o);
 			}
+			var args2 = {}
+			args2.pX = args.owner;
+			args2.card = args.card;
+			args2.cause = 'resolveJutsuFromStack';
+			args2.from = 'stack';
+			args2.to = 'discard';
+			args2.team = null;
+			console.log('resolveMove'.red)
+			Actions.moveCardToZone(args2,o)
 		}
 		return result;
 	},
@@ -1048,14 +1063,41 @@ var Actions = {
 			if ('atEndOfTurn' in o.S.statuses[card]) {
 				for (var i in o.S.statuses[card].atEndOfTurn) {
 					if (o.S.statuses[card].atEndOfTurn[i].type == 'changePower') {
-						result.attack = o.S.statuses[card].atEndOfTurn[i].attack;
-						result.support = o.S.statuses[card].atEndOfTurn[i].support;
+						result.attack += o.S.statuses[card].atEndOfTurn[i].attack;
+						result.support += o.S.statuses[card].atEndOfTurn[i].support;
 					}
 				}
 			} 
 		}
 		return result;
 	},
+    'getNinjaDefaultPower' : function(card, o) {
+        return {
+            attack : Actions.getNinjaDefaultAttack(card, o),
+            support : Actions.getNinjaDefaultSupport(card, o)
+        }   
+    },
+    'getNinjaDefaultAttack' : function(card, o) {
+    	var isHealt = true;
+    	if (card in o.S.statuses && o.S.statuses.card) isHealt = false;
+    	var cardObj = o.Known[o.Accordance[card]];
+        return isHealt ? cardObj.ah : cardObj.ai;
+    },
+    'getNinjaDefaultSupport' : function(card, o) {
+    	var isHealt = true;
+    	if (card in o.S.statuses && o.S.statuses.card)  isHealt = false;
+    	var cardObj = o.Known[o.Accordance[card]];
+        return isHealt ? cardObj.sh : cardObj.si;   
+    },
+
+    getNinjaModPower : function(card, o) {
+    	var o = o || getUniversalObject();
+        var mod = Actions.getAllPowerModificator(card, o);
+        var result = Actions.getNinjaDefaultPower(card, o);
+        result.attack += mod.attack;
+        result.support += mod.support;
+        return result;
+    },
 	'log' : function() { 
 		console.log('msg')
 	}
