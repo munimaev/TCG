@@ -1433,14 +1433,15 @@ function Card( o ) {
     this.getNinjaPower = function() {
         Log( 1, 'getNinjaPower' );
         var result = 0;
-        var mod = Actions.getAllPowerModificator(this.id, getUniversalObject());
-
+        var o =  getUniversalObject();
+        var mod = Actions.getAllPowerModificator(this.id, o);
+        var ninjaModPower = Actions.getNinjaModPower(this.id, o);
         switch ( this.params.teamPosition ) {
             case 'leader':
-                result = this.getNinjaModPower().attack;
+                result = ninjaModPower.attack;
                 break;
             case 'support':
-                result = this.getNinjaModPower().support;
+                result = ninjaModPower.support;
                 break;
         }
 
@@ -1448,28 +1449,6 @@ function Card( o ) {
         return result;
     };
 
-    this.getNinjaDefaultAttack = function() {
-        return this.params.isHealt ? this.params.ah : this.params.ai;
-    }
-
-    this.getNinjaDefaultSupport = function() {
-        return this.params.isHealt ? this.params.sh : this.params.si;   
-    }
-
-    this.getNinjaDefaultPower = function() {
-        return {
-            attack : this.getNinjaDefaultAttack(),
-            support : this.getNinjaDefaultSupport()
-        }   
-    }
-
-    this.getNinjaModPower = function() {
-        var mod = Actions.getAllPowerModificator(this.id, getUniversalObject());
-        var result = this.getNinjaDefaultPower();
-        result.attack += mod.attack;
-        result.support += mod.support;
-        return result;
-    }
 
     this.injure = function() {
         LogI['injure'] = 0;
@@ -1769,7 +1748,7 @@ Card.prototype = {
     changePower : function (mod) {
         if (this.params.type == 'N') {
             var currentPower = (this.$power.html()).split('/');
-            var mod = this.getNinjaModPower();
+            var mod = Actions.getNinjaModPower(this.id, getUniversalObject());
             if (parseInt(currentPower[0]) != mod.attack 
                 || parseInt(currentPower[1]) != mod.support 
             ){
