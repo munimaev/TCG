@@ -88,6 +88,7 @@ function get_arg(txt) {
 
 
 function applyUpd(d) {
+			console.log("d.upd.meta",d)
 	if (d.upd) {
 		//console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
@@ -99,6 +100,9 @@ function applyUpd(d) {
 		}
 		if (d.upd.meta) for (var i in d.upd.meta) {
 			Meta[i] = d.upd.meta[i];
+			if (i == 'toNextPhase') {
+			    updCurrentPhase();
+			}
 		}
 	}
 }
