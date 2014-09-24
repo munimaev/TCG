@@ -13,7 +13,6 @@
             "rewards": 0,
             "turnCounter": 1,
             "hand": [
-                "c102",
                 "c103",
                 "c104",
                 "c105"
@@ -37,7 +36,9 @@
                 "c123"
             ],
             "chackra": [],
-            "discard": [],
+            "discard": [
+                "c102"
+            ],
             "mission": [],
             "client": [],
             "village": {
@@ -58,8 +59,7 @@
                 "team": {}
             }
         },
-        "stack" : [
-        ],
+        "stack": [],
         "battlefield": {
             "3": "2"
         },
@@ -113,17 +113,20 @@
             }
         },
         "statuses": {
-            "c003": {
-                "injured": true
-            },
-            "c106": {
-                "injured": true
+            "c107": {
+                "atEndOfTurn": [
+                    {
+                        "type": "changePower",
+                        "attack": 5,
+                        "support": 2
+                    }
+                ]
             }
         }
     },
     "Accordance": {
-        "c001": "c003",
-        "c002": "c023",
+        "c001": "c051",
+        "c002": "c052",
         "c003": "c004",
         "c004": "c022",
         "c005": "c016",
