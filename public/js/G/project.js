@@ -1425,7 +1425,7 @@ function updPosition(position,sqr) {
             });
 
             C[S.stack[i].card].animation({
-                X : marginLeft,
+                X : marginLeft + 8 * sqr * (S.stack.length - 1 - i),
                 Y : I.H / 2 - sqr * 4,
                 W : 8 * sqr,
                 additional : {
