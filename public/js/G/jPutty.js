@@ -279,8 +279,8 @@ function fillScroll(o){
     for (var i in G) {
         params = {'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp, zindex:600};
         var preparams = Known[Accordance[G[i]]];
-        for (var i in preparams) {
-            params[i] = preparams[i];
+        for (var i2 in preparams) {
+            params[i2] = preparams[i2];
         }
         C[G[i]] = new Card(params);
         console.log('++++', Known[Accordance[G[i]]])
