@@ -15,6 +15,7 @@ var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
 var fs = require('fs');
+var colors = require('colors');
 
 //console.log(Stadies)
 
@@ -656,6 +657,8 @@ function pressNextBtn(d) {
 				data.stackPrep = actReuslt;
 				table.stackPrep = actReuslt;
 				table.stackPreppA = table.stackPreppB = null;
+				console.log('table.meta'.red)
+				console.log(table.meta)
 			}
 			else {
 				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
@@ -1062,7 +1065,7 @@ function preStackDone(d) {
 	if (table.stackPreppA && table.stackPreppB) {
 		var count = 0;
 
-		if (logThis) console.log("\n\n\n================")
+		if (logThis) console.log("\n================".green)
 		for (var i in table.stackPrep) {
 			if (i == 'afterQuestion' 
 				|| i == 'befor' 
@@ -1078,7 +1081,7 @@ function preStackDone(d) {
 		if (!count) {
 			//table.stackPrep = table.stack.pop();
 		}
-		if (logThis) console.log('\ntable.stackPrep')
+		if (logThis) console.log('table.stackPrep'.green)
 		if (logThis) console.log(table.stackPrep)
 
 		for (var i in getUniversalObject(d.u.table, {pX:d.u.you}).S) {
@@ -1087,18 +1090,18 @@ function preStackDone(d) {
 
 		var actReuslt = Actions.preStackDone( table, getUniversalObject(d.u.table, {pX:d.u.you}));
 		table.answers = {}
-		if (logThis) console.log('\nactReuslt');
+		if (logThis) console.log('actReuslt'.green);
 		if (logThis) console.log(actReuslt)
 		actReuslt = addStack(table,actReuslt);
-		if (logThis) console.log('\ntable.stack');
+		if (logThis) console.log('table.stack'.green);
 		if (logThis) console.log(table.stack)
 
 		var upds = getUpdatesForPlayers(table,actReuslt);
 		delete actReuslt.applyUpd;
 
-		if (logThis) console.log('\nupds');
+		if (logThis) console.log('upds'.green);
 		if (logThis) console.log(upds);
-		if (logThis) console.log('\ntoClient');
+		if (logThis) console.log('toClient'.green);
 		if (logThis) console.log(actReuslt);
 		
 		table.stackPrep = actReuslt;
@@ -1116,10 +1119,10 @@ function preStackDone(d) {
 			stackPrepIsEmpty = false;
 		} 
 
-		if (logThis) console.log('\ntoClient2');
+		if (logThis) console.log('toClient2'.green);
 		if (logThis) console.log(actReuslt);
-		if (logThis) console.log('stackPrepIsEmpty = ',stackPrepIsEmpty);
-		if (logThis) console.log("\n================")
+		if (logThis) console.log(('stackPrepIsEmpty = '+stackPrepIsEmpty).green);
+		if (logThis) console.log("================".green)
 
 		if (stackPrepIsEmpty) {
 				table.actionLock = true;
