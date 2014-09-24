@@ -456,6 +456,84 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
+    "c051": {
+        "owner": "pB",
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j001",
+        "number": "j001",
+        "elements": "EF",
+        "name": "Кунай",
+        "effectText" : "",
+        "requirement" : function(card,o) {
+            return true;
+        },
+        "target" : [{player:'you', zone: 'battle', func: function() {
+            return true;
+        }}],
+        "effect" : {
+            "trigger" : {
+                "resolve" : [
+                    {
+                        func : function(result, args, o) {
+                            if (!('toStack' in  result)) result.toStack = {};
+                            if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
+                            result.toStack.increaseNinjaPower.push({
+                                card : args.target[0],
+                                attack : 5,
+                                support : 2,                        
+                            });
+                            return result;
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "c052": {
+        "owner": "pB",
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j001",
+        "number": "j001",
+        "elements": "EF",
+        "name": "Кунай",
+        "effectText" : "",
+        "requirement" : function(card,o) {
+            return true;
+        },
+        "target" : [{player:'you', zone: 'battle', func: function() {
+            return true;
+        }}],
+        "effect" : {
+            "trigger" : {
+                "resolve" : [
+                    {
+                        func : function(result, args, o) {
+                            if (!('toStack' in  result)) result.toStack = {};
+                            if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
+                            result.toStack.increaseNinjaPower.push({
+                                card : args.target[0],
+                                attack : 5,
+                                support : 2,                        
+                            });
+                            return result;
+                        }
+                    }
+                ]
+            }
+        }
+    },
     "c121": {
         "owner": "pA",
         "type": "N",
@@ -533,7 +611,7 @@ var CardBase = {
                             if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
                             result.toStack.increaseNinjaPower.push({
                                 card : args.target[0],
-                                attack : 2,
+                                attack : 5,
                                 support : 2,                        
                             });
                             return result;
