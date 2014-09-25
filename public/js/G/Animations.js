@@ -508,7 +508,6 @@ var AN = {
 			console.log('ARGS', args)
 			var jutsu = Known[Accordance[args.card]];
 			AN.stop = true;
-			if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
 			var condidateCount = [];
 
 			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите исполльзующнго для техники.' );
@@ -525,6 +524,7 @@ var AN = {
 
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
+				if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
 				Answers.selectUserAndTargetForJutsu.push({
 					card: args.card, user : [card.id], pX:you, cause:'playJutsu',from:'hand', to:'stack'
 				})
@@ -551,7 +551,6 @@ var AN = {
 			var jutsu = Known[Accordance[args.card]];
 			var target = jutsu.target[args.targetKey];
 			AN.stop = true;
-			if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
 			var condidateCount = [];
 			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите цель для техники.' ); 
 
@@ -595,6 +594,7 @@ var AN = {
 						}
 					}
 					if (!itis) {
+						if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
 						Answers.selectUserAndTargetForJutsu.push({
 							card: args.card, target : [card.id], pX:you, cause:'playJutsu',from:'hand', to:'stack'
 						})
@@ -679,9 +679,9 @@ var AN = {
 				AN.preStack.countDown();
 			}
 		},
-		'kupdTable' : function(args) {
+		'updTable' : function(args) {
 			updTable();
-			setTimeout(AN.preStack.countDown,1100);
+			setTimeout(AN.preStack.countDown,550);
 		},
 		'toNextPhase' : function(args) {
 		
@@ -752,6 +752,9 @@ var AN = {
 		},
 		'increaseNinjaPower' : function(args){
 			Actions.increaseNinjaPower(args, getUniversalObject());
+		},
+		'clearAtEndOfTurnEffect' : function(args) {
+			Actions.clearAtEndOfTurnEffect(args, getUniversalObject());
 		}
 	}
 }
