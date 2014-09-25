@@ -522,6 +522,8 @@ var CardBase = {
                         func : function(result, args, o) {
                             if (!('toStack' in  result)) result.toStack = {};
                             if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
+                            console.log('args'.red)
+                            console.log(args)
                             result.toStack.increaseNinjaPower.push({
                                 card : args.target[0],
                                 attack : 5,
