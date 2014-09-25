@@ -134,7 +134,7 @@ var stackPrepAfter = {
 function applyStackAfter() {
 	//console.log('applyStackAfter',stackPrepAfter);	
 	var stackPrep = stackPrepAfter;
-	AN.preStack.count++;
+	AN.preStack.count = 1;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 				console.log('+++++++++++')
@@ -152,7 +152,7 @@ var stackPrepBefor = {};
 function applyStackBeafor() {
 	// console.log('stackPrepBefor',stackPrepBefor);	
 	var stackPrep = stackPrepBefor;
-	AN.preStack.count++;
+	AN.preStack.count = 1;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 				// console.log('+++++++++++')
@@ -170,7 +170,7 @@ var stackPrepNormal = {};
 function applyStackNormal() {
 	// console.log('stackPrepNormal',stackPrepNormal);	
 	var stackPrep = stackPrepNormal;
-	AN.preStack.count++;
+	AN.preStack.count = 1;
 	for (var func in stackPrep) {
 		for (var args in stackPrep[func]) {
 			//console.log('-----------')
