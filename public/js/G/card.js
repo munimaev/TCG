@@ -1871,7 +1871,11 @@ Card.prototype = {
                         function() {
                              sprite.animate(
                                 {opacity: 0,}, 
-                                200
+                                200, 
+                                function() {
+                                    sprite.remove();
+                                    afterFunc();
+                                }
                             )
                         }
                     )
