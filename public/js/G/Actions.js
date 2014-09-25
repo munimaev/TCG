@@ -137,22 +137,24 @@ var Actions = {
 
 		//console.log(isZoneSimple(args.from))
 		if ( !isZoneSimple(args.from)) {
+
+			result.updTable[0] = {};
+
 			if ( isZoneSimple(args.to) ){
 				// console.log('h->s')
-			o.S[args.pX][args.from].team[args.team].splice(args.cardInArray,1);
-			if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
-				o.S[args.pX][args.to].splice(0,0,args.card)
-			} else {
-				o.S[args.pX][args.to].push(args.card);
-			}
-			o.S.statuses[args.card] = {};
+				o.S[args.pX][args.from].team[args.team].splice(args.cardInArray,1);
+				if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+					o.S[args.pX][args.to].splice(0,0,args.card)
+				} else {
+					o.S[args.pX][args.to].push(args.card);
+				}
+				o.S.statuses[args.card] = {};
 
 				if (!module) {
 					C[args.card].params.zona = args.to;
 					AnimationPush({func:function() {
 						AN.moveCardToZone(args, o);
 					}, time:1000, name: 'moveCardToZone'});
-					setTimeout(AN.preStack.countDown,1000)
 				}
 			}
 			else if ( !isZoneSimple(args.from) ){
@@ -173,6 +175,7 @@ var Actions = {
 			// console.log(args.pX,args.from,args.card)
 			if  (args.from == 'stack') {
 				var ind = true;
+				result.updTable[0] = {};
 			} else {
 				var ind = arraySearch(o.S[args.pX][args.from], args.card);
 			}
@@ -221,6 +224,9 @@ var Actions = {
 				else if ( !isZoneSimple(args.to) ) 
 				{	
 				// console.log('s->h')
+				
+					result.updTable[0] = {};
+
 					Actions.createTeamFromCard(args, o);
 						if (!module) {
 							C[args.card].params.zona = args.to;
@@ -234,6 +240,8 @@ var Actions = {
 			}
 		}
 		if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
+
+
 		if (!result.updTable.length) delete result.updTable;
 		return result;
 	},
@@ -325,7 +333,8 @@ var Actions = {
 		var team2 = args.c2.team;
 		var Team1 = args.S[owner][zone].team[team1];
 		var Team2 = args.S[owner][zone].team[team2];
-
+		console.log('organisation'.red)
+		console.log(args)
 		// В соотвеввущем массиве команщды удаляеться элемент с номером карты
 		Actions.removeSelfFromTeam(o.S, args.c1 );
 
@@ -434,6 +443,7 @@ var Actions = {
 			};
 		}
 		var result = { 
+			'clearAtEndOfTurnEffect' : [{}],
 			'returnToVillaje' : [{team:'all', }],
 			'updTable' : [{players : 'all'}],
 			'toStack' : {'adNewTurn' : [{}]},
@@ -450,6 +460,15 @@ var Actions = {
 
 		return result;
 		//}
+	},
+	'clearAtEndOfTurnEffect' : function(args, o) {
+		for (var i in o.S.statuses) {
+			if ('atEndOfTurn' in o.S.statuses[i]) {
+				delete o.S.statuses[i].atEndOfTurn;
+			}
+		}
+		console.log('STATUS')
+		console.log(o.S.statuses)
 	},
 	'missionAtStart' : function(o) {
 		var args = {
