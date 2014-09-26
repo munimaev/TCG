@@ -199,7 +199,7 @@ function btnNextPhase() {
     if (Can.pressNextBtn({pX:you,S:S,Stadies:Stadies,meta:Meta})) {
        // console.log("↰",{u:Client})
         Card.prototype.hideActionCircle();
-        socket.emit('pressNextBtn',{u:Client, transferInitiativeFrom : G.transferInitiative})
+        socket.emit('pressNextBtn',{u:Client, transferInitiative : G.transferInitiative})
         G.transferInitiative = false;
     }
 }
@@ -1822,4 +1822,27 @@ function getUniversalObject(obj) {
         res[i] = obj[i];
     }
     return res;
+}
+
+function print() {
+    console.log('=====================================')
+    console.log('hand    : ' + S[opp].hand.length, S[opp].hand )
+    console.log('discard : ' + S[opp].discard.length, S[opp].discard )
+    console.log('chackra : ' + S[opp].chackra.length, S[opp].chackra )
+    console.log('-------------------------------------')
+    console.log('village : '     ,  S[opp].village.team)
+    console.log('block   : '     ,  S[opp].block.team)
+    console.log('attack  : '     ,  S[opp].attack.team)
+    console.log('-------------------------------------')
+    console.log('stack       : ' ,  S.stack)
+    console.log('battlefield : ' ,  S.battlefield)
+    console.log('-------------------------------------')
+    console.log('attack  : '     ,  S[you].attack.team)
+    console.log('block   : '     ,  S[you].block.team)
+    console.log('village : '     ,  S[you].village.team)
+    console.log('-------------------------------------')
+    console.log('chackra : ' + S[you].chackra.length, S[you].chackra )
+    console.log('discard : ' + S[you].discard.length, S[you].discard )
+    console.log('hand    : ' + S[you].hand.length, S[you].hand )
+    console.log('=====================================')
 }
