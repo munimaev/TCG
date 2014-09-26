@@ -1,17 +1,17 @@
 {
     "S": {
-        "activePlayer": "pB",
-        "phase": "start",
+        "activePlayer": "pA",
+        "phase": "jutsu",
         "stop": false,
-        "turnNumber": 3,
+        "turnNumber": 2,
         "counters": {
-            "playedNinjaActivePlayer": 0
+            "playedNinjaActivePlayer": 1
         },
         "pA": {
             "isDrawCardAtStartTurn": false,
             "isNewGame": false,
             "rewards": 0,
-            "turnCounter": 2,
+            "turnCounter": 1,
             "hand": [
                 "c103",
                 "c104",
@@ -69,11 +69,12 @@
             "rewards": 0,
             "turnCounter": 1,
             "hand": [
-                "c001",
                 "c004",
                 "c005",
                 "c006",
-                "c007"
+                "c007",
+                "c001",
+                "c002"
             ],
             "deck": [
                 "c008",
@@ -95,7 +96,6 @@
             ],
             "chackra": [],
             "discard": [
-                "c002"
             ],
             "mission": [],
             "client": [],
@@ -121,8 +121,7 @@
                         "attack": 5,
                         "support": 2
                     }
-                ],
-                "injured": true
+                ]
             },
             "c003": {
                 "atEndOfTurn": [
@@ -130,9 +129,13 @@
                         "type": "changePower",
                         "attack": 5,
                         "support": 2
+                    },
+                    {
+                        "type": "changePower",
+                        "attack": 5,
+                        "support": 2
                     }
-                ],
-                "injured": true
+                ]
             }
         }
     },
