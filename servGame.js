@@ -631,6 +631,8 @@ function pressNextBtn(d) {
 		S:StartedGames[d.u.table].Snapshot,
 		meta: StartedGames[d.u.table].meta})) {
 		var table = StartedGames[d.u.table];
+		// console.log('pressNextBtn'.red)
+		// console.log(d)
 		if (d.transferInitiative) {
 			table.meta.toNextPhase[d.u.opp] = false;	
 		}
@@ -649,7 +651,7 @@ function pressNextBtn(d) {
 			&& table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA']
 		))
 		{	
-			console.log("table.Snapshot.stack", table.Snapshot.stack)
+			// console.log("table.Snapshot.stack", table.Snapshot.stack)
 			if (table.Snapshot.stack.length) {
 				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
 				LoadStack(table);
@@ -657,8 +659,8 @@ function pressNextBtn(d) {
 				data.stackPrep = actReuslt;
 				table.stackPrep = actReuslt;
 				table.stackPreppA = table.stackPreppB = null;
-				console.log('table.meta'.red)
-				console.log(table.meta)
+				// console.log('table.meta'.red)
+				// console.log(table.meta)
 			}
 			else {
 				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
@@ -778,13 +780,10 @@ function playJutsu(d) {
 	var table = StartedGames[d.u.table];
 	//console.log(d.u);
 	if (Can.playJutsu({
-            Accordance : table.Accordance,
             card: d.arg.card,
-            Known: table.Known,
             owner:d.arg.owner,
             pX:d.u.you,
-            S:table.Snapshot,
-    })){
+    }, getUniversalObject(d.u.table))){
 		var args = {
 			card : d.arg.card,
 			cause : 'play',
