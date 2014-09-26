@@ -233,6 +233,7 @@ var AN = {
 				AN.moveCardToCenter(args);
 			}
 		}
+        updAllCount();
 	},
 	moveCardToCenter : function(args) {
 
@@ -562,23 +563,10 @@ var AN = {
 				}
 			} 
 			else {
-				var player = target.player == 'you' ? you : opp;
-				if (target.zone == 'battle') {
-					var role = player == o.S.activePlayer ? 'attack' : 'block';
-				}
-				else {
-					role = target.zone;
-				}
-
-				for (var i in o.S[player][role].team) {
-					AN.preStack.count++;
-					for (var c in o.S[player][role].team[i]) {
-						var ninja = o.S[player][role].team[i][c];
-						if ( target.func(C[ninja]), o) {
-							condidateCount.push(ninja);
-							C[ninja].setZIndex(1202);
-						}
-					}
+				AN.preStack.count++;
+				condidateCount = Can.areAvailableTargets(args, o);
+				for (var i in condidateCount) {
+					C[condidateCount[i]].setZIndex(1202);
 				}
 				AN.preStack.countDown();
 				Context.clickAction = function( card ) {
@@ -665,6 +653,7 @@ var AN = {
 		},
 		'moveCardToZone' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject(args))
+			setTimeout(AN.preStack.countDown,1000)
 		},
 		'afterQuestion' : function(args) {
 			//console.log('afterQuestion', args)
@@ -710,6 +699,7 @@ var AN = {
 		},
 		'putCardInPlay' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
+			setTimeout(AN.preStack.countDown,1000)
 		},
 		'playJutsu' : function(args) {
 			if (args.pX == you) {
@@ -726,6 +716,7 @@ var AN = {
 		},
 		'charge' : function(args) {
 			Actions.moveCardToZone(args, getUniversalObject())
+			setTimeout(AN.preStack.countDown,1000)
 		},
 		'winner' : function(args) {
 			Actions.winner(args, getUniversalObject())
@@ -755,6 +746,7 @@ var AN = {
 		},
 		'clearAtEndOfTurnEffect' : function(args) {
 			Actions.clearAtEndOfTurnEffect(args, getUniversalObject());
+			AN.preStack.countDown();
 		}
 	}
 }
