@@ -1518,11 +1518,8 @@ function Card( o ) {
         var $c = $c || $( '#cardAction' + this.id );
         var id = this.id;
         var obj = {
-            S:S,
             pX:you,
             card: this.id,
-            Known: Known,
-            Accordance : Accordance
         }
         if (Can.putInPlay(obj)) {
              $c.append( $( '<div />', {
@@ -1534,7 +1531,7 @@ function Card( o ) {
                 })()
             }))
         }
-        if (Can.playJutsu(obj)) {
+        if (Can.playJutsu(obj, getUniversalObject())) {
              $c.append( $( '<div />', {
                 class: 'actionIcon n1 putInPlay',
                 'click': (function() {
