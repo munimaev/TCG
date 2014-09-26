@@ -154,7 +154,7 @@ var Actions = {
 					C[args.card].params.zona = args.to;
 					AnimationPush({func:function() {
 						AN.moveCardToZone(args, o);
-					}, time:1000, name: 'moveCardToZone'});
+					}, time:760, name: 'moveCardToZone'});
 				}
 			}
 			else if ( !isZoneSimple(args.from) ){
@@ -215,8 +215,7 @@ var Actions = {
 						AnimationPush({func:function() {
 							AN.moveCardToZone(args, o);
 							AN.moveToHand(o);
-						}, time:1000, name: 'moveCardToZone'});
-						setTimeout(AN.preStack.countDown,1000)
+						}, time:760, name: 'moveCardToZone'});
 					}
 					// console.log("\n\n\nSTACK")
 					// console.log(o.S.stack)
@@ -233,8 +232,7 @@ var Actions = {
 							AnimationPush({func:function() {
 								AN.moveCardToZone(args, o);
 								AN.moveToHand(o);
-							}, time:1000, name: 'moveCardToZone'});
-							setTimeout(AN.preStack.countDown,1000)
+							}, time:760, name: 'moveCardToZone'});
 						}
 				}
 			}
@@ -331,10 +329,11 @@ var Actions = {
 		var zone = args.c1.zone;
 		var team1 = args.c1.team;
 		var team2 = args.c2.team;
-		var Team1 = args.S[owner][zone].team[team1];
-		var Team2 = args.S[owner][zone].team[team2];
-		console.log('organisation'.red)
-		console.log(args)
+		var Team1 = o.S[owner][zone].team[team1];
+		var Team2 = o.S[owner][zone].team[team2];
+		// console.log('organisation'.red)
+		// console.log(owner,zone,team2)
+		// console.log(Team2)
 		// В соотвеввущем массиве команщды удаляеться элемент с номером карты
 		Actions.removeSelfFromTeam(o.S, args.c1 );
 
@@ -523,7 +522,7 @@ var Actions = {
 			if (blockID) {
 				var blockTeam   = o.S[blocker].block.team[blockID];
 				var blockPower  = Actions.getTeamPower(blockTeam, o);
-				console.log(('attackPower ' + attackPower + ' / blockPower ' + blockPower).red)
+				//console.log(('attackPower ' + attackPower + ' / blockPower ' + blockPower).red)
 				if (attackPower > blockPower) {
 					if (attackPower - blockPower >= 5) {
 
@@ -783,6 +782,7 @@ var Actions = {
 		return result;
 	},
 	'retrunTeamToVillage'  : function (args, o) {
+		console.log('retrunTeamToVillage')
 		if (args.team == 'all') {
 			var pXs = ['pA','pB'];
 			var zones = ['attack','block'];
