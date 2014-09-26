@@ -244,20 +244,54 @@ var Can = {
              )
         }
     },
-    playJutsu : function(o) {
+    playJutsu : function(args, o) {
         if ( o.S.phase == 'jutsu' 
-             && arraySearch(o.S[o.pX].hand, o.card) !== null
-             && o.Known[o.Accordance[o.card]].type == 'J' 
-             && o.Known[o.Accordance[o.card]].owner == o.pX) {
+             && arraySearch(o.S[args.pX].hand, args.card) !== null
+             && o.Known[o.Accordance[args.card]].type == 'J' 
+             && o.Known[o.Accordance[args.card]].owner == args.pX
+             && Can.areAvailableTargets(args, o).length) {
             return true;
         }
         else {
             console.log(o.S.phase == 'jutsu' 
-             , arraySearch(o.S[o.pX].hand, o.card) !== null
-             , o.Known[o.Accordance[o.card]].type == 'J' 
-             , o.Known[o.Accordance[o.card]].owner == o.pX
+             , arraySearch(o.S[args.pX].hand, args.card) !== null
+             , o.Known[o.Accordance[args.card]].type == 'J' 
+             , o.Known[o.Accordance[args.card]].owner == args.pX
+             , Can.areAvailableTargets(args, o)
              )
         }
+    },
+    'areAvailableTargets' : function(args, o) { 
+
+        var jutsu = o.Known[o.Accordance[args.card]];
+        var target = jutsu.target[args.targetKey];
+
+        var player = target.player == 'you' ? args.pX : (arfs.pX == 'pA' ? 'pB' : 'pa');
+        if (target.zone == 'battle') {
+            var role = player == o.S.activePlayer ? 'attack' : 'block';
+        }
+        else {
+            role = target.zone;
+        }
+
+        var result = [];
+        for (var i in o.S[player][role].team) {
+            for (var c in o.S[player][role].team[i]) {
+                var ninja = o.S[player][role].team[i][c];
+                if ( target.func(C[ninja]), o) {
+                    result.push(ninja);
+                }
+            }
+        }
+        return result;
+    },
+    'areAvailableUsers' : function(args, o) {
+        var result = [];
+        return result;
+    },
+    'enoughChakra' : function(args, o) {
+        var result = [];
+        return result;
     },
     removeFromTeam : function(o){
         if ( o.S.phase == 'organisation'
