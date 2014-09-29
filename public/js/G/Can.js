@@ -19,12 +19,12 @@ var Can = {
             return true;
         }
     },
-    charge : function(o) {
+    charge : function(args, o) {
         if ( o.S.phase == 'mission' 
-             && o.S.activePlayer == o.pX  
-             && arraySearch(o.S[o.pX].hand, o.card) !== null
-             && o.Known[o.Accordance[o.card]]
-             && o.Known[o.Accordance[o.card]].owner == o.pX) 
+             && o.S.activePlayer == args.pX  
+             && arraySearch(o.S[args.pX].hand, args.card) !== null
+             && o.Known[o.Accordance[args.card]]
+             && o.Known[o.Accordance[args.card]].owner == args.pX) 
         {
             return true;
         } 
@@ -222,25 +222,25 @@ var Can = {
             }
         }
 	},
-    putInPlay : function(o) {
+    putInPlay : function(args, o) {
         if ( o.S.phase == 'mission' 
-             && o.S.activePlayer == o.pX  
+             && o.S.activePlayer == args.pX  
              && o.S.counters.playedNinjaActivePlayer == 0
-             && arraySearch(o.S[o.pX].hand, o.card) !== null
-             && o.Known[o.Accordance[o.card]].type == 'N' 
-             && o.Known[o.Accordance[o.card]].owner == o.pX 
+             && arraySearch(o.S[args.pX].hand, args.card) !== null
+             && o.Known[o.Accordance[args.card]].type == 'N' 
+             && o.Known[o.Accordance[args.card]].owner == args.pX 
              && o.S.counters.playedNinjaActivePlayer == 0  
-             && o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec) {
+             && o.S[args.pX].turnCounter >=  o.Known[args.Accordance[o.card]].ec) {
             return true;
         }
         else {
             console.log(  
              o.S.phase == 'mission' 
-             , arraySearch(o.S[o.pX].hand, o.card) !== null
-             , o.Known[o.Accordance[o.card]].type == 'N' 
-             , o.Known[o.Accordance[o.card]].owner == o.pX 
+             , arraySearch(o.S[args.pX].hand, args.card) !== null
+             , o.Known[o.Accordance[args.card]].type == 'N' 
+             , o.Known[o.Accordance[args.card]].owner == args.pX 
              ,  o.S.counters.playedNinjaActivePlayer == 0  
-             , o.S[o.pX].turnCounter >=  o.Known[o.Accordance[o.card]].ec
+             , o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec
              )
         }
     },
@@ -248,8 +248,17 @@ var Can = {
         if ( o.S.phase == 'jutsu' 
              && arraySearch(o.S[args.pX].hand, args.card) !== null
              && o.Known[o.Accordance[args.card]].type == 'J' 
-             && o.Known[o.Accordance[args.card]].owner == args.pX
-             && Can.areAvailableTargets(args, o).length) {
+             && o.Known[o.Accordance[args.card]].owner == args.pX) 
+        {
+        	for (var i in o.Known[o.Accordance[args.card]].target) {
+        		args.targetKey = i;
+        		if (!Can.areAvailableTargets(args, o).length) {
+        			allTarget = false;
+        			break;
+        		}
+        	}
+        	if (!Can.areAvailableUsers(args, o).length) return false; 
+        	delete args.targetKey;
             return true;
         }
         else {
@@ -257,16 +266,15 @@ var Can = {
              , arraySearch(o.S[args.pX].hand, args.card) !== null
              , o.Known[o.Accordance[args.card]].type == 'J' 
              , o.Known[o.Accordance[args.card]].owner == args.pX
-             , Can.areAvailableTargets(args, o)
              )
         }
     },
     'areAvailableTargets' : function(args, o) { 
 
         var jutsu = o.Known[o.Accordance[args.card]];
-        var target = jutsu.target[args.targetKey];
+        var target = args.targetKey ? jutsu.target[args.targetKey] : jutsu.target[0];
 
-        var player = target.player == 'you' ? args.pX : (arfs.pX == 'pA' ? 'pB' : 'pa');
+        var player = target.player == 'you' ? args.pX : (args.pX == 'pA' ? 'pB' : 'pa');
         if (target.zone == 'battle') {
             var role = player == o.S.activePlayer ? 'attack' : 'block';
         }
@@ -278,7 +286,7 @@ var Can = {
         for (var i in o.S[player][role].team) {
             for (var c in o.S[player][role].team[i]) {
                 var ninja = o.S[player][role].team[i][c];
-                if ( target.func(C[ninja]), o) {
+                if ( target.func(o.Known[o.Accordance[ninja]], o)) {
                     result.push(ninja);
                 }
             }
@@ -287,10 +295,25 @@ var Can = {
     },
     'areAvailableUsers' : function(args, o) {
         var result = [];
+
+		var role = args.pX == o.S.activePlayer ? 'attack' : 'block';
+		for (var i in o.S[args.pX][role].team) {
+			for (var c in o.S[args.pX][role].team[i]) {
+				var ninja = o.S[args.pX][role].team[i][c];
+				if ( o.Known[o.Accordance[args.card]].requirement(o.Known[o.Accordance[ninja]], o)) {
+					result.push(ninja);
+				}
+			}
+		}
+
         return result;
     },
     'enoughChakra' : function(args, o) {
-        var result = [];
+        var result = false;
+       	var costs = o.Known[o.Accordance[args.card]].cost;
+       	for (var cost in costs) {
+       		
+       	}
         return result;
     },
     removeFromTeam : function(o){
