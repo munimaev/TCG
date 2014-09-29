@@ -512,15 +512,10 @@ var AN = {
 			var condidateCount = [];
 
 			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите исполльзующнго для техники.' );
-			var role = args.pX == o.S.activePlayer ? 'attack' : 'block';
-			for (var i in o.S[args.pX][role].team) {
-				for (var c in o.S[args.pX][role].team[i]) {
-					var ninja = o.S[args.pX][role].team[i][c];
-					if ( Known[Accordance[args.card]].requirement(C[ninja]), o) {
-						condidateCount.push(ninja);
-						C[ninja].setZIndex(1202);
-					}
-				}
+			
+			condidateCount = Can.areAvailableTargets(args, o);
+			for (var i in condidateCount) {
+				C[condidateCount[i]].setZIndex(1202);
 			}
 
 			Context.workingUnit = 'card';
@@ -733,6 +728,7 @@ var AN = {
 		},
 		'addJutsuToStack' : function(args) {
 			Actions.addJutsuToStack(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,760)
 		},
 		'prepareStartStack' : function(args) {
 			Actions.prepareStartStack(args, getUniversalObject());
