@@ -469,6 +469,7 @@ var CardBase = {
         "number": "j001",
         "elements": "EF",
         "name": "Кунай",
+        "cost" : [['2']],
         "effectText" : "",
         "requirement" : function(card,o) {
             return true;
@@ -508,6 +509,7 @@ var CardBase = {
         "number": "j001",
         "elements": "EF",
         "name": "Кунай",
+        "cost" : [['W1']],
         "effectText" : "",
         "requirement" : function(card,o) {
             return true;
@@ -931,3 +933,7 @@ var CardBase = {
 if (module) {
     module.exports = CardBase;
 }
+
+
+
+
