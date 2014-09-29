@@ -63,8 +63,9 @@ function updAllCount() {
 }
 
 socket.on('bothIsJoin', function(d) {
-	Accordance = d.Accordance;
-	Known = d.Known;
+	// Accordance = d.Accordance;
+	// Known = d.Known;
+	applyUpd({upd:{Known : d.Known, Accordance : d.Accordance}})
 	console.log('bothIsJoin',d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
@@ -88,11 +89,12 @@ function get_arg(txt) {
 
 
 function applyUpd(d) {
-			console.log("d.upd.meta",d)
+	console.log("d.upd.meta",d)
 	if (d.upd) {
 		//console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
-			Known[i] = d.upd.Known[i];
+			//Known[i] = d.upd.Known[i];
+			console.log(i);
 			Known[i] = CardBase[i];
 		}
 		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
@@ -161,6 +163,7 @@ function applyStackBeafor() {
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
+	console.log('COUNT' , AN.preStack.count)
 	AN.preStack.countDown();
 }
 
