@@ -1521,7 +1521,7 @@ function Card( o ) {
             pX:you,
             card: this.id,
         }
-        if (Can.putInPlay(obj)) {
+        if (Can.putInPlay(obj, getUniversalObject())) {
              $c.append( $( '<div />', {
                 class: 'actionIcon n1 putInPlay',
                 'click': (function() {
@@ -1541,7 +1541,7 @@ function Card( o ) {
                 })()
             }))
         }
-        if (Can.charge(obj)) {
+        if (Can.charge(obj, getUniversalObject())) {
             $c.append( $( '<div />', {
                 class: 'actionIcon n2 charge',
                 'click': (function() {
