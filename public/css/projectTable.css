@@ -306,10 +306,9 @@ img {
     -webkit-box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.5);
     box-shadow: 1px 1px 10px 0 rgba(0,0,0,0.5);
 
+    padding: 1px;
 }
 .scroll {
-    position: absolute;
-    width: 100%;
     height: auto;
     border: 1px solid #b0a883;
     -webkit-border-radius: 5px;
@@ -322,11 +321,11 @@ img {
     color: #FFF;
     text-shadow: 1px 1px 0 #000,  1px -1px 0 #000,  -1px 1px 0 #000,  -1px -1px 0 #000;
     margin: 0;
-    height: 10%;
+    display: block;
+    padding: 0px;
+    margin: 0px;
 }
 .scrollCards {
-    height: 90%;
-    width: 100%;
     overflow-y: auto;
     border: 1px solid rgba(255,255,255,0.5);
     padding: 9px;
@@ -335,4 +334,31 @@ img {
     border-radius: 5px;
     -webkit-box-shadow:inset 0 0 10px 0 rgba(0,0,0,1),  0 0 10px 3 rgba(255,255,255,0.5);
     box-shadow:inset 0 0 10px 0 rgba(0,0,0,1),  0 0 10px 0 rgba(255,255,255,0.5);
+}
+.jutsuCost {
+    border: 1px solid #FFF;
+    float: left;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    margin-left: 9px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 75%;
+  
+
+}
+.jutsuCost.payd {
+    background-color: #FFF;
+}
+.jutsuCost.current {
+    background-color: rgba(255,255,255,0.5);
+}
+.jutsuCost:first-child {
+    margin-left: 0px;
+}
+.jutsuCost1 {
+    background-image: url('/public/pics/void.png');
+}
+.jutsuCostW {
+    background-image: url('/public/pics/wind.png');
 }
