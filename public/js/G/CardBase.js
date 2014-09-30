@@ -469,7 +469,8 @@ var CardBase = {
         "number": "j001",
         "elements": "EF",
         "name": "Кунай",
-        "cost" : [['2']],
+        "cost" : [['1','1']],
+        "costText" : [['2']],
         "effectText" : "",
         "requirement" : function(card,o) {
             return true;
@@ -509,7 +510,8 @@ var CardBase = {
         "number": "j001",
         "elements": "EF",
         "name": "Кунай",
-        "cost" : [['W1']],
+        "cost" : [['W','W', '1']],
+        "costText" : [['WW1']],
         "effectText" : "",
         "requirement" : function(card,o) {
             return true;
