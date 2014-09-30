@@ -227,6 +227,7 @@ var Can = {
              && o.S.activePlayer == args.pX  
              && o.S.counters.playedNinjaActivePlayer == 0
              && arraySearch(o.S[args.pX].hand, args.card) !== null
+             && o.Known[o.Accordance[args.card]]
              && o.Known[o.Accordance[args.card]].type == 'N' 
              && o.Known[o.Accordance[args.card]].owner == args.pX 
              && o.S.counters.playedNinjaActivePlayer == 0  
@@ -237,18 +238,18 @@ var Can = {
             console.log(  
              o.S.phase == 'mission' 
              , arraySearch(o.S[args.pX].hand, args.card) !== null
-             , o.Known[o.Accordance[args.card]].type == 'N' 
-             , o.Known[o.Accordance[args.card]].owner == args.pX 
-             ,  o.S.counters.playedNinjaActivePlayer == 0  
-             , o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec
+             , o.Known[o.Accordance[args.card]]
+             ,  o.S.counters.playedNinjaActivePlayer == 0 
              )
         }
     },
     playJutsu : function(args, o) {
         if ( o.S.phase == 'jutsu' 
              && arraySearch(o.S[args.pX].hand, args.card) !== null
+             && o.Known[o.Accordance[args.card]] 
              && o.Known[o.Accordance[args.card]].type == 'J' 
-             && o.Known[o.Accordance[args.card]].owner == args.pX) 
+             && o.Known[o.Accordance[args.card]].owner == args.pX
+             && Can.enoughChakra(args, o)) 
         {
         	for (var i in o.Known[o.Accordance[args.card]].target) {
         		args.targetKey = i;
@@ -264,8 +265,7 @@ var Can = {
         else {
             console.log(o.S.phase == 'jutsu' 
              , arraySearch(o.S[args.pX].hand, args.card) !== null
-             , o.Known[o.Accordance[args.card]].type == 'J' 
-             , o.Known[o.Accordance[args.card]].owner == args.pX
+             , o.Known[o.Accordance[args.card]]
              )
         }
     },
@@ -309,10 +309,48 @@ var Can = {
         return result;
     },
     'enoughChakra' : function(args, o) {
-        var result = false;
+        var result = true;
        	var costs = o.Known[o.Accordance[args.card]].cost;
-       	for (var cost in costs) {
-       		
+
+       	var chackraDefault = []
+       	for (var i in o.S[args.pX].chackra) {
+       		var card = o.S[args.pX].chackra[i];
+       		chackraDefault.push((o.Known[o.Accordance[card]].elements).split())
+       	}
+       	for (var c in costs) {
+
+       		var chackra = [];
+       		for (var i in chackraDefault) chackra.push(chackraDefault[i]);
+
+       		var cost = [];
+       		for (var i in costs[c]) cost.push(costs[c][i]);
+
+       		console.log(cost, chackraDefault);
+
+       		nextElementInCost:
+       		for (var i in cost) { // перебираем элементы в цене
+       			var itIs = false;
+       			nextCardInChackra:
+       			for (var j = chackraDefault.length - 1; j >= 0; j--) { // перебираем карты в чакре
+       				console.log(cost[i] , chackraDefault[j])
+       				if (cost[i] == '1') {
+       					itIs = true;
+       					chackraDefault.splice(j,0)
+       					continue nextElementInCost;
+       				}
+       				for (var k in chackraDefault[j]) { // перебираем элементы в картые чакры
+       					if (chackraDefault[j][k] == cost[i]) {
+	       					itIs = true;
+       						chackraDefault.splice(j,0)
+	       					continue nextElementInCost;
+       					}
+       				}
+       			}
+       			if (!itIs) {
+       				result = false;
+       			}
+       		}
+
        	}
         return result;
     },
