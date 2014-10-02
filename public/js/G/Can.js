@@ -117,20 +117,20 @@ var Can = {
      * @param  {[type]} o.c2.card - вторая выбранная
      * @param  {[type]} o.pX
      */
-    orgAddToTeam : function(o){
+    orgAddToTeam : function(args, o){
         console.log(  o.S.phase == 'organisation'
-             , o.Known[o.Accordance[o.c1.card]].type == 'N' 
-             , o.Known[o.Accordance[o.c2.card]].type == 'N' 
-             , o.Known[o.Accordance[o.c1.card]].owner == o.pX 
-             , o.Known[o.Accordance[o.c2.card]].owner == o.pX )
+             , o.Known[o.Accordance[args.c1.card]].type == 'N' 
+             , o.Known[o.Accordance[args.c2.card]].type == 'N' 
+             , o.Known[o.Accordance[args.c1.card]].owner == args.pX 
+             , o.Known[o.Accordance[args.c2.card]].owner == args.pX )
         if ( o.S.phase == 'organisation'
-             && o.Known[o.Accordance[o.c1.card]].type == 'N' 
-             && o.Known[o.Accordance[o.c2.card]].type == 'N' 
-             && o.Known[o.Accordance[o.c1.card]].owner == o.pX 
-             && o.Known[o.Accordance[o.c2.card]].owner == o.pX 
+             && o.Known[o.Accordance[args.c1.card]].type == 'N' 
+             && o.Known[o.Accordance[args.c2.card]].type == 'N' 
+             && o.Known[o.Accordance[args.c1.card]].owner == args.pX 
+             && o.Known[o.Accordance[args.c2.card]].owner == args.pX 
         ){
-            for (var i in o.S[o.pX].village.team) {
-                if (arraySearch(o.S[o.pX].village.team[i], o.c2.card) !== null) {
+            for (var i in o.S[args.pX].village.team) {
+                if (arraySearch(o.S[args.pX].village.team[i], args.c2.card) !== null) {
                     return true;
                 }
             }
@@ -174,20 +174,20 @@ var Can = {
      * @param  {[type]} o.card
      * @param  {[type]} o.pX
      */
-    orgChangeInTeam : function(o){
+    orgChangeInTeam : function(args, o){
         if ( o.S.phase == 'organisation'
-             && o.Known[o.Accordance[o.c1.card]].type == 'N' 
-             && o.Known[o.Accordance[o.c2.card]].type == 'N' 
-             && o.Known[o.Accordance[o.c1.card]].owner == o.pX 
-             && o.Known[o.Accordance[o.c2.card]].owner == o.pX 
+             && o.Known[o.Accordance[args.c1.card]].type == 'N' 
+             && o.Known[o.Accordance[args.c2.card]].type == 'N' 
+             && o.Known[o.Accordance[args.c1.card]].owner == args.pX 
+             && o.Known[o.Accordance[args.c2.card]].owner == args.pX 
         ){
             return true;
         }
         console.log(o.S.phase == 'organisation'
-             , o.Known[o.Accordance[o.c1.card]].type == 'N' 
-             , o.Known[o.Accordance[o.c2.card]].type == 'N' 
-             , o.Known[o.Accordance[o.c1.card]].owner == o.pX 
-             , o.Known[o.Accordance[o.c2.card]].owner == o.pX)
+             , o.Known[o.Accordance[args.c1.card]].type == 'N' 
+             , o.Known[o.Accordance[args.c2.card]].type == 'N' 
+             , o.Known[o.Accordance[args.c1.card]].owner == args.pX 
+             , o.Known[o.Accordance[args.c2.card]].owner == args.pX)
         return false;
     },
 	pressNextBtn : function(o) {
@@ -231,7 +231,7 @@ var Can = {
              && o.Known[o.Accordance[args.card]].type == 'N' 
              && o.Known[o.Accordance[args.card]].owner == args.pX 
              && o.S.counters.playedNinjaActivePlayer == 0  
-             && o.S[args.pX].turnCounter >=  o.Known[args.Accordance[o.card]].ec) {
+             && o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec) {
             return true;
         }
         else {
