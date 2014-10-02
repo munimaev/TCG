@@ -233,6 +233,11 @@ function areaClick(o){
         return false;
     };
     if (G[o.owner][o.area].isOpen) {
+        var pX = o.owner == 'you' ? you : opp; 
+        for (var i in S[pX][o.area]) {
+            C[S[pX][o.area][i]].$mouse.mouseout();
+            C[S[pX][o.area][i]].hidePrewiev();
+        }
         emptyScroll(o);
         $('#' + o.owner + '_' + o.area + '_' + o.clicker).remove();
         $('.'+o.area,'#'+o.owner+'Bar').removeClass('selectedZone');
