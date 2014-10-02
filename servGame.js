@@ -8,7 +8,7 @@ var preGamesLobbi = {
 var StartedGames = {
 };
 var Testing = false;
-var Load = true;
+var Load = false;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
@@ -359,7 +359,7 @@ function getStartSnapshot(table) {
 	    },
 	    pA : {
 	    	isDrawCardAtStartTurn : false,
-	    	isNewGame : false,
+	    	isNewGame : true,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -388,7 +388,7 @@ function getStartSnapshot(table) {
 	    },
 	    pB : {
 	    	isDrawCardAtStartTurn : false,
-	    	isNewGame : false,
+	    	isNewGame : true,
 	    	rewards : 0,
 	    	turnCounter : 0,
 	        hand: [],
@@ -399,7 +399,6 @@ function getStartSnapshot(table) {
             client : [],
 	        village : {
 	            team : {
-	            	 4:['c001'],
 	        	}
 	        },
 	        attack : {
@@ -694,13 +693,10 @@ function addToTeam(d) {
 	var table = StartedGames[d.u.table];
 		//console.log(d.arg)
 	if (Can.orgAddToTeam({
-			Accordance : table.Accordance ,
 			c1 : {card:d.arg.c1.card} ,
 			c2 : {card:d.arg.c1.card} ,
-			Known : table.Known ,
-			pX : d.arg.pX,
-			S : table.Snapshot,
-        })) 
+			pX : d.arg.pX
+        },getUniversalObject(d.u.table))) 
 	{
 		d.arg.S = table.Snapshot;
 		Actions['addToTeam'](d.arg, getUniversalObject(d.u.table));
@@ -717,13 +713,10 @@ function addToTeam(d) {
 function changeInTeam(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.orgChangeInTeam({
-			Accordance : table.Accordance ,
 			c1 : {card:d.arg.c1.card} ,
 			c2 : {card:d.arg.c1.card} ,
-			Known : table.Known ,
 			pX : d.arg.pX,
-			S : table.Snapshot,
-        })) 
+        },getUniversalObject(d.u.table))) 
 	{
 		d.arg.S = table.Snapshot;
 		Actions['organisation'](d.arg, getUniversalObject(d.u.table));
@@ -741,13 +734,10 @@ function putInPlay(d) {
 	var table = StartedGames[d.u.table];
 	//console.log(d.u);
 	if (Can.putInPlay({
-            Accordance : table.Accordance,
             card: d.arg.card,
-            Known: table.Known,
             owner:d.arg.owner,
             pX:d.u.you,
-            S:table.Snapshot,
-        })) {
+        }, getUniversalObject(d.u.table))) {
 		var args = {
 			card : d.arg.card,
 			cardInArray : null,
