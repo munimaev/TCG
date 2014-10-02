@@ -399,17 +399,15 @@ var AN = {
 	showCostBar : function(args, o) {
 
 		var elementSize = Math.round(I.card.W / 3)
-		var barWrap = $('<div />', {'class' : 'scrollWrap'} )
-		// barWrap.css('height',elementSize + 52);
-		// barWrap.css('width',elementSize + 52);
+
+		var barWrap = $('<div />', {'class' : 'scrollWrap', 'id':'costBar'} )
 
 		var bar = $('<div />', {'class' : 'scroll'} )
-		// bar.css('height',elementSize + 30);
-
 
 		var barCheck = $('<div />', {'class' : 'scrollCards'} )
-		// barCheck.css('height',elementSize);
-		var barConteiner = $('<div />');
+
+		var barConteiner = $('<div />',{'id':'costBarConteiner'});
+
 		barConteiner.css('height', elementSize + 2)
 		var jutsu = o.Known[o.Accordance[args.card]];
 		
@@ -418,30 +416,47 @@ var AN = {
 		for (var i in jutsu.cost) {
 			Meta.playingJutsu.push([])
 			for (var j in jutsu.cost[i]) {
-
 				Meta.playingJutsu[i].push({element:jutsu.cost[i][j], card: null})
-
-				if (barConteiner.width()) {
-					barConteiner.css('width', barConteiner.width() + 9)
-				}
-				barConteiner.append($('<div />', {
-					'class' : 'jutsuCost ' + 'jutsuCost'+ jutsu.cost[i][j]
-				})
-					.css('width', elementSize)
-					.css('height', elementSize)
-				)
-				barConteiner.css('width', barConteiner.width() + (elementSize + 2))
-
-				AnimationPush({func:function() {
-					AN.Questions.payChackra((function(args){return args})(args), getUniversalObject());
-				}, time:1200, name: 'Questions - payChackra'  });
-
 			}
 		}
 		barCheck.append(barConteiner)
 		bar.append(barCheck);
 		barWrap.append(bar);
         H.animate.append(barWrap);
+
+
+		AN.updCostBar(Meta.playingJutsu )
+
+	},
+	updCostBar : function(playingJutsu) {
+
+
+		var elementSize = Math.round(I.card.W / 3)
+
+		var barConteiner = $('#costBarConteiner')
+		barConteiner.empty();
+		barConteiner.width(0)
+
+		for (var i in playingJutsu) {
+			for (var j in playingJutsu[i]) {
+
+				if (barConteiner.width()) {
+					barConteiner.css('width', barConteiner.width() + 9)
+				}
+
+				var classCircle = 'jutsuCost ' + 'jutsuCost'+ playingJutsu[i][j].element;
+				if (playingJutsu[i][j].card != null) {
+					classCircle += ' payd';
+				}
+				barConteiner.append($('<div />', {
+					'class' : classCircle
+				})
+					.css('width', elementSize)
+					.css('height', elementSize)
+				)
+				barConteiner.css('width', barConteiner.width() + (elementSize + 2))
+			}
+		}
 
 	},
 	Questions : {
@@ -568,10 +583,23 @@ var AN = {
 
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
-				if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
-				Answers.selectUserAndTargetForJutsu.push({
-					card: args.card, user : [card.id], pX:you, cause:'playJutsu',from:'hand', to:'stack'
-				})
+				var itis = false;
+				for (var i in Answers.selectUserAndTargetForJutsu) {
+					if (Answers.selectUserAndTargetForJutsu[i].card == args.card) {
+						if (!('target' in Answers.selectUserAndTargetForJutsu[i])) {
+							Answers.selectUserAndTargetForJutsu[i].user = []
+						}
+						Answers.selectUserAndTargetForJutsu[i].user.push(card.id);
+						itis = true;
+						break;
+					}
+				}
+				if (!itis) {
+					if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
+					Answers.selectUserAndTargetForJutsu.push({
+						card: args.card, user : [card.id], pX:you, cause:'playJutsu',from:'hand', to:'stack'
+					})
+				}
 				AN.hideNoir({ condidateCount:condidateCount });
 			}
 		},
@@ -640,58 +668,74 @@ var AN = {
 			btnArea('chackra','you');
 			AN.showCostBar(args, o);
 
-
+			AnimationPush({func:function() {
+				AN.Questions.payChackra((function(args){return args})(args), getUniversalObject());
+			}, time:1200, name: 'Questions - payChackra'  });
 		},
 		'payChackra' : function(args, o) {
 			AN.stop = true;
 			var condidateCount = [];
-			// $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите плату для '+args.element+' техники.' );
-
-			// toNextCardInChacra:
-			// for (var i in o.S[args.pX].chackra) {
-			// 	var chackraCard = o.S[args.pX].chackra[i];
-			// 	var chackra = o.Known[o.Accordance[chackraCard]].elements.split()
-			// 	console.log(chackra)
-			// 	for (var j in chackra) {
-			// 		console.log(chackra[j] , args.element)
-			// 		if (chackra[j] == args.element
-			// 			|| args.element == '1' ) {
-			// 			condidateCount.push(chackraCard);
-			// 			C[condidateCount[i]].hover(true);
-			// 			continue toNextCardInChacra;
-			// 		}
-			// 	}
-			// }
 
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
 
 				var chackra = o.Known[o.Accordance[card.id]].elements.split()
 
-
-			 	toNextelementInCost:
+				toNextElementInCost:
 				for (var i in Meta.playingJutsu) {
-					console.log('- ', Meta.playingJutsu[i])
+					var isPaid = false;
 					for (var j in Meta.playingJutsu[i]) {
-						console.log('- - ', Meta.playingJutsu[i][j])
 						if (Meta.playingJutsu[i][j].card == card.id) {
 							Meta.playingJutsu[i][j].card = null;
-							
-
+							card.select(false);
+							isPaid  = true;
 						}
-						for (var k in chackra) {
-						console.log('- - - ', chackra[k])
-							if ( Meta.playingJutsu[i][j].element == chackra[k]
-								|| Meta.playingJutsu[i][j].element == '1' ) {
-								Meta.playingJutsu[i][j].card = card.id;
-								break toNextelementInCost;
+					}
+					if (!isPaid) {
+						for (var j in Meta.playingJutsu[i]) {
+							for (var k in chackra) {
+								if (Meta.playingJutsu[i][j].card == null
+									&& (Meta.playingJutsu[i][j].element == chackra[k]
+										|| Meta.playingJutsu[i][j].element == '1' )) 
+								{
+									card.select(true);
+									isPaid  = true;
+									Meta.playingJutsu[i][j].card = card.id;
+									continue toNextElementInCost;
+								}
 							}
 						}
 					}
 				}
-				AN.hideNoir({ condidateCount:condidateCount });
-			}
+				AN.updCostBar(Meta.playingJutsu)
 
+				var allIsPaid = true;
+				var paidForJutsu = [];
+				for (var i in Meta.playingJutsu) {
+					for (var j in Meta.playingJutsu[i]) {
+						if (Meta.playingJutsu[i][j].card == null){
+							allIsPaid = false;
+						} else {
+							paidForJutsu.push(Meta.playingJutsu[i][j].card)
+						}
+					}
+				}
+
+				if (allIsPaid) {
+					$('#costBar').remove();
+					Meta.playingJutsu = [];
+					btnArea('chackra','you');
+					if (!('selectUserAndTargetForJutsu' in Answers)) Answers.selectUserAndTargetForJutsu = [];
+					Answers.selectUserAndTargetForJutsu.push({
+						card: args.card, chackra: paidForJutsu,  pX:you, cause:'playJutsu',from:'hand', to:'stack'
+					})
+					
+					AN.stop = false;
+					AnimationNext();
+				}
+
+
+			}
 		}
 	},
 	preStack : {
@@ -803,9 +847,9 @@ var AN = {
 		},
 		'playJutsu' : function(args) {
 			if (args.pX == you) {
-				// AnimationPush({func:function() {
-				// 	AN.Questions.selectChackra(args, getUniversalObject());
-				// }, time:1000, name: 'Questions - selectChackra'});
+				AnimationPush({func:function() {
+					AN.Questions.selectChackra(args, getUniversalObject());
+				}, time:1000, name: 'Questions - selectChackra'});
 				AnimationPush({func:function() {
 					AN.Questions.selectUserForJutsu(args, getUniversalObject());
 				}, time:1000, name: 'Questions - selectUserForJutsu'});
