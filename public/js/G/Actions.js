@@ -125,7 +125,7 @@ var Actions = {
 	 * @return {[type]}	  [description]
 	 */
 	'moveCardToZone' : function (args, o) {
-		// console.log('moveCardToZone'.red)
+		 console.log('moveCardToZone'.red)
 		// console.log(args, isZoneSimple(args.from),args.from)
 		var result = {
 			updTable : [],
@@ -135,7 +135,7 @@ var Actions = {
 			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
 		}
 
-		//console.log(isZoneSimple(args.from))
+		console.log(isZoneSimple(args.from))
 		if ( !isZoneSimple(args.from)) {
 
 			result.updTable[0] = {};
@@ -172,14 +172,14 @@ var Actions = {
 			}
 		} 
 		else if ( isZoneSimple(args.from) ) {	
-			// console.log(args.pX,args.from,args.card)
+			console.log(args.pX,args.from,args.card)
 			if  (args.from == 'stack') {
 				var ind = true;
 				result.updTable[0] = {};
 			} else {
 				var ind = arraySearch(o.S[args.pX][args.from], args.card);
 			}
-			// console.log('IND', ind)
+			 console.log('IND', ind)
 			if (ind !== null) {
 				if (args.from == 'stack') {
 					for (var i in o.S.stack) {
@@ -1001,7 +1001,18 @@ var Actions = {
 	},
 	'addJutsuToStack' : function(args, o) {
 		args.team = null;
-		Actions.moveCardToZone(args, o)
+		Actions.moveCardToZone(args, o);
+		for (var i in args.chackra) {
+			var args2  = {
+				pX : args.pX,
+				card : args.chackra[i],
+				cause : 'justsuCost',
+				from : 'chackra',
+				to : 'discard',
+				team : null,
+			}
+			Actions.moveCardToZone(args2, o);
+		}
 		if (!module) {
 			G.transferInitiative = true;
 		}
