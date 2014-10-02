@@ -1556,7 +1556,7 @@ function Card( o ) {
                 obj.c2 = this.getMainParams();
                 obj.c1 = G.selectedCard.getMainParams();
                 console.log(this.id, G.selectedCard.id)
-                if (Can.orgAddToTeam(obj)) {
+                if (Can.orgAddToTeam(obj, getUniversalObject())) {
                     $c.append(
                         $( '<div />', {
                             class: 'actionIcon n1 addToTeam',
@@ -1568,7 +1568,7 @@ function Card( o ) {
                             })()
                         } ) )
                 }
-                if (Can.orgChangeInTeam(obj)) {
+                if (Can.orgChangeInTeam(obj, getUniversalObject())) {
                     $c.append( 
                         $( '<div />', {
                             class: 'actionIcon n2 changeInTeam',
