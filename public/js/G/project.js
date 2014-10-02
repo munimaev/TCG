@@ -1429,7 +1429,15 @@ function updPosition(position,sqr) {
                 Y : I.H / 2 - sqr * 4,
                 W : 8 * sqr,
                 additional : {
-                    outCard: true
+                    outCard: true,
+                    after :{ 
+                        func : (function() {
+                                    var card = S.stack[i].card;
+                                    return function(){
+                                        C[card].setZIndex(200);
+                                    }
+                                })()
+                    }
                 }
             });
         }
