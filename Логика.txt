@@ -48,3 +48,129 @@
 	Все ниндзя отправляются на кладбище
 	Для всех комнда без лидера выбираеться лидер
 	Для всех ушедших карт срабатывает тригер смери, для все оставшихся карт, крат на руке, в сброе и чакре срабатывает тригер чужой смерти.
+
+В резулттате подсчета нужен объект вида
+	[
+		{
+			'adWinnerAndLooser' : [
+				{pX:pA, zone:attack, team:1, ad:'completeWin'},
+				{pX:pB, zone:block,  team:2, ad:'defeat'},
+				{pX:pA, zone:attack, team:3, ad:'rewards'},
+			],
+		},
+		{
+			'afterWinnerAndLooser' : [],
+		},
+		{
+			'givingDamage' : [
+				{card: c104, damage: 1, type: fire},
+				{card: c103, damage: 2, type: fire},
+				{card: c102, damage: 2, type: fire},
+			]
+		},
+		{
+			'afterGivingDamage' : [],
+		},
+		{
+			'damageResult' : [
+				{card: c105, result: death},
+				{card: c103, result: injured},
+			]
+		},
+		{
+			'newLeader' : [
+				{team: 5},
+			]
+		},
+		{
+			'afterGivingDamage' : [],
+		},
+		step4 : {
+			'retrunToVillage' : all // ну или подоробно для каждого если есть иключения
+		}
+	]
+=======================
+
+
+         Server    CLient
+         ----------------
+                <- initGame      Страница полностью загружена.
+
+         C_init ->               Подготавливает связи сервер-клиент для стола. Отсылает S.
+
+                <- imJoined		 Подготовка полносью завешена
+
+     bothIsJoin ->               Собираеться Known и Accrodance для каждого игрока и отсылаеться
+     
+                <- startDrawHand
+S_startDrawHand -> 
+
+
+
+
+
+                                     <- playJutsu
+            Actions.preparePlayJutsu
+                         "playJutst" ->
+                         			    AN.Questions.selectUserForJutsu
+                         			    AN.Questions.selectTargetsForJutsu
+                         			 <- Answers.selectUserAndTargetForJutsu
+      Actions.prepareAddJutsuToStack
+                   "addJutsuToStack" -> 
+                                        Actions.addJutsuToStack
+                                        Actions.moveCardToZone
+
+
+
+
+                                     <- pressNextBtn
+                           LoadStack 
+                 "prepareStartStack" ->
+                                     <- Actions.prepareStartStack
+
+
+
+
+
+
+                                     <- "resolveJutsuInStack"
+              AN.resolveJutsuInStack
+          Action.resolveJutsuInStack
+                AnimationPush(spark)
+              Actions.moveCardToZone
+
+
+Mission
+
+2x BBQ M319 (M589)
+2x Lunchbox M466
+2x Decoding the Message M821
+2x The Nara Clan M859
+2x Student and Sensei M673
+2x After the Battle M777
+
+Jutsu
+2x Formation J517
+2x Expansion Jutsu: Super Slap! J697
+2x  Shikamaru's Judjment J710
+2x Formidable Team J890
+
+-----
+
+Mission
+
+2x  Puppet Show M224
+2x  A master's death M843
+2x Sasori if the Red Sand M375
+2x  A Gift M815
+2x  Los M633
+
+Jutsu
+2x Secret White Move: Chikamatsu's Ten Puppets J504
+2x Substitution by puppet J447
+2x Wind Scythe jutsu J631
+2x WindStyle: Pressure Damage J914
+1x Sand burai J100
+
+
+
