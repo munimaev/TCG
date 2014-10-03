@@ -90,7 +90,8 @@ function Card( o ) {
             card: {
                 bg: { 
                     'N': { r: 176, g: 196, b: 222, a: 0 } ,
-                    'J': { r: 176, g: 196, b: 222, a: 0 } 
+                    'J': { r: 176, g: 196, b: 222, a: 0 } ,
+                    'M': { r: 176, g: 196, b: 222, a: 0 } 
                 }
             }
         }
@@ -166,6 +167,7 @@ function Card( o ) {
         //console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
         if (this.params.type == "N") this.fillAsFaceUpNinja( link )
         if (this.params.type == "J") this.fillAsFaceUpJutsu( link )
+        if (this.params.type == "M") this.fillAsFaceUpMission( link )
     };
 
     this.fillAsFaceUpNinja = function(link) {
@@ -208,6 +210,9 @@ function Card( o ) {
                     .append( $( '<div />', { 'class': 'corner ceb bottom '} )
                         .css('background', this.getBG('corner bottom')) )
                     ) // end append 'romb'
+                .append(
+                    $( '<div />', { 'class': 'icon atribut' } )
+                    )
                 .append(
                     $( '<div />', {
                         'class': 'powerCurrent power ' + (this.params.isHealt  ? '' :'powerInjured'),
@@ -269,9 +274,6 @@ function Card( o ) {
                     .append(
                         $( '<div />', { 'class': 'turncost' + this.params.ec } )
                         )
-                    )
-                .append(
-                    $( '<div />', { 'class': 'icon atribut' } )
                     )
                 )
             .append( $( '<div />', { 'class': 'mouseControle' } ) );
@@ -335,6 +337,74 @@ function Card( o ) {
                     $( '<div />', { 'class': 'icon cardIcon' } )
                     .css( 'left', '-3%' )
                     .css( 'top', '9%' )
+                    .css( 'width', '25%' )
+                    .css( 'height', '25%' )
+                    .append(
+                        $( '<div />', { 'class': 'turncost' + this.params.ec } )
+                        )
+                    )
+                )
+            .append( $( '<div />', { 'class': 'mouseControle' } ) );
+
+    };
+    this.fillAsFaceUpMission = function(link) {
+        link
+            .append( $( '<div />', { 'class': 'cbg' } ) )
+            .append( $( '<div />', { 'class': 'outShell' } )
+                .css( 'width', '92%' )
+                .css( 'height', '92%' )
+                .css( 'top', '4%' )
+                .css( 'left', '4%' )
+                .append(
+                    $( '<div />', {
+                        'class': 'rectangle'
+                    } ) // end create 'limon'
+                    .css('background', this.getBG('side bottom right'))
+                    .append(
+                        $( '<div />', { 'class': 'rectangle_image' } )
+                            .css( 'background-image', 'url(public/pics/' + this.params.img + '.jpg)' )
+                        )
+                    ) // end append 'limon'
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'right', '18%' )
+                    .css( 'top', '0%' )
+                    .css( 'width', '20%' )
+                    .css( 'height', '20%' )
+                    .append(
+                        $( '<div />', { 'class': 'blur' } )
+                        )
+                    .append(
+                        $( '<div />', { 'class': 'fire' } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'right', '0%' )
+                    .css( 'top', '0%' )
+                    .css( 'width', '20%' )
+                    .css( 'height', '20%' )
+                    .append(
+                        $( '<div />', { 'class': 'blur' } )
+                        )
+                    .append(
+                        $( '<div />', { 'class': 'void' } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'left', '18%' )
+                    .css( 'top', '-3%' )
+                    .css( 'width', '25%' )
+                    .css( 'height', '25%' )
+                    .append(
+                        $( '<div />', { 'class': 'handcost' + this.params.hc } )
+                        )
+                    )
+                .append(
+                    $( '<div />', { 'class': 'icon cardIcon' } )
+                    .css( 'left', '-3%' )
+                    .css( 'top', '-3%' )
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
