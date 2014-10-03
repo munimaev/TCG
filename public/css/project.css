@@ -114,6 +114,19 @@
     background-position: 50% 20%;
 
 }
+.rectangle {
+    width: 98%;
+    height: 76%;
+    margin: 23% 1% 1%;
+    border: 1px solid rgba(0,0,0,0.35);
+}
+.rectangle_image {
+    width: 94%;
+    height: 94%;
+    margin: 3%;
+    background-size: 120% auto;
+    background-position: 50% 35%;
+}
 .shadow {
     -webkit-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
     -moz-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
