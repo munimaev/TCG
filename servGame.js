@@ -8,7 +8,7 @@ var preGamesLobbi = {
 var StartedGames = {
 };
 var Testing = false;
-var Load = false;
+var Load = true;
 exports.StartedGames = StartedGames;
 var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
@@ -307,10 +307,10 @@ function bothIsJoin(d) {
 	if (table.socketA && table.socketB && !table.bothIsJoin) {
 		console.log("Otdal kajdomu")
 		table.bothIsJoin = true;
-		table.Accordance = getStartAccordiance(table);
-		table.Known = getStartCards();
 		table.pA = {Accordance:{},Known:{}}; 
 		table.pB = {Accordance:{},Known:{}};
+		table.Accordance = getStartAccordiance(table);
+		table.Known = getStartCards();
 		getStartAccordanceKnown(table,'pA');
 		getStartAccordanceKnown(table,'pB');
 		table.meta = getStartMeta(table);
@@ -411,84 +411,104 @@ function getStartSnapshot(table) {
 	        }
 	    },
 	    statuses : {
-			// c002: {
-			// 	injured: true
-			// },
-			// c006: {
-			// 	injured: true
-			// },
-			// c001: {
-			// 	injured: true
-			// }
 	    }
 	};
-	var pu;
-	for (var i = 1; i <= 23 ; i++) {
-		pu = i < 10 ? "0"+i : i;
-		result.pA.deck.push('c1' + pu )
-		result.pB.deck.push('c0' + pu )
+
+	var deckpA = [
+	];
+	var deckpB = [
+	];
+
+
+
+	var pXs = {'pA':'c0','pB' : 'c1'};
+	for (var pX in pXs) {
+		var count = 1;
+		for (var i in Decks[pX]) {
+			for (var j = 1 ; j <= Decks[pX][i].count ; j++) {
+				var number = pXs[pX] + (count < 10 ? '0' + count : ''+count);
+				result[pX].deck.push(number)
+				count++;
+			}
+		}
 	}
+
 	return result;
 }
 
 var CardBase = require('./public/js/G/CardBase.js');
 
+var  Decks = {
+	pA : [
+	    { "count": 1, "number": "j001" },
+	    { "count": 2, "number": "m466" },
+	    { "count": 2, "number": "m589" },
+	    { "count": 2, "number": "m673" },
+	    { "count": 2, "number": "m777" },
+	    { "count": 2, "number": "m821" },
+	    { "count": 2, "number": "m859" },
+	    { "count": 2, "number": "n1279" },
+	    { "count": 2, "number": "n1366" },
+	    { "count": 2, "number": "n1423" },
+	    { "count": 3, "number": "n1427" },
+	    { "count": 1, "number": "n1429" },
+	    { "count": 1, "number": "n348" },
+	    { "count": 1, "number": "n515" },
+	    { "count": 1, "number": "n516" },
+	    { "count": 1, "number": "n589" },
+	    { "count": 1, "number": "n699" },
+	    { "count": 1, "number": "n700" },
+	    { "count": 1, "number": "n724" },
+	    { "count": 1, "number": "n823" },
+	    { "count": 1, "number": "n844" },
+	    { "count": 2, "number": "nus014" },
+	    { "count": 1, "number": "pr046" },
+	],
+	pB : [
+	    { "count": 2, "number": "j001" },
+	    { "count": 1, "number": "n1086" },
+	    { "count": 2, "number": "n1092" },
+	    { "count": 2, "number": "n1267" },
+	    { "count": 1, "number": "n130" },
+	    { "count": 2, "number": "n1319" },
+	    { "count": 1, "number": "n1321" },
+	    { "count": 1, "number": "n1322" },
+	    { "count": 2, "number": "n1325" },
+	    { "count": 2, "number": "n1418" },
+	    { "count": 1, "number": "n1420" },
+	    { "count": 2, "number": "n1474" },
+	    { "count": 1, "number": "n1481" },
+	    { "count": 1, "number": "n1484" },
+	    { "count": 1, "number": "n180" },
+	    { "count": 1, "number": "n483" },
+	    { "count": 1, "number": "n602" },
+	    { "count": 2, "number": "n847" },
+	    { "count": 2, "number": "nus025" },
+	]
+};
 function getStartCards() {
-	var C = { // as Construcors
-		//Gaara
-	    c001: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
-	    c002: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 2, si: 0, img: 'n1092' , elements: 'W', name : "Kankuro" },
-	    c003: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
-	    c004: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n847' , elements: 'W', name : "Mizuki (Childhood)" },
-	    c005: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 2, sh: 0, ai: 1, si: 0, img: 'n602' , elements: 'W', name : "Matsuri" },
-	    c006: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
-	    c007: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n1474' , elements: 'W', name : "Epidemic Prevention Officer" },
-	    c008: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 3, sh: 3, ai: 2, si: 2, img: 'n1321' , elements: 'W', name : "Crow" },
-	    c009: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
-	    c015: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1319' , elements: 'W', name : "Yaoki" },
-	    c010: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
-	    c011: {owner: 'pB', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus025' , elements: 'W', name : "Temari" },
-	    c012: {owner: 'pB', type: 'N', ec: 1, hc: 0, ah: 0, sh: 3, ai: 0, si: 1, img: 'n1322' , elements: 'W', name : "Black Ant" },
-	    c013: {owner: 'pB', type: 'N', ec: 1, hc: 0, ah: 0, sh: 3, ai: 0, si: 1, img: 'n1086' , elements: 'W', name : "Crow" },
-	    c014: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 3, sh: 2, ai: 1, si: 1, img: 'n180' , elements: 'W', name : "Yashamaru" },
-	    c016: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
-	    c017: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 1, sh: 3, ai: 1, si: 3, img: 'n1325' , elements: 'W', name : "Salamander" },
-	    c018: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
-	    c019: {owner: 'pB', type: 'N', ec: 2, hc: 0, ah: 5, sh: 1, ai: 5, si: 0, img: 'n1267' , elements: 'W', name : "Gaara of the Desert" },
-	    c020: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
-	    c021: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 3, img: 'n1418' , elements: 'W', name : "Chiyo" },
-	    c022: {owner: 'pB', type: 'N', ec: 4, hc: 0, ah: 3, sh: 3, ai: 3, si: 2, img: 'n1481' , elements: 'WE', name : "Kankuro" },
-	    c023: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 0, si: 3, img: 'n1484' , elements: 'W', name : "Temari" },
-	    c024: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 2, si: 3, img: 'n1420' , elements: 'W', name : "Sasori" },
-	    c025: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 5, sh: 1, ai: 3, si: 1, img: 'n130' , elements: 'W', name : "Баки" },
-	    c026: {owner: 'pB', type: 'N', ec: 5, hc: 1, ah: 6, sh: 2, ai: 4, si: 2, img: 'n483' , elements: 'W', name : "Gaara of the Desert" },	    
-	    
-	    c121: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c122: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c123: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 0, si: 0, img: 'n1427' , elements: 'E', name : "Choji Akimichi"  },
-	    c104: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c105: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c106: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 3, sh: 0, ai: 2, si: 0, img: 'n1423' , elements: 'E', name : "Neji Hyuga"  },
-	    c107: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 0, ai: 0, si: 0, img: 'n699' , elements: 'E', name : "Koharu Utatane (Childhood)"  },
-	    c108: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 0, ai: 0, si: 0, img: 'n700' , elements: 'E', name : "Homura Mitomon (Childhood)"  },
-	    c109: {owner: 'pA', type: 'N', ec: 0, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'n1272' , elements: 'E', name : "Shiho"  },
-	    c110: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
-	    c111: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 0, img: 'nus014' , elements: 'E', name : "Shikamaru Nara"  },
-	    c112: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 1, sh: 1, ai: 1, si: 1, img: 'n348' , elements: 'E', name : "Tenten"  },
-	    c113: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
-	    c113: {owner: 'pA', type: 'N', ec: 1, hc: 0, ah: 0, sh: 2, ai: 0, si: 1, img: 'n724' , elements: 'E', name : "Yoshino Nara"},
-	    c114: {owner: 'pA', type: 'N', ec: 2, hc: 0, ah: 2, sh: 2, ai: 1, si: 2, img: 'n1429' , elements: 'E', name : "Hinata Hyuga"},
-	    c115: {owner: 'pA', type: 'N', ec: 3, hc: 0, ah: 4, sh: 3, ai: 1, si: 1, img: 'n1366' , elements: 'E', name : "Foo"},
-	    c116: {owner: 'pA', type: 'N', ec: 3, hc: 0, ah: 2, sh: 2, ai: 1, si: 2, img: 'n1366' , elements: 'E', name : "Foo"},
-	    c117: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n823' , elements: 'E', name : "Asuma Sarutobi"},
-	    c118: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 4, sh: 3, ai: 1, si: 3, img: 'n1279' , elements: 'E', name : "Inoichi Yamanaka"},
-	    c119: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 5, sh: 3, ai: 0, si: 0, img: 'n515' , elements: 'E', name : "Shikaku Nara"},
-	    c120: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 0, ai: 0, si: 0, img: 'n516' , elements: 'E', name : "Choza Akimichi"},
-	    c101: {owner: 'pA', type: 'N', ec: 4, hc: 0, ah: 6, sh: 2, ai: 2, si: 0, img: 'n589' , elements: 'EF', name : "Sasuke Uchiha"},
-	    c102: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 5, sh: 4, ai: 3, si: 2, img: 'pr046' , elements: 'EF', name : "Yamato"},
-	    c103: {owner: 'pA', type: 'N', ec: 5, hc: 1, ah: 7, sh: 1, ai: 4, si: 0, img: 'n844' , elements: 'EF', name : "Yugito Ni'i"},
-	};
-	return CardBase;
+	var result = {};
+
+	var pXs = {'pA':'c0','pB' : 'c1'};
+	for (var pX in pXs) {
+		var count = 1;
+		for (var i in Decks[pX]) {
+
+			for (var j = 1 ; j <= Decks[pX][i].count ; j++) {
+
+
+
+				var number = pXs[pX] + (count < 10 ? '0' + count : ''+count);
+				result[number] = {};
+				for (var prop in CardBase[Decks[pX][i].number]) {
+					result[number][prop] = CardBase[Decks[pX][i].number][prop];
+				} 
+				result[number].owner = pX;
+				count++;
+			}
+		}
+	}
+	return result;
 }
 
 function getStartMeta(S) {
@@ -508,33 +528,36 @@ function getStartMeta(S) {
 	return result;
 }
 
+
 function getStartAccordiance(S) {
 	if (S.Accordance) return S.Accordance;
-	var pXs = ['c0','c1'];
+	var pXs = {'pA':'c0','pB' : 'c1'};
 	
 	var result = {};
+
+	if (Load) {
+		var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
+		return obj.Accordance;
+	}
 
 	for (var pX in pXs) {
 		var keys = [];
 		var values = [];
-		for (var i = 1; i <= 23 ; i++) {
-			keys.push(i < 10 ? '0' + i : ''+i)
-			values.push(i < 10 ? '0' + i : ''+i)
+		var count = 1;
+		for (var i in Decks[pX]) {
+			for (var j = 1 ; j <= Decks[pX][i].count ; j++) {
+				keys.push(count < 10 ? '0' + count : ''+count)
+				values.push(count < 10 ? '0' + count : ''+count)
+				count++;
+			}
 		}
 
-		if (!Load) {
-			values.sort(  function() { return Math.random()-0.5} )
-		} else {
-			var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
-			return obj.Accordance;
-		}
-
-		
+		values.sort(  function() { return Math.random()-0.5} )
 		for (var i in keys) {
-			result[pXs[pX] + keys[i]] = pXs[pX] + values[i] 
+			result[pXs[pX] + keys[i]] = pXs[pX] + values[i];
 		};
 	}
-	//console.log(result)
+	console.log(result)
 	return result;
 }
 
@@ -745,7 +768,12 @@ function putInPlay(d) {
 			from : 'hand',
 			pX : d.u.you,
 			team : null,
-			to : 'village',
+		}
+		if (table.Known[table.Accordance[d.arg.card]].type == "N") {
+			args.to ='village';
+		}
+		if (table.Known[table.Accordance[d.arg.card]].type == "M") {
+			args.to ='mission';
 		}
 		var data = {};
 		args.teamCounter = ++table.meta.teamCounter;
