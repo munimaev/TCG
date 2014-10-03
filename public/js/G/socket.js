@@ -95,7 +95,9 @@ function applyUpd(d) {
 		if (d.upd.Known) for (var i in d.upd.Known) {
 			//Known[i] = d.upd.Known[i];
 			console.log(i);
-			Known[i] = CardBase[i];
+			Known[i] = CardBase[d.upd.Known[i].number];
+			Known[i].owner = d.upd.Known[i].owner;
+			console.log(Known)
 		}
 		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
 			Accordance[i] = d.upd.Accordance[i];
