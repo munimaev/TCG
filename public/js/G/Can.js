@@ -228,9 +228,10 @@ var Can = {
              && o.S.counters.playedNinjaActivePlayer == 0
              && arraySearch(o.S[args.pX].hand, args.card) !== null
              && o.Known[o.Accordance[args.card]]
-             && o.Known[o.Accordance[args.card]].type == 'N' 
+             && (o.Known[o.Accordance[args.card]].type == 'M'
+                || (o.Known[o.Accordance[args.card]].type == 'N'
+                    && o.S.counters.playedNinjaActivePlayer == 0 ))
              && o.Known[o.Accordance[args.card]].owner == args.pX 
-             && o.S.counters.playedNinjaActivePlayer == 0  
              && o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec) {
             return true;
         }
