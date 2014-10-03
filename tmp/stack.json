@@ -1,0 +1,191 @@
+{
+    "S": {
+        "activePlayer": "pA",
+        "phase": "jutsu",
+        "stop": false,
+        "turnNumber": 2,
+        "counters": {
+            "playedNinjaActivePlayer": 1
+        },
+        "pA": {
+            "isDrawCardAtStartTurn": false,
+            "isNewGame": false,
+            "rewards": 0,
+            "turnCounter": 1,
+            "hand": [
+                "c103",
+                "c104",
+                "c105"
+            ],
+            "deck": [
+                "c108",
+                "c109",
+                "c110",
+                "c111",
+                "c112",
+                "c113",
+                "c114",
+                "c115",
+                "c116",
+                "c117",
+                "c118",
+                "c119",
+                "c120",
+                "c121",
+                "c122",
+                "c123"
+            ],
+            "chackra": [],
+            "discard": [
+                "c102"
+            ],
+            "mission": [],
+            "client": [],
+            "village": {
+                "team": {
+                    "1": [
+                        "c106"
+                    ]
+                }
+            },
+            "attack": {
+                "team": {
+                    "3": [
+                        "c107"
+                    ]
+                }
+            },
+            "block": {
+                "team": {}
+            }
+        },
+        "stack": [],
+        "battlefield": {
+            "3": "2"
+        },
+        "pB": {
+            "isDrawCardAtStartTurn": false,
+            "isNewGame": false,
+            "rewards": 0,
+            "turnCounter": 1,
+            "hand": [
+                "c004",
+                "c005",
+                "c006",
+                "c007",
+                "c001",
+                "c002"
+            ],
+            "deck": [
+                "c012",
+                "c013",
+                "c014",
+                "c015",
+                "c016",
+                "c017",
+                "c018",
+                "c019",
+                "c020",
+                "c021",
+                "c022",
+                "c023"
+            ],
+            "chackra": [
+                "c008",
+                "c009",
+                "c010",
+                "c011"
+            ],
+            "discard": [
+            ],
+            "mission": [],
+            "client": [],
+            "village": {
+                "team": {}
+            },
+            "attack": {
+                "team": {}
+            },
+            "block": {
+                "team": {
+                    "2": [
+                        "c003"
+                    ]
+                }
+            }
+        },
+        "statuses": {
+            "c107": {
+                "atEndOfTurn": [
+                    {
+                        "type": "changePower",
+                        "attack": 5,
+                        "support": 2
+                    }
+                ]
+            },
+            "c003": {
+                "atEndOfTurn": [
+                    {
+                        "type": "changePower",
+                        "attack": 5,
+                        "support": 2
+                    },
+                    {
+                        "type": "changePower",
+                        "attack": 5,
+                        "support": 2
+                    }
+                ]
+            }
+        }
+    },
+    "Accordance": {
+        "c001": "c051",
+        "c002": "c052",
+        "c003": "c004",
+        "c004": "c022",
+        "c005": "c016",
+        "c006": "c005",
+        "c007": "c009",
+        "c008": "c010",
+        "c009": "c012",
+        "c010": "c002",
+        "c011": "c021",
+        "c012": "c017",
+        "c013": "c020",
+        "c014": "c019",
+        "c015": "c011",
+        "c016": "c007",
+        "c017": "c018",
+        "c018": "c001",
+        "c019": "c013",
+        "c020": "c006",
+        "c021": "c014",
+        "c022": "c015",
+        "c023": "c008",
+        "c101": "c109",
+        "c102": "c104",
+        "c103": "c120",
+        "c104": "c108",
+        "c105": "c112",
+        "c106": "c121",
+        "c107": "c106",
+        "c108": "c103",
+        "c109": "c110",
+        "c110": "c122",
+        "c111": "c114",
+        "c112": "c119",
+        "c113": "c115",
+        "c114": "c118",
+        "c115": "c117",
+        "c116": "c101",
+        "c117": "c102",
+        "c118": "c113",
+        "c119": "c116",
+        "c120": "c111",
+        "c121": "c105",
+        "c122": "c123",
+        "c123": "c107"
+    }
+}
