@@ -1,6 +1,5 @@
 var CardBase = {
-    "c001": {
-        "owner": "pB",
+    "n1092": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -15,24 +14,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c002": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 2,
-        "sh": 0,
-        "ai": 2,
-        "si": 0,
-        "img": "n1092",
-        "number": "n1092",
-        "elements": "W",
-        "name": "Kankuro",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c003": {
-        "owner": "pB",
+    "n847": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -88,24 +70,7 @@ var CardBase = {
         	}
         }
     },
-    "c004": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 0,
-        "si": 0,
-        "img": "n847",
-        "number": "n847",
-        "elements": "W",
-        "name": "Mizuki (Childhood)",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c005": {
-        "owner": "pB",
+    "n602": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -120,8 +85,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c006": {
-        "owner": "pB",
+    "n1474": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -136,24 +100,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c007": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 0,
-        "sh": 2,
-        "ai": 0,
-        "si": 1,
-        "img": "n1474",
-        "number": "n1474",
-        "elements": "W",
-        "name": "Epidemic Prevention Officer",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c008": {
-        "owner": "pB",
+    "n1321": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -168,8 +115,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c009": {
-        "owner": "pB",
+    "n1319": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -184,24 +130,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c015": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 0,
-        "sh": 2,
-        "ai": 0,
-        "si": 0,
-        "img": "n1319",
-        "number": "n1319",
-        "elements": "W",
-        "name": "Yaoki",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c010": {
-        "owner": "pB",
+    "nus025": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -216,24 +145,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c011": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 0,
-        "sh": 2,
-        "ai": 0,
-        "si": 0,
-        "img": "nus025",
-        "number": "nus025",
-        "elements": "W",
-        "name": "Temari",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c012": {
-        "owner": "pB",
+    "n1322": {
         "type": "N",
         "ec": 1,
         "hc": 0,
@@ -248,8 +160,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c013": {
-        "owner": "pB",
+    "n1086": {
         "type": "N",
         "ec": 1,
         "hc": 0,
@@ -264,8 +175,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c014": {
-        "owner": "pB",
+    "n180": {
         "type": "N",
         "ec": 2,
         "hc": 0,
@@ -280,8 +190,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c016": {
-        "owner": "pB",
+    "n1325": {
         "type": "N",
         "ec": 2,
         "hc": 0,
@@ -296,24 +205,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c017": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 2,
-        "hc": 0,
-        "ah": 1,
-        "sh": 3,
-        "ai": 1,
-        "si": 3,
-        "img": "n1325",
-        "number": "n1325",
-        "elements": "W",
-        "name": "Salamander",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c018": {
-        "owner": "pB",
+    "n1267": {
         "type": "N",
         "ec": 2,
         "hc": 0,
@@ -328,24 +220,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c019": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 2,
-        "hc": 0,
-        "ah": 5,
-        "sh": 1,
-        "ai": 5,
-        "si": 0,
-        "img": "n1267",
-        "number": "n1267",
-        "elements": "W",
-        "name": "Gaara of the Desert",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c020": {
-        "owner": "pB",
+    "n1418": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -360,24 +235,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c021": {
-        "owner": "pB",
-        "type": "N",
-        "ec": 4,
-        "hc": 0,
-        "ah": 3,
-        "sh": 3,
-        "ai": 3,
-        "si": 3,
-        "img": "n1418",
-        "number": "n1418",
-        "elements": "W",
-        "name": "Chiyo",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c022": {
-        "owner": "pB",
+    "n1481": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -392,8 +250,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c023": {
-        "owner": "pB",
+    "n1484": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -408,8 +265,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c024": {
-        "owner": "pB",
+    "n1420": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -424,8 +280,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c025": {
-        "owner": "pB",
+    "n130": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -440,8 +295,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c026": {
-        "owner": "pB",
+    "n483": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -456,49 +310,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c051": {
-        "owner": "pB",
-        "type": "J",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 2,
-        "si": 0,
-        "img": "j001",
-        "number": "j001",
-        "elements": "EF",
-        "name": "Кунай",
-        "cost" : [['1','1']],
-        "costText" : [['2']],
-        "effectText" : "",
-        "requirement" : function(card,o) {
-            return true;
-        },
-        "target" : [{player:'you', zone: 'battle', func: function() {
-            return true;
-        }}],
-        "effect" : {
-            "trigger" : {
-                "resolve" : [
-                    {
-                        func : function(result, args, o) {
-                            if (!('toStack' in  result)) result.toStack = {};
-                            if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
-                            result.toStack.increaseNinjaPower.push({
-                                card : args.target[0],
-                                attack : 5,
-                                support : 2,                        
-                            });
-                            return result;
-                        }
-                    }
-                ]
-            }
-        }
-    },
-    "c052": {
-        "owner": "pB",
+    "j001": {
         "type": "J",
         "ec": 0,
         "hc": 0,
@@ -540,8 +352,7 @@ var CardBase = {
             }
         }
     },
-    "c121": {
-        "owner": "pA",
+    "n1427": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -556,79 +367,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c122": {
-        "owner": "pA",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 0,
-        "si": 0,
-        "img": "n1427",
-        "number": "n1427",
-        "elements": "E",
-        "name": "Choji Akimichi",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c123": {
-        "owner": "pA",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 0,
-        "si": 0,
-        "img": "n1427",
-        "number": "n1427",
-        "elements": "E",
-        "name": "Choji Akimichi",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c104": {
-        "owner": "pA",
-        "type": "J",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 2,
-        "si": 0,
-        "img": "j001",
-        "number": "j001",
-        "elements": "EF",
-        "name": "Кунай",
-        "effectText" : "",
-        "requirement" : function(card,o) {
-            return true;
-        },
-        "target" : [{player:'you', zone: 'battle', func: function() {
-            return true;
-        }}],
-        "effect" : {
-            "trigger" : {
-                "resolve" : [
-                    {
-                        func : function(result, args, o) {
-                            if (!('toStack' in  result)) result.toStack = {};
-                            if (!('increaseNinjaPower' in  result.toStack)) result.toStack.increaseNinjaPower = [];
-                            result.toStack.increaseNinjaPower.push({
-                                card : args.target[0],
-                                attack : 5,
-                                support : 2,                        
-                            });
-                            return result;
-                        }
-                    }
-                ]
-            }
-        }
-    },
-    "c105": {
-        "owner": "pA",
+    "n1423": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -643,24 +382,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c106": {
-        "owner": "pA",
-        "type": "N",
-        "ec": 0,
-        "hc": 0,
-        "ah": 3,
-        "sh": 0,
-        "ai": 2,
-        "si": 0,
-        "img": "n1423",
-        "number": "n1423",
-        "elements": "E",
-        "name": "Neji Hyuga",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c107": {
-        "owner": "pA",
+    "n699": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -675,8 +397,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c108": {
-        "owner": "pA",
+    "n700": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -691,8 +412,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c109": {
-        "owner": "pA",
+    "n1272": {
         "type": "N",
         "ec": 0,
         "hc": 0,
@@ -707,8 +427,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c110": {
-        "owner": "pA",
+    "nus014": {
         "type": "N",
         "ec": 1,
         "hc": 0,
@@ -723,24 +442,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c111": {
-        "owner": "pA",
-        "type": "N",
-        "ec": 1,
-        "hc": 0,
-        "ah": 0,
-        "sh": 2,
-        "ai": 0,
-        "si": 0,
-        "img": "nus014",
-        "number": "nus014",
-        "elements": "E",
-        "name": "Shikamaru Nara",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c112": {
-        "owner": "pA",
+    "n348": {
         "type": "N",
         "ec": 1,
         "hc": 0,
@@ -755,8 +457,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c113": {
-        "owner": "pA",
+    "n724": {
         "type": "N",
         "ec": 1,
         "hc": 0,
@@ -771,8 +472,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c114": {
-        "owner": "pA",
+    "n1429": {
         "type": "N",
         "ec": 2,
         "hc": 0,
@@ -787,24 +487,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c115": {
-        "owner": "pA",
-        "type": "N",
-        "ec": 3,
-        "hc": 0,
-        "ah": 4,
-        "sh": 3,
-        "ai": 1,
-        "si": 1,
-        "img": "n1366",
-        "number": "n1366",
-        "elements": "E",
-        "name": "Foo",
-        "effectText" : "",
-        "effect" : {}
-    },
-    "c116": {
-        "owner": "pA",
+    "n1366": {
         "type": "N",
         "ec": 3,
         "hc": 0,
@@ -819,8 +502,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c117": {
-        "owner": "pA",
+    "n823": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -835,8 +517,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c118": {
-        "owner": "pA",
+    "n1279": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -851,8 +532,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c119": {
-        "owner": "pA",
+    "n515": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -867,8 +547,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c120": {
-        "owner": "pA",
+    "n516": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -883,8 +562,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c101": {
-        "owner": "pA",
+    "n589": {
         "type": "N",
         "ec": 4,
         "hc": 0,
@@ -899,8 +577,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c102": {
-        "owner": "pA",
+    "pr046": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -915,8 +592,7 @@ var CardBase = {
         "effectText" : "",
         "effect" : {}
     },
-    "c103": {
-        "owner": "pA",
+    "n844": {
         "type": "N",
         "ec": 5,
         "hc": 1,
@@ -928,6 +604,72 @@ var CardBase = {
         "number": "n844",
         "elements": "EF",
         "name": "Yugito Ni'i",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m466": {
+        "type": "M",
+        "ec": 1,
+        "hc": 1,
+        "img": "m466",
+        "number": "m466",
+        "elements": "E",
+        "name": "Lunchbox",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m589": {
+        "type": "M",
+        "ec": 2,
+        "hc": 1,
+        "img": "m589",
+        "number": "m589",
+        "elements": "E",
+        "name": "BBQ House",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m673": {
+        "type": "M",
+        "ec": 1,
+        "hc": 1,
+        "img": "m673",
+        "number": "m673",
+        "elements": "E",
+        "name": "Student and Sensei",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m777": {
+        "type": "M",
+        "ec": 3,
+        "hc": 1,
+        "img": "m777",
+        "number": "m777",
+        "elements": "E",
+        "name": "After the battle",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m821": {
+        "type": "M",
+        "ec": 1,
+        "hc": 1,
+        "img": "m821",
+        "number": "m821",
+        "elements": "E",
+        "name": "Decoding the Message",
+        "effectText" : "",
+        "effect" : {}
+    },
+    "m859": {
+        "type": "M",
+        "ec": 2,
+        "hc": 1,
+        "img": "m859",
+        "number": "m859",
+        "elements": "E",
+        "name": "The Nara Clan",
         "effectText" : "",
         "effect" : {}
     }
