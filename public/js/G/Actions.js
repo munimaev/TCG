@@ -1,6 +1,7 @@
 function isZoneSimple(name) {
 	if ( name == 'deck' || name == 'discard' 
-			|| name == 'chackra' || name == 'hand' || name == 'stack') {
+			|| name == 'chackra' || name == 'hand' || name == 'stack' 
+			|| name == 'mission') {
 		return true;
 	}
 	 return false;
@@ -173,7 +174,7 @@ var Actions = {
 		} 
 		else if ( isZoneSimple(args.from) ) {	
 			console.log(args.pX,args.from,args.card)
-			if  (args.from == 'stack') {
+			if  (args.from == 'stack' ) {
 				var ind = true;
 				result.updTable[0] = {};
 			} else {
