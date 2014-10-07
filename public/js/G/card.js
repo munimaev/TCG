@@ -496,6 +496,9 @@ function Card( o ) {
             case 'J' :
                 this.$romb = $( '.limon', this.$id );
                 break;
+            case 'M' :
+                this.$romb = $( '.rectangle', this.$id );
+                break;
             case 'N' :
             default  :
                 this.$romb = $( '.romb', this.$id );
@@ -1295,41 +1298,43 @@ function Card( o ) {
                 }
             }
         }
-        $prewContent
-        .append(
-            $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':9, 'width':'100%'}).append(
-                $('<tbody />', {'valign':'top'}).append(
-                    $('<tr />', {}).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h6 />', {'text':'Здоровый'})
-                        )
+        if (this.params.type == 'N') {
+            $prewContent
+            .append(
+                $('<table />', {'border':0,'cellpadding':0,'cellspacing':0,'cols':9, 'width':'100%'}).append(
+                    $('<tbody />', {'valign':'top'}).append(
+                        $('<tr />', {}).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h6 />', {'text':'Здоровый'})
+                            )
+                        ).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h6/>', {'text':'Атрибут'})
+                            )
+                        ).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h6 />', {'text':'Раненный'})
+                            )
+                        ).css('text-align','center')
                     ).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h6/>', {'text':'Атрибут'})
-                        )
-                    ).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h6 />', {'text':'Раненный'})
-                        )
-                    ).css('text-align','center')
-                ).append(
-                    $('<tr />', {}).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h3 />', {'class':'normalPower','text':this.params.ah + '/' + this.params.sh})
-                        )
-                    ).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h3 />', {'text':'-=-'})
-                        )
-                    ).append(
-                        $('<td />', {'colspan':3}).append(
-                            $('<h3 />', {'class':'power powerInjured','text':this.params.ai + '/' + this.params.si})
-                        )
-                    ).css('text-align','center')
+                        $('<tr />', {}).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h3 />', {'class':'normalPower','text':this.params.ah + '/' + this.params.sh})
+                            )
+                        ).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h3 />', {'text':'-=-'})
+                            )
+                        ).append(
+                            $('<td />', {'colspan':3}).append(
+                                $('<h3 />', {'class':'power powerInjured','text':this.params.ai + '/' + this.params.si})
+                            )
+                        ).css('text-align','center')
+                    )
                 )
+                
             )
-            
-        )
+        }
         $prew.append( $prewContent );
         if ($prewContent.height() > H - 20)  {
             var r = $prewContent.height() - H + 20
