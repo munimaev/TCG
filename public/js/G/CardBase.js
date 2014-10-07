@@ -64,6 +64,8 @@ var CardBase = {
 							team  : null,
 							options : {moveTo : 'top'}
         				});
+
+
         				return result;
 					}
         		}]
@@ -615,8 +617,14 @@ var CardBase = {
         "number": "m466",
         "elements": "E",
         "name": "Lunchbox",
-        "effectText" : "",
-        "effect" : {}
+        "effectText" : {
+            "effects" : [
+                {"effect":"Пстоянная 2"},
+                {"effect":"Когда эффект это мисси применяеться, возьмите 1 карту. ваши ниндзя получают +1/+1."}
+            ]
+        },
+        "effect" : {
+                "permanent" : 2}
     },
     "m589": {
         "type": "M",
@@ -626,7 +634,12 @@ var CardBase = {
         "number": "m589",
         "elements": "E",
         "name": "BBQ House",
-        "effectText" : "",
+        "effectText" : {
+            "effects" : [
+                {"effect":"Пстоянная 3"},
+                {"effect":"В конце каждого хода, в котором ваш оппонент выигрываете или получает 1 или более боевых наград, он должен сбросить 1 карт из своей руки."}
+            ]
+        },
         "effect" : {}
     },
     "m673": {
@@ -637,8 +650,48 @@ var CardBase = {
         "number": "m673",
         "elements": "E",
         "name": "Student and Sensei",
-        "effectText" : "",
-        "effect" : {}
+        "effectText" : {
+            "effects" : [
+                {"effect":"Ваш оппонент получает 1 боевую награду. В этом случае возьмите 2 карты."}
+            ]
+        },
+        "effect" : {
+            "trigger" : {
+                "resolve" : [
+                    {
+                        "func" : function(result, args, o){
+                            console.log(args)
+                            if (!('toStack' in result)) result.toStack = {};
+
+
+                            if (!('givingReward' in result.toStack)) result.toStack.givingReward = [];
+                            result.toStack.givingReward.push({
+                                pX: args.owner == 'pA' ? 'pB' : 'pA',  
+                                zone: 'stack', 
+                                card: args.card, 
+                                rewardsCount : 1, 
+                                causeOfReward : 'effectOfcard'
+                            })
+
+                            if (!('drawCard' in result.toStack)) result.toStack.drawCard = [];
+                            result.toStack.drawCard.push({
+                                player:  args.owner,
+                                numberOfCard: 2, 
+                                drawCardCause: 'cardeffect'
+                            });
+
+                            if (!('applyUpd' in result.toStack)) result.toStack.applyUpd = [];
+                            result.toStack.applyUpd.push({
+                                forPlayer: args.owner, 
+                                cards : [o.S[args.owner].deck[0], o.S[args.owner].deck[1]]
+                            })
+
+                            return result;
+                        }
+                    }
+                ]
+            }
+        }
     },
     "m777": {
         "type": "M",
@@ -648,7 +701,11 @@ var CardBase = {
         "number": "m777",
         "elements": "E",
         "name": "After the battle",
-        "effectText" : "",
+        "effectText" : {
+            "effects" : [
+                {"effect":"Сбросьте карту, в этом случае возьмите 3 карты."}
+            ]
+        },
         "effect" : {}
     },
     "m821": {
@@ -659,8 +716,20 @@ var CardBase = {
         "number": "m821",
         "elements": "E",
         "name": "Decoding the Message",
-        "effectText" : "",
-        "effect" : {}
+        "effectText" : {
+            "effects" : [
+                {"effect":"Пстоянная 3"},
+                {"effect":"Ваши ниндзя с 'Тень' получают +1/+1 и +2 к ментальной силе."},
+                {
+                    "when" : ["Обмен техниками"],
+                    "cost" : "E1",
+                    "effect":"Ваша целевая команада с ниндзя с 'Тень' и сражающася против нее команда (если такая есть) вступают в ментальную битву на этапе полсчета.",
+                }
+            ]
+        },
+        "effect" : {
+            "permanent" : 3,
+        }
     },
     "m859": {
         "type": "M",
@@ -670,8 +739,18 @@ var CardBase = {
         "number": "m859",
         "elements": "E",
         "name": "The Nara Clan",
-        "effectText" : "",
-        "effect" : {}
+        "effectText" : {
+            "effects" : [
+                {"effect":"Пстоянная"},
+                {
+                    "when" : ["Attacker", "Mission"],
+                    "cost" : "Выберите тип карты. Затем откройте верхнюю карту вашей колоды.",
+                    "effect":"Если открытая карты имеет загаданный вами тип, положите ее в свою руку.",
+                }
+            ]
+        },
+        "effect" : {
+            "permanent" : true,}
     }
 };
 if (module) {
