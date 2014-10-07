@@ -1051,6 +1051,9 @@ var Actions = {
 			args2.cause = 'resolveJutsuFromStack';
 			args2.from = 'stack';
 			args2.to = 'discard';
+			if (jutsu.type == 'M' && jutsu.effect.permanent) {
+				args2.to = 'mission';
+			} 
 			args2.team = null;
 			console.log('resolveMove'.red)
 			Actions.moveCardToZone(args2,o)
