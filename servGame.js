@@ -773,7 +773,7 @@ function putInPlay(d) {
 			args.to ='village';
 		}
 		if (table.Known[table.Accordance[d.arg.card]].type == "M") {
-			args.to ='mission';
+			args.to ='stack';
 		}
 		var data = {};
 		args.teamCounter = ++table.meta.teamCounter;
@@ -1049,10 +1049,10 @@ function addStack(table, actReuslt ) {
 }
 
 function getUpdatesForPlayers(table, actReuslt) {
+	console.log('\ngetUpdatesForPlayers'.cyan);
+	console.log(actReuslt);
 	var result = {};
 	if (!actReuslt.applyUpd) return null;
-	console.log('\ngetUpdatesForPlayers');
-	console.log(actReuslt.applyUpd);
 	var obj = {};
 	for ( var i in actReuslt.applyUpd) {
 		obj = actReuslt.applyUpd[i];
@@ -1134,6 +1134,9 @@ function preStackDone(d) {
 			table.stackPrep = table.stack.pop();
 			actReuslt = table.stackPrep;
 			stackPrepIsEmpty = false;
+
+			upds = getUpdatesForPlayers(table,actReuslt);
+			delete actReuslt.applyUpd;
 		} 
 
 		if (logThis) console.log('toClient2'.green);
