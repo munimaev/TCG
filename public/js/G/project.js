@@ -1165,6 +1165,7 @@ function updTeams() {
     
     // определить размер плитки
     var finalSqr = maxSqrSize;
+    console.log(position)
     updPosition(position,finalSqr);
 }
 /**
@@ -1199,7 +1200,8 @@ function updTeams() {
 function getPosition(pX) {
     var result = {
         village : getPositionVillage(pX),
-        battle : getPositionBattle(pX)
+        battle : getPositionBattle(pX),
+        mission : getPositionMission(pX)
     }
     result.W = result.village.W;
     return result;
@@ -1263,6 +1265,17 @@ function getPositionBattle(pX, zone) {
     }
     return result;
 }
+
+function getPositionMission(pX) {
+    var result = {W:0,H:0}
+    var len = S[pX].mission.length;
+    if (len) {
+        result.W += len * 10;
+        result.W += len * 2;
+    }
+
+    return result;
+}
 /**
  * [getTeamSize description]
  * @param  {[type]} team [description]
@@ -1291,10 +1304,12 @@ function updPosition(position,sqr) {
     if (isFight) msqr = sqr / 2;
 
     var villageWidth = ( position.you.village.W ) * msqr;
-    var marginLeft = (I.W - villageWidth) / 2; 
+    var missionWidth = ( position.you.mission.W ) * msqr;
+    var marginLeft = (I.W - villageWidth - missionWidth) / 2; 
+    var villageY = (I.H ) / 2 + (isFight ? (S.stack.length ? 21 : 17) :6) * sqr
     var o2 = {
-        X : marginLeft,
-        Y : (I.H ) / 2 + (isFight ? (S.stack.length ? 21 : 17) :6) * sqr,
+        X : marginLeft + missionWidth,
+        Y : villageY,
         zona : 'village',
         owner : you,
         player : 'you' ,
@@ -1306,12 +1321,43 @@ function updPosition(position,sqr) {
         createteam(o,o2);
         o2.X+= (position.you.village.team[t].W + 2 ) * msqr;
     }
+    for (var m in S[you].mission) {
+            createCard({
+                id: S[you].mission[m],
+                zona: 'mission',
+                owner: you,
+                team: null,
+                position: null,
+                condition: 'createmission'
+            });
+
+            C[S[you].mission[m]].animation({
+                X : marginLeft + 11 * msqr * m,
+                Y : villageY,
+                W : 10 * msqr,
+                additional : {
+                    outCard: true,
+                    after :{ 
+                        func : (function() {
+                                    var card = S[you].mission[m];
+                                    return function(){
+                                        C[card].setZIndex(200);
+                                    }
+                                })()
+                    }
+                }
+            });
+    }
+
+
 
     var villageWidth = ( position.opp.village.W ) * msqr;
-    var marginLeft = (I.W - villageWidth) / 2;
+    var missionWidth = ( position.opp.mission.W ) * msqr;
+    var marginLeft = (I.W - villageWidth - missionWidth) / 2;
+    var villageY = (I.H ) / 2 - (isFight ? (S.stack.length ? 28 : 24 ): 22) * sqr;
     var o2 = {
-        X : marginLeft,
-        Y : (I.H ) / 2 - (isFight ? (S.stack.length ? 28 : 24 ): 22) * sqr,
+        X : marginLeft + missionWidth,
+        Y : villageY,
         zona : 'village',
         owner : opp,
         player : 'opp' ,
@@ -1322,6 +1368,33 @@ function updPosition(position,sqr) {
         o2.team = t;
         createteam(o,o2);
         o2.X += (position.opp.village.team[t].W + 2) * msqr;
+    }
+    for (var m in S[opp].mission) {
+            createCard({
+                id: S[opp].mission[m],
+                zona: 'mission',
+                owner: opp,
+                team: null,
+                position: null,
+                condition: 'createmission'
+            });
+
+            C[S[opp].mission[m]].animation({
+                X : marginLeft + 11 * msqr * m,
+                Y : villageY,
+                W : 10 * msqr,
+                additional : {
+                    outCard: true,
+                    after :{ 
+                        func : (function() {
+                                    var card = S[opp].mission[m];
+                                    return function(){
+                                        C[card].setZIndex(200);
+                                    }
+                                })()
+                    }
+                }
+            });
     }
 
     if (isFight) {
