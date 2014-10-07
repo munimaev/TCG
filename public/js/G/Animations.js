@@ -219,11 +219,13 @@ var AN = {
 		} 
 		else if ( isZoneSimple(args.from) ) {
 			if ( isZoneSimple(args.to) ) {
-				if (args.to != 'stack') {
+				if (args.to != 'stack' &&  args.to != 'mission' ) {
 					AN.moveCardFaceDownToZone(args)
 				} 
 				else {
-					AN.moveCardToCenter(args);
+					if (args.from != 'stack' &&  args.to != 'mission') {
+						AN.moveCardToCenter(args);
+					}
 					AnimationPush({func:function() {
 						 updTable();
 					}, time:600, name: 'updTeams'});
