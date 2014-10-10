@@ -293,7 +293,6 @@ function fillScroll(o){
             params[i2] = preparams[i2];
         }
         C[G[i]] = new Card(params);
-        console.log('++++', Known[Accordance[G[i]]])
         C[G[i]].$id.css('position','relative').css('display','inline-block').css('margin','0 1.1% 1.1% 0');
         $('.scrollCards','#' + o.owner + '_' + o.area + '_' + o.clicker).append(C[G[i]].$id);
     }
