@@ -225,10 +225,10 @@ var Can = {
     putInPlay : function(args, o) {
         if ( o.S.phase == 'mission' 
              && o.S.activePlayer == args.pX  
-             && o.S.counters.playedNinjaActivePlayer == 0
              && arraySearch(o.S[args.pX].hand, args.card) !== null
              && o.Known[o.Accordance[args.card]]
-             && (o.Known[o.Accordance[args.card]].type == 'M'
+             && ((o.Known[o.Accordance[args.card]].type == 'M'
+                    && o.S[args.pX].counters.playedMission == 0)
                 || (o.Known[o.Accordance[args.card]].type == 'N'
                     && o.S.counters.playedNinjaActivePlayer == 0 ))
              && o.Known[o.Accordance[args.card]].owner == args.pX 
@@ -240,7 +240,17 @@ var Can = {
              o.S.phase == 'mission' 
              , arraySearch(o.S[args.pX].hand, args.card) !== null
              , o.Known[o.Accordance[args.card]]
+             , '\n(' 
+             , o.Known[o.Accordance[args.card]].type == 'M' 
+             , '&&'
+             , o.S[args.pX].counters.playedMission == 0
+             , '||'
+             , o.Known[o.Accordance[args.card]].type == 'N'
+             , '&&'
              ,  o.S.counters.playedNinjaActivePlayer == 0 
+             , ')\n'
+             , o.Known[o.Accordance[args.card]].owner == args.pX 
+             , o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec
              )
         }
     },
@@ -379,5 +389,6 @@ var Can = {
     },
 }
 if (module) {
+    Actions = require(__dirname+'/Actions.js');
 	module.exports = Can;
 }
