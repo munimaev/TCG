@@ -233,6 +233,11 @@ var AN = {
 			}
 			else if ( !isZoneSimple(args.to) ) {
 				AN.moveCardToCenter(args);
+				//TODO возможно следующую анимацию надо перенести
+				//в allback  функцию ждя предыдущей функции
+				AnimationPush({func:function() {
+					 updTable();
+				}, time:600, name: 'updTeams'});
 			}
 		}
         updAllCount();
@@ -664,8 +669,8 @@ var AN = {
 					AN.preStack.countDown();
 				}
 			}
-
 		},
+
 		'selectChackra' : function(args, o) {
 			btnArea('chackra','you');
 			AN.showCostBar(args, o);
@@ -674,6 +679,7 @@ var AN = {
 				AN.Questions.payChackra((function(args){return args})(args), getUniversalObject());
 			}, time:1200, name: 'Questions - payChackra'  });
 		},
+
 		'payChackra' : function(args, o) {
 			AN.stop = true;
 			var condidateCount = [];
@@ -735,9 +741,49 @@ var AN = {
 					AN.stop = false;
 					AnimationNext();
 				}
-
-
 			}
+		},
+
+		'selectHandCost' : function(args, o) {
+			if (!('selectHandCost' in Answers)) Answers.selectHandCost = [];
+			if (o.Known[o.Accordance[args.card]].hc == 0) {
+				Answers.selectHandCost.push({
+					pX   : you,
+					card : args.card,
+					handCost : []
+				});
+				AN.preStack.countDown();
+				return;
+			}
+			AN.stop = true;
+			var condidateCount = [];
+			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите карты для оплаты цены руки.' ); 
+			AN.moveToPreview( { pX: args.pX } );
+			Card.moveToPreviewToHandBlocker = true;
+
+			var condidateCount = [];
+			for (var i in S[args.pX].hand) {
+				var cardId = S[args.pX].hand[i];
+				if (true) {
+					condidateCount.push(cardId);
+					C[cardId].setZIndex(1202);
+				}
+			}
+
+			Context.workingUnit = 'card';
+			Context.clickAction = function( card ) {
+				var change = false;
+				Answers.selectHandCost.push({
+					pX   : you,
+					card : args.card,
+					handCost : [card.id]
+				});
+				C[card.id].$mouse.mouseout();
+				AN.preStack.countDown()
+				Card.moveToPreviewToHandBlocker = false;
+				AN.hideNoir({ condidateCount:condidateCount });
+			}
+
 		}
 	},
 	preStack : {
@@ -844,8 +890,14 @@ var AN = {
 			Actions['Draw X cards'](args, getUniversalObject())
 		},
 		'putCardInPlay' : function(args) {
-			Actions.moveCardToZone(args, getUniversalObject())
-			setTimeout(AN.preStack.countDown,1000)
+			if (args.pX == you) {
+				AnimationPush({func:function() {
+					AN.Questions.selectHandCost(args, getUniversalObject());
+				}, time:1000, name: 'Questions - selectHandCost'});
+			}
+			else {
+				AN.preStack.countDown();
+			}
 		},
 		'playJutsu' : function(args) {
 			if (args.pX == you) {
@@ -897,6 +949,12 @@ var AN = {
 		'clearAtEndOfTurnEffect' : function(args) {
 			Actions.clearAtEndOfTurnEffect(args, getUniversalObject());
 			AN.preStack.countDown();
+		},
+		'prepareEffect' : function(args) {
+			console.log('---!--- prepareEffect')
+			console.log(args);
+				if (args.effectType == 'trigger')
+				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey].question(args, getUniversalObject());
 		}
 	}
 }
