@@ -9,11 +9,14 @@
         },
         "pA": {
             "isDrawCardAtStartTurn": false,
+            "counters" : {
+                "playedMission" : 0
+            },
             "isNewGame": false,
             "rewards": 0,
-            "turnCounter": 1,
+            "turnCounter": 5,
             "hand": [
-                "c001",
+                "c009",
                 "c002",
                 "c003",
                 "c004",
@@ -23,12 +26,12 @@
             ],
             "deck": [
                 "c008",
-                "c009",
+                "c014",
                 "c010",
                 "c011",
                 "c012",
                 "c013",
-                "c014",
+                "c001",
                 "c015",
                 "c016",
                 "c017",
@@ -68,10 +71,13 @@
         "battlefield": {},
         "stack": [],
         "pB": {
+            "counters" : {
+                "playedMission" : 0
+            },
             "isDrawCardAtStartTurn": false,
             "isNewGame": false,
             "rewards": 0,
-            "turnCounter": 1,
+            "turnCounter": 5,
             "hand": [
                 "c101",
                 "c103",
