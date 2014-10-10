@@ -125,7 +125,7 @@
     height: 94%;
     margin: 3%;
     background-size: 120% auto;
-    background-position: 50% 35%;
+    background-position: 50% 15%;
 }
 .shadow {
     -webkit-box-shadow:1px 1px 5px 0 rgba(0,0,0,0.5);
@@ -421,16 +421,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     z-index: 2;
     -webkit-filter: blur(5px);
 }
-.card .icon .handcost1 ,
-.card .icon .handcost0  {
-    width: 100%;
-    height: 100%;
-    background-size: 100% 100%;
-}
 
-.card .icon .handcost1 { background-image: url('../pics/H1.png'); }
-.card .icon .handcost0 { background-image: url('../pics/H0.png'); }
 
+.card .icon .handcost0,
+.card .icon .handcost1,
 .card .icon .turncost0,
 .card .icon .turncost1,
 .card .icon .turncost2,
@@ -438,11 +432,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
 .card .icon .turncost4,
 .card .icon .turncost5,
 .card .icon .turncost6,
-.card .icon .turncost7 {
+.card .icon .turncost7,
+.card .icon .permanent {
     width: 100%;
     height: 100%;
     background-size: 100% 100%;
+    text-align: center;
 }
+.card .icon .handcost1 { background-image: url('../pics/H1.png'); }
+.card .icon .handcost0 { background-image: url('../pics/H0.png'); }
 .card .icon .turncost0 { background-image: url('../pics/T0.png'); }
 .card .icon .turncost1 { background-image: url('../pics/T1.png'); }
 .card .icon .turncost2 { background-image: url('../pics/T2.png'); }
@@ -451,6 +449,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
 .card .icon .turncost5 { background-image: url('../pics/T5.png'); }
 .card .icon .turncost6 { background-image: url('../pics/T6.png'); }
 .card .icon .turncost7 { background-image: url('../pics/T7.png'); }
+
+.card .icon .permanent { background-image: url('../pics/permanent.png'); }
 
 .card .mouseControle {
     width: 75%;
