@@ -26,7 +26,7 @@ var CardBase = {
         "number": "n847",
         "elements": "W",
         "name": "Mizuki (Childhood)",
-        effectText : {
+        "effectText" : {
         	effectName : "Премечивый нрав",
         	"effects" : [
         		{"effect":"Когда этот ниндзя сбрасываеться в результате подсчета, оппонент перемещает случайную карту из своей руки наверх колоды.",
@@ -620,11 +620,64 @@ var CardBase = {
         "effectText" : {
             "effects" : [
                 {"effect":"Пстоянная 2"},
-                {"effect":"Когда эффект это мисси применяеться, возьмите 1 карту. ваши ниндзя получают +1/+1."}
+                {"effect":"Когда эффект это мисси применяеться, возьмите 1 карту."},
+                {"effect":"Ваши ниндзя получают +1/+1."}
             ]
         },
         "effect" : {
-                "permanent" : 2}
+            "permanent" : 2,
+            "trigger" : {
+                "resolve" : [
+                    {
+                        "func" : function(result, args, o){
+                            console.log(args)
+                            if (!('toStack' in result)) result.toStack = {};
+
+                            if (!('drawCard' in result.toStack)) result.toStack.drawCard = [];
+                            result.toStack.drawCard.push({
+                                player:  args.owner,
+                                numberOfCard: 1, 
+                                drawCardCause: 'cardeffect'
+                            });
+
+                            if (!('applyUpd' in result.toStack)) result.toStack.applyUpd = [];
+                            result.toStack.applyUpd.push({
+                                forPlayer: args.owner, 
+                                cards : [o.S[args.owner].deck[0], o.S[args.owner].deck[1]]
+                            })
+
+                            return result;
+                        }    
+                    }
+                ]
+            },
+            "static" : {                // подконтрольная облась powerNinja
+                "powerNinja" : [
+                    {    
+                        "condition" : function(args, o) {
+                            return Actions.cardPath({
+                                card:args.card, 
+                                path:{
+                                    players:[o.Known[o.Accordance[args.self]].owner],
+                                    zones: ['village','attack', 'block']
+                                }},o);
+                        },
+                        "conditionSelf" : function(args, o) {
+                            return Actions.cardPath({
+                                card:args.self, 
+                                path:{
+                                    players:[o.Known[o.Accordance[args.self]].owner],
+                                    zones: ['mission']
+                                }},o);
+                        },
+                        "powerMod" : {
+                            attack : 1,
+                            support : 1,                        
+                        }
+                    }
+                ]
+            }
+        }
     },
     "m589": {
         "type": "M",
@@ -706,7 +759,98 @@ var CardBase = {
                 {"effect":"Сбросьте карту, в этом случае возьмите 3 карты."}
             ]
         },
-        "effect" : {}
+        "effect" : {
+            "trigger" : {
+                "resolve" : [
+                    {
+                        "func" : function(result, args, o){
+                            console.log("m777".yellow)
+                            console.log(args)
+                            if (!('toStack' in result)) result.toStack = {};
+                            if (!('prepareCardEffect' in result.toStack)) result.toStack.prepareEffect = [];
+                            result.toStack.prepareEffect.push({
+                                pX : args.owner + '',
+                                card: args.card, 
+                                effectType : 'trigger', 
+                                trigger:'resolve', 
+                                effectKey: 0});
+                            return result;
+                        },
+                        "question" : function(args, o) {
+                            if (args.pX == you) {
+                                AN.stop = true;
+                                if (!('cardEffect' in Answers)) Answers.cardEffect = [];
+                                var condidateCount = [];
+                                $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите карту для сброса.' ); 
+                                AN.moveToPreview( { pX: args.pX } );
+                                Card.moveToPreviewToHandBlocker = true;
+
+                                var condidateCount = [];
+                                for (var i in S[args.pX].hand) {
+                                    var cardId = S[args.pX].hand[i];
+                                    if (true) {
+                                        condidateCount.push(cardId);
+                                        C[cardId].setZIndex(1202);
+                                    }
+                                }
+                                Context.workingUnit = 'card';
+                                Context.clickAction = function( card ) {
+                                    args.discartedCard = card.id;
+                                    Answers.cardEffect.push(args)
+                                    AN.hideNoir({ condidateCount:condidateCount });
+                                    Card.moveToPreviewToHandBlocker = false;
+                                    AN.preStack.countDown();
+                                }
+                            }
+                            else {
+                                AN.preStack.countDown();
+                            }
+                        },
+                        "cardEffect" : function(result, args, o) {
+
+                            if (!('drawCard' in result)) result.drawCard = [];
+                            result.drawCard.push({
+                                player:  args.pX,
+                                numberOfCard: 3, 
+                                drawCardCause: 'cardeffect'
+                            });
+
+                            if (!('applyUpd' in result)) result.applyUpd = [];
+                            var topDeck = [];
+                            for (var i = 0; i<=2; i++) {
+                                topDeck.push(o.S[args.pX].deck[0])
+                                var topArrgs = {
+                                    pX  : args.pX,
+                                    card  : o.S[args.pX].deck[0] ,
+                                    cause  : 'effectOfcard' ,
+                                    from  : 'deck' ,
+                                    to  : 'hand' ,
+                                    team  : null
+                                }
+                                Actions.moveCardToZone(topArrgs, o);
+                            }
+                            result.applyUpd.push({
+                                forPlayer: args.pX, 
+                                cards : topDeck
+                            })
+
+                            if (!('moveCardToZone' in result)) result.moveCardToZone = [];
+                            var moveArgs = {
+                                pX  : args.pX,
+                                card  : args.discartedCard ,
+                                cause  : 'effectOfcard' ,
+                                from  : 'hand' ,
+                                to  : 'discard' ,
+                                team  : null
+                            }                            
+                            Actions.moveCardToZone(moveArgs, o);
+                            result.moveCardToZone.push(moveArgs);
+
+                        }
+                    }
+                ]
+            }
+        }
     },
     "m821": {
         "type": "M",
@@ -728,7 +872,7 @@ var CardBase = {
             ]
         },
         "effect" : {
-            "permanent" : 3,
+            "permanent" : 3
         }
     },
     "m859": {
