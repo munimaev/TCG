@@ -154,7 +154,7 @@ var stackPrepBeforIsRun = false;
 var stackPrepBefor = {};
 
 function applyStackBeafor() {
-	// console.log('stackPrepBefor',stackPrepBefor);	
+	 console.log('stackPrepBefor',stackPrepBefor);	
 	var stackPrep = stackPrepBefor;
 	AN.preStack.count = 1;
 	for (var func in stackPrep) {
