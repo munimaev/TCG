@@ -19,7 +19,7 @@ var Stadies = {
         rusName :  'Фаза миссии', //'Организовать команды'
         workingUnit : 'card',
         clickAction : null,
-        party: 'attacker',
+        party: 'both',
         autoNextPhase : false,
     },
     organisation: {
