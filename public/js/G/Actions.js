@@ -79,6 +79,8 @@ var Actions = {
 		o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
 		o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
 		o.S.counters.playedNinjaActivePlayer = 0;
+		o.S.pA.counters.playedMission = 0;
+		o.S.pB.counters.playedMission = 0;
 		}
 		//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
 		o.S.phase = o.Stadies.order[newKey];
@@ -132,8 +134,13 @@ var Actions = {
 			updTable : [],
 		};
 
-		if (args.cause == 'play' && o.Known[o.Accordance[args.card]].type == 'N') {
-			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
+		if (args.cause == 'play') {
+			if (o.Known[o.Accordance[args.card]].type == 'N') {
+				o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
+			}
+			if (o.Known[o.Accordance[args.card]].type == 'M') {
+				o.S[args.pX].counters.playedMission += 1;
+			}
 		}
 
 		console.log(isZoneSimple(args.from))
@@ -207,10 +214,6 @@ var Actions = {
 							o.S[args.pX][args.to].push(args.card);
 						}
 					}
-
-
-
-
 					if (!module) {
 						C[args.card].params.zona = args.to;
 						AnimationPush({func:function() {
@@ -239,8 +242,6 @@ var Actions = {
 			}
 		}
 		if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
-
-
 		if (!result.updTable.length) delete result.updTable;
 		return result;
 	},
@@ -425,6 +426,8 @@ var Actions = {
 		// 	}, time:1210, name: 'startAtStart '});
 		// } else {
 		o.S.counters.playedNinjaActivePlayer = 0;
+		o.S.pA.counters.playedMission = 0;
+		o.S.pB.counters.playedMission = 0;
 		if (o.S.pA.rewards >= 10 || o.S.pB.rewards >= 10 ) {
 			var winner = '';
 			if (o.S.pA.rewards >= 10 && o.S.pB.rewards < 10) {
@@ -873,7 +876,8 @@ var Actions = {
 		}
 	},
 	'preStackDone' : function(table, o) {
-		// console.log('table',table.stackPrep)
+		var loging = false;
+		if (loging) console.log('table',table.stackPrep)
 		o.answers = table.answers;
 		var results = [];
 		var result = {};
@@ -884,16 +888,19 @@ var Actions = {
 			}
 		}
 		var befor = [];
-		 // console.log('\ntable.answers');
-		 // console.log(table.answers)
+		if (loging) console.log('\ntable.answers');
+		if (loging) console.log(table.answers)
 		for (var ans in table.answers) {
 			for (var args in table.answers[ans]) {
-				befor.push(Actions[ans](table.answers[ans][args], o));
+				var res = Actions[ans](table.answers[ans][args], o);
+				if (loging)console.log('\nRES'.cyan)
+				if (loging)console.log(res);
+				befor.push(res);
 			}
 		}
-		// console.log("------------------------");
-		// console.log(results);
-		// console.log("------------------------");
+		if (loging) console.log("------------------------");
+		if (loging) console.log(results);
+		if (loging) console.log("------------------------");
 		var toStack = [];
 		for (var i in results) {
 			if (results[i]) {
@@ -966,7 +973,46 @@ var Actions = {
 		return Actions['Draw X cards'](args, o);
 	},
 	'putCardInPlay' : function(args, o) {
-		return Actions.moveCardToZone(args, o)
+		//return Actions.moveCardToZone(args, o)
+		return {};
+	},
+	'selectHandCost' : function(args, o) {
+		var result = {};
+		result.moveCardToZone = [];
+		result.applyUpd = [];
+		var oppNeedencard = [args.card];
+		var moveArgsPermanent = {
+			pX : args.pX,
+			card : args.card,
+			cause : 'play',
+			from : 'hand',
+			to : 'village', // for Ninja
+			team : null
+		}
+		if (o.Known[o.Accordance[args.card]].type == 'M') {
+			moveArgsPermanent.to = 'stack'; //for Mission
+		}
+		result.moveCardToZone.push(moveArgsPermanent);
+		Actions.moveCardToZone(moveArgsPermanent, o)
+
+		for (var i in args.handCost) {
+			var moveArgsPermanent = {
+				pX : args.pX,
+				card : args.handCost[i],
+				cause : 'handCost',
+				from : 'hand',
+				to : 'chackra',
+				team : null
+			}
+			oppNeedencard.push(args.handCost[i])
+			result.moveCardToZone.push(moveArgsPermanent);
+			Actions.moveCardToZone(moveArgsPermanent, o)
+		}
+		result.applyUpd.push({
+			forPlayer: args.pX == 'pA' ? 'pB' : 'pA', 
+			cards : oppNeedencard
+		});
+		return result;
 	},
 	'playJutsu' : function (args, o) {
 		// var cardKey = arraySearch(o.S[args.pX][args.from], args.card);
@@ -974,7 +1020,7 @@ var Actions = {
 		// o.S.stack.push(
 		// 	{"card" :args.card, "user":"c107", "target":"c107", "owner":"pA"}
 		// )
-		console.log('!!!!')
+		return {};
 	},
 	'charge' : function(args, o) {
 		return Actions.moveCardToZone(args, o)
@@ -1050,7 +1096,7 @@ var Actions = {
 			args2.card = args.card;
 			args2.cause = 'resolveJutsuFromStack';
 			args2.from = 'stack';
-			args2.to = 'discard';
+			args2.to = 'chackra';
 			if (jutsu.type == 'M' && jutsu.effect.permanent) {
 				args2.to = 'mission';
 			} 
@@ -1103,6 +1149,25 @@ var Actions = {
 				}
 			} 
 		}
+		for (var accCard in o.Accordance) {
+			if (o.Known[o.Accordance[accCard]].effect
+				&& o.Known[o.Accordance[accCard]].effect.static
+				&& o.Known[o.Accordance[accCard]].effect.static.powerNinja
+			) {
+				var powerNinja = o.Known[o.Accordance[accCard]].effect.static.powerNinja;
+				for (var i in powerNinja) {
+					var conditionSelf = powerNinja[i].conditionSelf({"card":card, "self":accCard},o);
+					var condition = powerNinja[i].condition({"card":card, "self":accCard},o);
+					if (conditionSelf
+						&& condition
+					) {
+						result.attack += powerNinja[i].powerMod.attack;
+						result.support += powerNinja[i].powerMod.support;
+					}
+				}
+			}
+			
+		}
 		return result;
 	},
     'getNinjaDefaultPower' : function(card, o) {
@@ -1132,9 +1197,73 @@ var Actions = {
         result.support += mod.support;
         return result;
     },
+    'cardEffect' : function(args, o) {
+    	var result = {};
+    	console.log('\n--- cardEffect ---'.yellow);
+    	console.log(args)
+		if (args.effectType == 'trigger')
+			o.Known[o.Accordance[args.card]].effect.trigger[args.trigger][args.effectKey].cardEffect(result, args, o);
+    	return result;
+    },
 	'log' : function() { 
 		console.log('msg')
-	}
+	},
+	'prepareEffect': function(){
+		return {};
+	},
+	/**
+	 * [description]
+	 * @param  {[type]} args [description]
+	 * @param  {[type]} args.path
+	 * @param  {[type]} args.path.player ['pA', 'pB']
+	 * @param  {[type]} args.path.zone ['mission', 'village']
+	 * @param  {[type]} o    [description]
+	 * @return {[type]}      [description]
+	 */
+	'cardPath' : function(args, o) {
+		var defaultZones = ['deck','stack','village','hand','discard','mission','attack','block'];
+		var defaultPlayers = ['pA', 'pB'];
+		args.path = args.path || {
+			path : {
+				player : defaultPlayers,
+				zones : defaultZones
+			}
+		};
+		var zones = args.path.zones || defaultZones;
+        var pXs = args.path.players || defaultPlayers;
+
+        for (var pX in pXs) {
+	        for (var zone in zones ) {
+	            if (!isZoneSimple(zones[zone])) {
+	            	for (var team in o.S[pXs[pX]][zones[zone]]) {
+	            		for (var cardId in o.S[pXs[pX]][zones[zone]][team]) {
+		                    if (args.card == o.S[pXs[pX]][zones[zone]][team][cardId]) {
+		                        return {
+		                        	player : pXs[pX],
+		                        	zone : zones[zone],
+		                        	team : team,
+		                        	key : cardId
+		                        };
+		                    }
+	            		}
+	            	}
+	            }
+            	else {
+	                for (var cardId in o.S[pXs[pX]][zones[zone]]) {
+	                    if (args.card == o.S[pXs[pX]][zones[zone]][cardId]) {
+	                        return {
+		                        	player : pXs[pX],
+		                        	zone : zones[zone],
+		                        	key : cardId
+	                        };
+	                    }
+	                }
+	            }
+	            
+	        }
+	    }
+	    return false;
+	} 
 };
 if (module) {
 	module.exports = Actions;
