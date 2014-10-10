@@ -148,6 +148,13 @@ function Card( o ) {
             css( 'lineHeight', size / 4 + 'px' );
         Log( -1, 'instTeamPower' );
     };
+    this.instIconText = function( size, o ) {
+        var o = o || {_this : this};
+        var size = size || this.params.W;
+        console.log( o._this.id)
+        o._this.$icons.css( 'fontSize', size / 8  + 'px' );
+        o._this.$icons.css( 'lineHeight', size / 4  + 'px' );
+    };
     this.instMouseControleDown = function( size, o ) {
         if (o._this.params.status == 'card') {
             o._this.$mouse.css( '-webkit-transform', 'translate3d(0,0,' + (size / 15 + 1) + 'px )' )
@@ -350,21 +357,24 @@ function Card( o ) {
     this.fillAsFaceUpMission = function(link) {
         link
             .append( $( '<div />', { 'class': 'cbg' } ) )
-            .append( $( '<div />', { 'class': 'outShell' } )
+
+            var outShell = $( '<div />', { 'class': 'outShell' })
                 .css( 'width', '92%' )
                 .css( 'height', '92%' )
                 .css( 'top', '4%' )
                 .css( 'left', '4%' )
+
+            outShell
                 .append(
                     $( '<div />', {
                         'class': 'rectangle'
-                    } ) // end create 'limon'
+                    } ) // end create 'rectangle'
                     .css('background', this.getBG('side bottom right'))
                     .append(
                         $( '<div />', { 'class': 'rectangle_image' } )
                             .css( 'background-image', 'url(public/pics/' + this.params.img + '.jpg)' )
                         )
-                    ) // end append 'limon'
+                    ) // end append 'rectangle'
                 .append(
                     $( '<div />', { 'class': 'icon cardIcon' } )
                     .css( 'right', '18%' )
@@ -398,7 +408,8 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'handcost' + this.params.hc } )
+                        $( '<div />', { 'class': 'whiteTextblackBorder handcost' + this.params.hc,
+                                        'text' : this.params.hc   } )
                         )
                     )
                 .append(
@@ -408,10 +419,33 @@ function Card( o ) {
                     .css( 'width', '25%' )
                     .css( 'height', '25%' )
                     .append(
-                        $( '<div />', { 'class': 'turncost' + this.params.ec } )
+                        $( '<div />', { 'class': 'whiteTextblackBorder turncost' + this.params.ec,
+                                        'text' : this.params.ec  } )
                         )
                     )
-                )
+
+            var permanentValue = Known[Accordance[this.id]].effect.permanent;
+            if (permanentValue) {
+                if (permanentValue !== true) {
+
+                    if (S.statuses[this.id] && S.statuses[this.id].permanent) {
+                        permanentValue = S.statuses[this.id].permanent;
+                    }
+
+                    outShell
+                        .append(
+                            $( '<div />', { 'class': 'icon cardIconPermanent' } )
+                            .css( 'left', '37.5%' )
+                            .css( 'top', '77%' )
+                            .append(
+                                $( '<div />', { 'class': 'permanent whiteTextblackBorder',
+                                                'text' : permanentValue } )
+                                )
+                            )
+                }
+            }
+         link
+         .append(outShell)  
             .append( $( '<div />', { 'class': 'mouseControle' } ) );
 
     };
@@ -504,7 +538,7 @@ function Card( o ) {
                 this.$romb = $( '.romb', this.$id );
                 break;
         }
-        this.$icons = $( '.cardIcon', this.$id );
+        this.$icons = $( '.icon', this.$id );
         this.$mouse = $( '.mouseControle', this.$id );
         this.$cbg = $( '.cbg', this.$id );
     };
@@ -521,6 +555,8 @@ function Card( o ) {
             .css( 'left', this.params.position.X )
             .css( 'width', this.params.W )
             .css( 'height', this.params.W )
+            .css( 'font-size', this.params.W / 8  + 'px')
+            .css( 'line-height', this.params.W / 4 + 'px')
             .css( 'backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')' );
         if ( this.params.faceUp ) {
             this.fillAsFaceUp( $card );
@@ -971,6 +1007,7 @@ function Card( o ) {
                 o._this.instPower( nowH, o );
                 o._this.instTeamPower( nowH, o );
                 o._this.upSideAndCorner( nowH, o );
+                o._this.instIconText( nowH, o );
             }
 
 
