@@ -144,7 +144,7 @@ $(window).readyresize(function(width, height) {
     $('#youHand').putty('xysize', bar_H + login_W + dd_W+ dd_W, 1, hand_W, bar_H - 4);
     $('#oppHand').putty('xysize', bar_H + login_W + dd_W+ dd_W, 1, hand_W, bar_H - 4);
     $('#table').putty('xysize', 0, bar_H, main_W, main_H - 2 * bar_H );
-    $('#noir').putty('xysize', 0, bar_H, 0, 0 )
+    $('#noir').putty('xysize', 0, 0, 0, 0 )
             .css('lineHeight',  (bar_H - 5) + 'px')
             .css('fontSize',  (bar_H - 5 ) / 1.5 + 'px');
 
