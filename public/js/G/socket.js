@@ -136,7 +136,7 @@ var stackPrepAfter = {
 	afterQuestion : []
 };
 function applyStackAfter() {
-	//console.log('applyStackAfter',stackPrepAfter);	
+	console.log('applyStackAfter',stackPrepAfter);	
 	var stackPrep = stackPrepAfter;
 	AN.preStack.count = 1;
 	for (var func in stackPrep) {
