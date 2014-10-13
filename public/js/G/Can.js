@@ -224,6 +224,7 @@ var Can = {
 	},
     putInPlay : function(args, o) {
         if ( o.S.phase == 'mission' 
+             && !o.S.stack.length
              && o.S.activePlayer == args.pX  
              && arraySearch(o.S[args.pX].hand, args.card) !== null
              && o.Known[o.Accordance[args.card]]
