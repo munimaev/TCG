@@ -502,7 +502,7 @@ var AN = {
 				AN.preStack.countDown();
 				return;
 			}
-			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
+			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Выберите нового лидера для команды' );
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {				
 				Answers.newLeader.push( {
@@ -526,7 +526,7 @@ var AN = {
 			AN.stop = true;
 			if (!('discardExcess' in Answers)) Answers.discardExcess = [];
 			var condidateCount = [];
-			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Сбросьте картs с руки до 6.' ); 
+			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Сбросьте картs с руки до 6.' ); 
 			AN.moveToPreview( { pX: args.pX } );
 			Card.moveToPreviewToHandBlocker = true;
 
@@ -574,14 +574,41 @@ var AN = {
 				AN.hideNoir({ condidateCount:condidateCount });
 			}
 		},
+		discardCardFromHand : function(args, o) {
+			AN.stop = true;
+			if (!('discardCardFromHand' in Answers)) Answers.discardCardFromHand = [];
+			var condidateCount = [];
+			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Сбросьте картs с руки до 6.' ); 
+			AN.moveToPreview( { pX: args.pX } );
+			Card.moveToPreviewToHandBlocker = true;
 
+			var condidateCount = [];
+			for (var i in S[args.pX].hand) {
+				var cardId = S[args.pX].hand[i];
+				if (true) {
+					condidateCount.push(cardId);
+					C[cardId].setZIndex(1202);
+				}
+			}
+			Context.workingUnit = 'card';
+			Context.clickAction = function( card ) {
+				Answers.discardCardFromHand.push( {
+					pX   : you,
+					card : card.id,
+				});
+				C[card.id].select(true);
+				Card.moveToPreviewToHandBlocker = false;
+				AN.hideNoir({ condidateCount:condidateCount });
+				AN.preStack.countDown();
+			}
+		},
 		selectUserForJutsu : function(args, o) {
 			console.log('ARGS', args)
 			var jutsu = Known[Accordance[args.card]];
 			AN.stop = true;
 			var condidateCount = [];
 
-			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите исполльзующнго для техники.' );
+			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Выберите исполльзующнго для техники.' );
 			
 			condidateCount = Can.areAvailableTargets(args, o);
 			for (var i in condidateCount) {
@@ -757,14 +784,14 @@ var AN = {
 			}
 			AN.stop = true;
 			var condidateCount = [];
-			$( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите карты для оплаты цены руки.' ); 
+			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Выберите карты для оплаты цены руки.' ); 
 			AN.moveToPreview( { pX: args.pX } );
 			Card.moveToPreviewToHandBlocker = true;
 
 			var condidateCount = [];
 			for (var i in S[args.pX].hand) {
 				var cardId = S[args.pX].hand[i];
-				if (true) {
+				if (cardId != args.card) {
 					condidateCount.push(cardId);
 					C[cardId].setZIndex(1202);
 				}
@@ -955,6 +982,25 @@ var AN = {
 			console.log(args);
 				if (args.effectType == 'trigger')
 				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey].question(args, getUniversalObject());
+		},
+		'adEndOfTurn' : function() {
+			AN.preStack.countDown();
+		},
+		'discardCardFromHand' : function() {
+			if (args.pX == you) {
+				AnimationPush({func:function() {
+					AN.Questions.discardCardFromHand(args, getUniversalObject());
+				}, time:1000, name: 'Questions - discardCardFromHand'});
+			}
+			else {
+				AN.preStack.countDown();
+			}
+		},
+		'removePermanentCounter' : function(args) {
+			Actions.removePermanentCounter(args, getUniversalObject());
+		},
+		'discardMission' : function(args) {
+			Actions.discardMission(args, getUniversalObject());
 		}
 	}
 }
