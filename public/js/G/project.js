@@ -892,7 +892,7 @@ function shoseNewLeader( team ) {
     for ( var i in team.support.order ) {
         window[team.support.order[i]].setZIndex( 500 );
     }
-    $( '#noir' ).css( 'width', I.table.W ).css( 'height', I.table.H ).html( 'Выберите нового лидера для команды' );
+    $( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Выберите нового лидера для команды' );
     Context.workingUnit = 'card';
     Context.clickAction = function( card ) {
         makeAsLeader( card );
@@ -1347,6 +1347,7 @@ function updPosition(position,sqr) {
                     }
                 }
             });
+            C[S[you].mission[m]].changePermanentCounter();
     }
 
 
@@ -1395,6 +1396,7 @@ function updPosition(position,sqr) {
                     }
                 }
             });
+            C[S[opp].mission[m]].changePermanentCounter();
     }
 
     if (isFight) {
@@ -1912,6 +1914,7 @@ function print() {
     console.log('chackra : ' + S[opp].chackra.length, S[opp].chackra )
     console.log('-------------------------------------')
     console.log('village : '     ,  S[opp].village.team)
+    console.log('mission : '     ,  S[opp].mission)
     console.log('block   : '     ,  S[opp].block.team)
     console.log('attack  : '     ,  S[opp].attack.team)
     console.log('-------------------------------------')
@@ -1920,6 +1923,7 @@ function print() {
     console.log('-------------------------------------')
     console.log('attack  : '     ,  S[you].attack.team)
     console.log('block   : '     ,  S[you].block.team)
+    console.log('mission : '     ,  S[you].mission)
     console.log('village : '     ,  S[you].village.team)
     console.log('-------------------------------------')
     console.log('chackra : ' + S[you].chackra.length, S[you].chackra )
