@@ -67,6 +67,12 @@ body {
 .actionIcon.changeInTeam {
     background-image: url('../pics/icons/changeInTeam.png');
 }
+.actionIcon.changeInTeam {
+    background-image: url('../pics/icons/changeInTeam.png');
+}
+.actionIcon.activateEffect1 {
+    background-image: url('../pics/number1.png');   
+}
 .actionClose {
     position: absolute;
     width: 20%;
