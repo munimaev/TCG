@@ -135,7 +135,7 @@ var Actions = {
 	 * @return {[type]}	  [description]
 	 */
 	'moveCardToZone': function(args, o) {
-		console.log('Move Card TO Zone')
+		// console.log('Move Card TO Zone')
 		// console.log(args, isZoneSimple(args.from),args.from)
 		var result = {
 			updTable: [],
@@ -150,7 +150,7 @@ var Actions = {
 			}
 		}
 
-		console.log(isZoneSimple(args.from))
+		// console.log(isZoneSimple(args.from))
 		if (!isZoneSimple(args.from)) {
 
 			result.updTable[0] = {};
@@ -189,14 +189,14 @@ var Actions = {
 				}
 			}
 		} else if (isZoneSimple(args.from)) {
-			console.log(args.pX, args.from, args.card)
+			// console.log(args.pX, args.from, args.card)
 			if (args.from == 'stack') {
 				var ind = true;
 				result.updTable[0] = {};
 			} else {
 				var ind = arraySearch(o.S[args.pX][args.from], args.card);
 			}
-			console.log('IND', ind)
+			// console.log('IND', ind)
 			if (ind !== null) {
 				if (args.from == 'stack') {
 					for (var i in o.S.stack) {
@@ -529,8 +529,8 @@ var Actions = {
 				delete o.S.statuses[i].atEndOfTurn;
 			}
 		}
-		console.log('STATUS')
-		console.log(o.S.statuses)
+		// console.log('STATUS')
+		// console.log(o.S.statuses)
 	},
 	'adEndOfTurn': function(args, o) {
 		var result = {
@@ -705,6 +705,7 @@ var Actions = {
 	},
 	'actionLock': function(arg) {
 		actionLock = arg.lock;
+		console.log('actionLock', arg.lock)
 	},
 	'completeDefeat': function(team, o) {
 		//console.log('completeDefeat' , team)
@@ -978,7 +979,7 @@ var Actions = {
 		return result;
 	},
 	'retrunTeamToVillage': function(args, o) {
-		console.log('retrunTeamToVillage')
+		// console.log('retrunTeamToVillage')
 		if (args.team == 'all') {
 			var pXs = ['pA', 'pB'];
 			var zones = ['attack', 'block'];
@@ -1313,8 +1314,10 @@ var Actions = {
 			});
 			setTimeout(AN.preStack.countDown, 1510);
 		} else {
-			for (var i in jutsu.effect.trigger.resolve) {
-				jutsu.effect.trigger.resolve[i].func(result, args, o);
+			if (jutsu.effect.trigger && jutsu.effect.trigger.resolve) {
+				for (var i in jutsu.effect.trigger.resolve) {
+					jutsu.effect.trigger.resolve[i].func(result, args, o);
+				}
 			}
 		}
 		var args2 = {}
@@ -1526,6 +1529,7 @@ var Actions = {
 
 		if (!module) {
 			updTable();
+			AN.preStack.countDown();
 		}
 		else {
 			return result;
