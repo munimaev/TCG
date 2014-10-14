@@ -221,6 +221,11 @@ var AN = {
 			if ( isZoneSimple(args.to) ) {
 				if (args.to != 'stack' &&  args.to != 'mission' ) {
 					AN.moveCardFaceDownToZone(args)
+					if (args.from == "mission") {
+						AnimationPush({func:function() {
+							 updTable();
+						}, time:600, name: 'updTeams'});
+					}
 				} 
 				else {
 					if (args.from != 'stack' &&  args.to != 'mission') {
@@ -539,7 +544,6 @@ var AN = {
 				}
 			}
 
-
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
 				var change = false;
@@ -590,6 +594,14 @@ var AN = {
 					C[cardId].setZIndex(1202);
 				}
 			}
+
+			if (!condidateCount.length) {
+				Card.moveToPreviewToHandBlocker = false;
+				AN.hideNoir({ condidateCount:condidateCount });
+				AN.preStack.countDown();
+				return;
+			}
+
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
 				Answers.discardCardFromHand.push( {
@@ -819,22 +831,22 @@ var AN = {
 			
 			//console.log('stackPrepArfterIsRun = ',stackPrepArfterIsRun)
 			AN.preStack.count--;
-			console.log('countDown',AN.preStack.count)
+			// console.log('countDown',AN.preStack.count)
 			if (AN.preStack.count < 1) {
 				if (stackPrepBeforIsRun ) {
 					stackPrepBeforIsRun = false;
-					console.log('b')
+					// console.log('b')
 					applyStackNormal();
 				}
 				else if (stackPrepArfterIsRun ) {
 					stackPrepArfterIsRun = false;
-					console.log('a')
+					// console.log('a')
 					applyStackAfter();
 				}
 				else {
-					console.log('Answers', Answers)
+					// console.log('Answers', Answers)
 					//
-					console.log('t2 = ' + (Date.now() - updactTimeStart))
+					// console.log('t2 = ' + (Date.now() - updactTimeStart))
 					socket.emit('preStackDone',{u:Client, answers: Answers});
 					Answers = {};
 				}
@@ -904,7 +916,7 @@ var AN = {
 			Actions.giveReward(args, getUniversalObject());
 		},
 		'returnToVillaje' : function(args) {
-			console.log(args);
+			// console.log(args);
 			Actions.retrunTeamToVillage(args, getUniversalObject());
 		},
 		'adNewTurn' : function(args) {
@@ -913,7 +925,7 @@ var AN = {
 			setTimeout (AN.preStack.countDown, 1210)
 		},
 		'drawCard' : function(args) {
-			console.log(args);
+			// console.log(args);
 			Actions['Draw X cards'](args, getUniversalObject())
 		},
 		'putCardInPlay' : function(args) {
@@ -978,8 +990,8 @@ var AN = {
 			AN.preStack.countDown();
 		},
 		'prepareEffect' : function(args) {
-			console.log('---!--- prepareEffect')
-			console.log(args);
+			// console.log('---!--- prepareEffect')
+			// console.log(args);
 				if (args.effectType == 'trigger')
 				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey].question(args, getUniversalObject());
 		},
@@ -1001,6 +1013,7 @@ var AN = {
 		},
 		'discardMission' : function(args) {
 			Actions.discardMission(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,760)
 		}
 	}
 }
