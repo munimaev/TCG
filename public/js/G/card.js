@@ -1041,10 +1041,10 @@ function Card(o) {
 
         if ((!o.isInclining && o.isMoving && !o.additional.incline) || o.additional.after) {
             done = function() {
-                //if (o._this.id == 'c005')console.log('after',o);
-                //console.log(o._this.params);
+                // if (o._this.id == 'c001')console.log('after',o);
+                // console.log(o._this.params.incline);
                 if (!o.isInclining && o.isMoving && !o.additional.incline) {
-                    //console.log(o._this.id, 'after')
+                    // console.log(o._this.id, 'after')
                     o._this.animation({
                         x: 0,
                         y: 0,
@@ -1053,7 +1053,7 @@ function Card(o) {
                         duration: Math.round(o.duration / 2)
                     });
                 }
-                //console.log(o);
+                // console.log(o);
                 if (o.additional.after) {
                     if (o.additional.after.func) {
                         o.additional.after.func();
@@ -1159,6 +1159,7 @@ function Card(o) {
                 css('-webkit-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)').
                 css('-moz-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)');
                 //console.log(fx.prop, fx.start, now, fx.end)
+                o._this.params.incline = {x: nowX, y: nowY, z: nowZ, deg: nowDeg};
             }
 
 
@@ -1175,7 +1176,6 @@ function Card(o) {
                 o._this.instIconText(nowH, o);
             }
 
-
             if (o.isInclining && (!o.isMoving || o.additional.incline)) {
                 var nowXi = oldXi - (oldXi - newXi) * multipler;
                 var nowYi = oldYi - (oldYi - newYi) * multipler;
@@ -1186,6 +1186,7 @@ function Card(o) {
                 $(this).
                 css('-webkit-transform', 'rotate3d(' + nowXi + ',' + nowYi + ',' + nowZi + ',' + nowDegi + 'deg)').
                 css('-moz-transform', 'rotate3d(' + nowXi + ',' + nowYi + ',' + nowZi + ',' + nowDegi + 'deg)');
+
             }
             if (o.additional.intoCard) {
                 if ('intoCard' in o.additional && o.additional.intoCard) {
@@ -1940,6 +1941,38 @@ function Card(o) {
                             }
                         })()
                     }))
+            }
+        }
+        if (Known[Accordance[this.id]].effect.activate) {
+            var id = this.id;
+            var activate = Known[Accordance[this.id]].effect.activate;
+            for (var i in activate) {
+                console.log(';;')
+                console.log(activate[i].can({card: this.id},
+                    getUniversalObject()
+                ).result)
+                if (activate[i].can({card: this.id},
+                    getUniversalObject()
+                ).result) {
+                    $c.append(
+                        $('<div />', {
+                            class: 'actionIcon n' + ( 3 + Number(i) )+ ' activateEffect' + (Number(i) + 1),
+                            'click': (function() {
+                                return function() {
+                                    C[id].hideAction();
+                                    socket.emit('activateEffect', {
+                                        u: Client,
+                                        arg: {
+                                            card : id,
+                                            pX: you,
+                                            effectKey : i
+                                        }
+                                    })
+                                }
+                            })()
+                        }))
+
+                }
             }
         }
     }
