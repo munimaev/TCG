@@ -385,8 +385,48 @@ var CardBase = {
         "number": "n1423",
         "elements": "E",
         "name": "Neji Hyuga",
-        "effectText": "",
-        "effect": {}
+        "effectText": {
+            effectName: "План зашиты",
+            "effects": [{
+                "effect": "Когда 1 из ваших постоянных миссий земли должны  быть перемещены в из игры  под действием эффекта, вы можете  переместить этого ниндзя в вашу чакру в этом случае переместит эту мисси. в вашу руку. ",
+            }]
+        },
+        "effect": {
+            "trigger": {
+                "moveCardToZone": [{
+                    "condition": function(args, o) {
+                        if (o.Known[args.card].number == 'n847' && (args.from == "block" || args.from == "attack") && args.cause == "resultOfshutdown") {
+                            return true;
+                        }
+                        return false;
+                    },
+                    "result": function(result, args, o) {
+                        var opp = args.pX == 'pA' ? 'pB' : 'pA';
+                        if (!o.S[opp].hand.length) return result;
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('cardTriggerEffect' in result.toStack)) result.toStack.moveCardToZone = [];
+
+                        console.log(o.S[opp].hand)
+
+                        var card = o.S[opp].hand[Math.round(Math.random() * (o.S[opp].hand.length - 1))];
+                        result.toStack.moveCardToZone.push({
+                            pX: opp,
+                            card: card,
+                            cause: 'effectOfcard',
+                            from: 'hand',
+                            to: 'deck',
+                            team: null,
+                            options: {
+                                moveTo: 'top'
+                            }
+                        });
+
+
+                        return result;
+                    }
+                }]
+            }
+        }
     },
     "n699": {
         "type": "N",
@@ -690,7 +730,7 @@ var CardBase = {
         "img": "m589",
         "number": "m589",
         "elements": "E",
-        "name": "*** BBQ House",
+        "name": "=== BBQ House ===",
         "effectText": {
             "effects": [{
                 "effect": "Пстоянная 3"
@@ -933,6 +973,23 @@ var CardBase = {
         },
         "effect": {
             "permanent": true,
+            "activate": [{
+                "can": function(args, o) {
+                    var owner = o.Known[o.Accordance[args.card]].owner;
+                    if (o.S.activePlayer == owner && o.S.phase == "mission" && Actions.cardPath({
+                        card: args.card,
+                        path : {players: [owner],
+                        zones: ['mission']}
+                    }, o)) {
+                        return {
+                            "result": true
+                        };
+                    }
+                    return {
+                        "result": false
+                    };
+                },
+            }]
         }
     }
 };
