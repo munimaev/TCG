@@ -53,6 +53,7 @@ exports.initLobbi = function(sio, socket, session_store_) {
 	gameSocket.on('preStackDone', preStackDone);
 	gameSocket.on('addAnswers', addAnswers);
 	gameSocket.on('save', saveGame);
+	gameSocket.on('activateEffect', activateEffect);
 	//gameSocket.on('load',loadGame);
 	//-----------------------------------------
 	gameSocket.on('initGame', S_init);
@@ -405,9 +406,7 @@ function getStartSnapshot(table) {
 			}
 		},
 		battlefield: {},
-		stack: {
-
-		},
+		stack: [],
 		pB: {
 			counters: {
 				playedMission: 0
@@ -1118,6 +1117,23 @@ function charge(d) {
 	// TODO возможно надо реагировать
 }
 
+function activateEffect(d) {
+	var o = getUniversalObject(d.u.table);
+	if (o.Known[o.Accordance[d.arg.card]]
+		&& o.Known[o.Accordance[d.arg.card]].effect
+		&& o.Known[o.Accordance[d.arg.card]].effect.activate
+		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey]
+		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can
+	){
+		var canResult = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can();
+		if (!canResult.result) return;
+		
+	}
+	else {
+		return;
+	} 
+}
+
 function drawCardAtStartTurn(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.drawCardAtStartTurn({
@@ -1242,9 +1258,13 @@ function getUpdatesForPlayers(table, actReuslt) {
 		};
 		for (var card in obj.cards) {
 
-			result[obj.forPlayer].Accordance[obj.cards[card]] = table[obj.forPlayer].Accordance[obj.cards[card]] = table.Accordance[obj.cards[card]];
+			result[obj.forPlayer].Accordance[obj.cards[card]] 
+				= table[obj.forPlayer].Accordance[obj.cards[card]] 
+				= table.Accordance[obj.cards[card]];
 
-			result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] = table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] = table.Known[table.Accordance[obj.cards[card]]];
+			result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+				= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+				= table.Known[table.Accordance[obj.cards[card]]];
 		}
 	}
 	delete actReuslt.applyUpd;
@@ -1352,16 +1372,34 @@ function preStackDone(d) {
 			if (upds) {
 				if (logThis) console.log(' -> 1', upds.pB)
 				io.sockets.in(table.roompA).emit('updact', {
+					acts: [{
+						'arg': {
+							lock: true
+						},
+						'act': 'actionLock'
+					}],
 					'stackPrep': actReuslt,
 					upd: upds.pA
 				});
 				io.sockets.in(table.roompB).emit('updact', {
+					acts: [{
+						'arg': {
+							lock: true
+						},
+						'act': 'actionLock'
+					}],
 					'stackPrep': actReuslt,
 					upd: upds.pB
 				});
 			} else {
 				if (logThis) console.log(' -> 2')
 				io.sockets.in(table.room).emit('updact', {
+					acts: [{
+						'arg': {
+							lock: true
+						},
+						'act': 'actionLock'
+					}],
 					'stackPrep': actReuslt,
 					ket: 3
 				});
