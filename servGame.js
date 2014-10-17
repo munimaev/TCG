@@ -53,6 +53,7 @@ exports.initLobbi = function(sio, socket, session_store_) {
 	gameSocket.on('preStackDone', preStackDone);
 	gameSocket.on('addAnswers', addAnswers);
 	gameSocket.on('save', saveGame);
+	gameSocket.on('getS', getS);
 	gameSocket.on('activateEffect', activateEffect);
 	//gameSocket.on('load',loadGame);
 	//-----------------------------------------
@@ -593,28 +594,73 @@ var Decks = {
 function getStartCards() {
 	var result = {};
 
+	
+	// 	console.log(CardBase)
+
+
 	var pXs = {
 		'pA': 'c0',
 		'pB': 'c1'
 	};
+
+
+	function rec(input, output) {
+		for (var i in output) {
+			if (typeof output[i] == 'object') {
+				if (output[i].length) {
+					input[i] = rec([], output[i]);
+				}
+				else {
+					input[i] = rec({}, output[i]);  
+				}
+			}
+			else {
+				input[i] = output[i];
+			}
+		}
+		return input;
+	}
+
+	var Known = rec({}, CardBase)
+
+	for (var card in Known) {
+		if ('effect' in Known[card]){
+			for (var type in Known[card]['effect']) {
+				for (var subType in Known[card]['effect'][type]) {
+					for (var index in Known[card]['effect'][type][subType]) {
+						if ('ciclingCheck' in Known[card]['effect'][type][subType][index]) {
+							Known[card]['effect'][type][subType][index]['ciclingCheck'] 
+								= Actions.setCicling(Known[card]['effect'][type][subType][index]['ciclingCheck']);
+						}
+					}
+				}
+			}
+		}
+	}
+
+
 	for (var pX in pXs) {
+		var oboidennie = [];
 		var count = 1;
 		for (var i in Decks[pX]) {
 
 			for (var j = 1; j <= Decks[pX][i].count; j++) {
-
-
-
 				var number = pXs[pX] + (count < 10 ? '0' + count : '' + count);
 				result[number] = {};
-				for (var prop in CardBase[Decks[pX][i].number]) {
-					result[number][prop] = CardBase[Decks[pX][i].number][prop];
+
+				for (var prop in Known[Decks[pX][i].number]) {
+					result[number][prop] = Known[Decks[pX][i].number][prop];
 				}
+
 				result[number].owner = pX;
 				count++;
 			}
 		}
 	}
+
+
+	
+
 	return result;
 }
 
@@ -1118,6 +1164,7 @@ function charge(d) {
 }
 
 function activateEffect(d) {
+	console.log(('-> ' + d.arg.card + ' ' + d.arg.effectKey).cyan)
 	var o = getUniversalObject(d.u.table);
 	if (o.Known[o.Accordance[d.arg.card]]
 		&& o.Known[o.Accordance[d.arg.card]].effect
@@ -1125,9 +1172,34 @@ function activateEffect(d) {
 		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey]
 		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can
 	){
-		var canResult = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can();
+		var canResult = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can(d.arg, o);
 		if (!canResult.result) return;
 		
+
+		var table = StartedGames[d.u.table];
+		var data = {};
+		var actReuslt = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].prepareEffect(d.arg, o);
+		data.stackPrep = actReuslt;
+		table.stackPrep = actReuslt;
+		table.stackPreppA = table.stackPreppB = null;
+		var upds = getUpdatesForPlayers(table, actReuslt);
+		delete actReuslt.applyUpd;
+		var dataA = {
+			'stackPrep': actReuslt,
+		};
+		if (upds && upds.A) {
+			dataA.upd = upds.pA
+		}
+		io.sockets.in(table.roompA).emit('updact', dataA);
+
+		var dataB = {
+			'stackPrep': actReuslt,
+		};
+		if (upds && upds.B) {
+			dataB.upd = upds.pB
+		}
+		io.sockets.in(table.roompB).emit('updact', dataB);
+
 	}
 	else {
 		return;
@@ -1245,10 +1317,10 @@ function addStack(table, actReuslt) {
 }
 
 function getUpdatesForPlayers(table, actReuslt) {
-	// console.log('\ngetUpdatesForPlayers'.cyan);
-	// console.log(actReuslt);
 	var result = {};
 	if (!actReuslt.applyUpd) return null;
+	console.log('\ngetUpdatesForPlayers'.cyan);
+	console.log(actReuslt.applyUpd);
 	var obj = {};
 	for (var i in actReuslt.applyUpd) {
 		obj = actReuslt.applyUpd[i];
@@ -1260,11 +1332,11 @@ function getUpdatesForPlayers(table, actReuslt) {
 
 			result[obj.forPlayer].Accordance[obj.cards[card]] 
 				= table[obj.forPlayer].Accordance[obj.cards[card]] 
-				= table.Accordance[obj.cards[card]];
+				= actReuslt.applyUpd[i].unknown ? null : table.Accordance[obj.cards[card]];
 
 			result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
 				= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
-				= table.Known[table.Accordance[obj.cards[card]]];
+				= actReuslt.applyUpd[i].unknown ? null : table.Known[table.Accordance[obj.cards[card]]];
 		}
 	}
 	delete actReuslt.applyUpd;
@@ -1332,8 +1404,8 @@ function preStackDone(d) {
 
 		if (logThis) console.log('upds'.green);
 		if (logThis) console.log(upds);
-		if (logThis) console.log('toClient'.green);
-		if (logThis) console.log(actReuslt);
+		// if (logThis) console.log('toClient'.green);
+		// if (logThis) console.log(actReuslt);
 
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
@@ -1370,7 +1442,7 @@ function preStackDone(d) {
 			});
 		} else {
 			if (upds) {
-				if (logThis) console.log(' -> 1', upds.pB)
+				//if (logThis) console.log(' -> 1', upds.pB)
 				io.sockets.in(table.roompA).emit('updact', {
 					acts: [{
 						'arg': {
@@ -1423,4 +1495,8 @@ function saveGame(d) {
 			console.log("JSON saved to " + outputFilename);
 		}
 	});
+}
+function getS(d) {
+	var table = StartedGames[d.u.table];
+	io.sockets.in(table.room).emit('getS',  table.Snapshot);
 }
