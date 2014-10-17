@@ -36,7 +36,7 @@ var CardBase = {
         "effect": {
             "trigger": {
                 "moveCardToZone": [{
-                    "condition": function(args, o) {
+                    "conditionSelf": function(args, o) {
                         if (o.Known[args.card].number == 'n847' && (args.from == "block" || args.from == "attack") && args.cause == "resultOfshutdown") {
                             return true;
                         }
@@ -127,8 +127,204 @@ var CardBase = {
         "number": "n1319",
         "elements": "W",
         "name": "Yaoki",
-        "effectText": "",
-        "effect": {}
+        "effectText": {
+            effectName: "Кукловод песка",
+            "effects": [{
+                "when" : "Обмен техниками",
+                "cost" : "1",
+                "effect": "переместите целевую марионетку из другой вашей отправленной в сражение в команду этого ниндзя на любую позицию.",
+            }]
+        },
+        "effect": {
+            "activate": [{
+                "can": function(args, o) {
+                    var owner = o.Known[o.Accordance[args.card]].owner;
+                    if (o.S.activePlayer == owner 
+                        && (!module
+                            && o.S.activePlayer == you)
+                        && o.S.phase == "mission" 
+                        && (!o.S.statuses[args.card] 
+                            || !o.S.statuses[args.card].atEndOfTurn
+                            || !o.S.statuses[args.card].atEndOfTurn.activateUsed0 )
+                        && Actions.cardPath({
+                            card: args.card,
+                            path : {players: [owner],
+                            zones: ['mission']}
+                            }, o)
+                    ) {
+                        return {
+                            "result": true
+                        };
+                    }
+                    return {
+                        "result": false
+                    };
+                },
+                "prepareEffect": function(args, o) {
+                    // if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    // if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    // o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    // result = {
+                    //     'prepareEffect': [{
+                    //         pX: o.Known[o.Accordance[args.card]].owner,
+                    //         card: args.card,
+                    //         effectType: 'activate',
+                    //         effectKey: 0
+                    //     }]
+                    // }
+                    // return result;
+                },
+                "question" : function(args, o) {
+                    // if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    // if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    // o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    // if (args.pX == you) {
+                    //     AN.stop = true;
+                    //     if (!('primal' in Answers)) Answers.primal = {};
+                    //     if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                    //     var condidateCount = [];
+                    //     $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите тип карты.');                       
+                    //     var clickFunction = function(type){
+                    //         var type = type;
+                    //         return function() {
+                    //             args.selectedType = type;
+                    //             Answers.primal.cardEffect.push(args)
+                    //             AN.hideNoir({
+                    //                 condidateCount: []
+                    //             });
+                    //             AN.preStack.countDown();                                
+                    //         }
+                    //     }
+
+                    //     AN.selectFromThree({
+                    //         'text1': 'Ниндзя',
+                    //         'func1': clickFunction('N'),
+                    //         'text2': 'Техника',
+                    //         'func2': clickFunction('J'),
+                    //         'text3': 'Миссия',
+                    //         'func3': clickFunction('M')
+                    //     });
+                    // } else {
+                    //     AN.preStack.countDown();
+                    // }
+                },
+                "cardEffect": function(result, args, o) {
+                    // console.log('args'.red)
+                    // console.log(args)
+                    // if (!('applyUpd' in result)) result.applyUpd = [];
+                    // result.applyUpd.push({
+                    //     forPlayer: 'pA',
+                    //     cards: [o.S[args.pX].deck[0]]
+                    // })
+                    // result.applyUpd.push({
+                    //     forPlayer: 'pB',
+                    //     cards: [o.S[args.pX].deck[0]]
+                    // })
+
+                    // if (!('prepareEffect' in result)) result.prepareEffect = [];
+                    // result.prepareEffect.push({
+                    //     pX: o.Known[o.Accordance[args.card]].owner,
+                    //     card: args.card,
+                    //     effectType: 'activate',
+                    //     effectKey: 0,
+                    //     step: 1,
+                    //     selectedType: args.selectedType,
+                    //     isType : o.Known[o.Accordance[o.S[args.pX].deck[0]]].type
+                    // })
+                    // return result;
+                },
+                "question1" : function(args, o) {                        
+                    // createCard({
+                    //     id: S[args.pX].deck[0],
+                    //     zona: 'deck',
+                    //     owner: args.pX,
+                    //     team: null,
+                    //     position: null,
+                    //     condition: 'look',
+                    //     X : G.you.deck.X,
+                    //     Y : G.you.deck.Y,
+                    //     W : G.you.deck.H,
+                    // } )
+
+                    // C[S[args.pX].deck[0]].animation({
+                    //     W: I.card.W * 2,
+                    //     X: G.you.deck.X + G.you.deck.H / 2 - I.card.W,
+                    //     Y: I.H / 2 - I.card.W
+                    // })  
+
+                    // if (args.pX == you) {
+                    //     if (!('primal' in Answers)) Answers.primal = {};
+                    //     if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                    //     Answers.primal.cardEffect.push(args)
+
+                    //     setTimeout( AN.preStack.countDown, 1350);
+                    // } else {
+                    //     AN.preStack.countDown();
+                    // }
+                },
+                "cardEffect1": function(result, args, o) {
+                    if (!('applyUpd' in result)) result.applyUpd = [];
+                    result.applyUpd.push({
+                        forPlayer: (args.pX == 'pA' ? 'pB' : 'pA'),
+                        cards: [o.S[args.pX].deck[0]],
+                        unknown : true
+                    })
+                    if (args.selectedType == args.isType) {
+                        if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                        result.adMoveCardToZone.push({
+                            pX: args.pX,
+                            card: o.S[args.pX].deck[0],
+                            cause: 'cardEffect',
+                            from: 'deck',
+                            to: 'hand',
+                            team: null
+                        })
+                    } 
+                    else {
+                        result.applyUpd.push({
+                            forPlayer: (args.pX == 'pA' ? 'pB' : 'pA'),
+                            cards: [o.S[args.pX].deck[0]],
+                            unknown : true
+                        })
+
+                        if (!('prepareEffect' in result)) result.prepareEffect = [];
+                        result.prepareEffect.push({
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0,
+                            step: 2
+                        })
+                    }
+                    return result;
+                },
+                "question2" : function(args, o) {
+                    C[S[args.pX].deck[0]].animation({
+                        W: G[args.pX == you ? 'you' : 'opp'].deck.H,
+                        X: G[args.pX == you ? 'you' : 'opp'].deck.X,
+                        Y: G[args.pX == you ? 'you' : 'opp'].deck.Y,
+                        opacity : 0,
+                        duration: 600, 
+                        additional: {
+                            after: {
+                                func : function() {
+                                    C[S[args.pX].deck[0]].destroyCard()
+                                }
+                            }
+                        }
+                        
+                    }) 
+
+                    if (args.pX == you) {
+                        setTimeout( AN.preStack.countDown, 600)
+                    } else {
+                        AN.preStack.countDown();
+                    }
+                }
+            }]
+        }
     },
     "nus025": {
         "type": "N",
@@ -345,8 +541,8 @@ var CardBase = {
                     func: function(result, args, o) {
                         if (!('toStack' in result)) result.toStack = {};
                         if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
-                        console.log('args'.red)
-                        console.log(args)
+                        // console.log('args'.red)
+                        // console.log(args)
                         result.toStack.increaseNinjaPower.push({
                             card: args.target[0],
                             attack: 5,
@@ -388,41 +584,115 @@ var CardBase = {
         "effectText": {
             effectName: "План зашиты",
             "effects": [{
-                "effect": "Когда 1 из ваших постоянных миссий земли должны  быть перемещены в из игры  под действием эффекта, вы можете  переместить этого ниндзя в вашу чакру в этом случае переместит эту мисси. в вашу руку. ",
+                "effect": "Когда 1 из ваших постоянных миссий земли должны  быть перемещены в из игры  под действием эффекта, вы можете переместить этого ниндзя в вашу чакру в этом случае переместит эту миссию в вашу руку. ",
             }]
         },
         "effect": {
             "trigger": {
-                "moveCardToZone": [{
+                "instedMoveCardToZone": [{
                     "condition": function(args, o) {
-                        if (o.Known[args.card].number == 'n847' && (args.from == "block" || args.from == "attack") && args.cause == "resultOfshutdown") {
+                        var mission = o.Known[o.Accordance[args.card]]; 
+                        if (mission.type = 'M'
+                            && ~mission.elements.indexOf('E')
+                            && args.from == "mission"
+                            && args.cause == "discardMission"
+                        ) {
                             return true;
                         }
                         return false;
+                   
                     },
-                    "result": function(result, args, o) {
-                        var opp = args.pX == 'pA' ? 'pB' : 'pA';
-                        if (!o.S[opp].hand.length) return result;
-                        if (!('toStack' in result)) result.toStack = {};
-                        if (!('cardTriggerEffect' in result.toStack)) result.toStack.moveCardToZone = [];
-
-                        console.log(o.S[opp].hand)
-
-                        var card = o.S[opp].hand[Math.round(Math.random() * (o.S[opp].hand.length - 1))];
-                        result.toStack.moveCardToZone.push({
-                            pX: opp,
-                            card: card,
-                            cause: 'effectOfcard',
-                            from: 'hand',
-                            to: 'deck',
-                            team: null,
-                            options: {
-                                moveTo: 'top'
+                    "conditionSelf": function(args, o) {
+                        return Actions.cardPath({
+                            card: args.card,
+                            path: {
+                                players: [o.Known[o.Accordance[args.card]].owner],
+                                zones: ['village', 'attack', 'block']
                             }
-                        });
-
-
+                        }, o)
+                    },
+                    "ciclingCheck": function(args, o) {
+                        return o.S.turnNumber + args.card + args.actionArgs.card;
+                    },
+                    "resultChange": function(result, args, o) {
+                        result = {
+                            'prepareEffect': [{
+                                pX: o.Known[o.Accordance[args.card]].owner,
+                                card: args.card,
+                                effectType: 'trigger',
+                                trigger: 'instedMoveCardToZone',
+                                effectKey: 0,
+                                actionArgs: args.actionArgs 
+                            }]
+                        }
+                        console.log(result);
                         return result;
+                    },
+                    "question" : function(args, o) {
+                        if (args.pX == you) {
+                            AN.stop = true;
+                            if (!('primal' in Answers)) Answers.primal = {};
+                            if (!('cardEffect' in Answers)) Answers.primal.cardEffect = [];
+                            var condidateCount = [];
+                            $('#noir').css('width', I.W).css('height', I.H).html('Вы можете переместить этого ниндзя в вашу чакру в этом случае переместит эту миссию в вашу руку.');
+
+                            var condidateCount = [args.card, args.actionArgs.card];
+                            C[args.card].setZIndex(1202);
+                            C[args.actionArgs.card].setZIndex(1202);
+                            AN.selectFromTwo({
+                                card1 : args.card,
+                                card2 : args.actionArgs.card,
+                                text1 : 'Сбросить этого ниндзя и вернуть миссию в руку.',
+                                text2 : 'Переместить миссию как обычно.'
+                            })
+                            Context.workingUnit = 'card';
+                            Context.clickAction = function(card) {
+                                if (card.id == args.card) {
+                                   args.useEffect = true; 
+                                }
+                                else {
+                                   args.useEffect = false; 
+                                }
+                                Answers.primal.cardEffect.push(args)
+                                AN.hideNoir({
+                                    condidateCount: condidateCount
+                                });
+                                AN.preStack.countDown();
+                            }
+                        } else {
+                            AN.preStack.countDown();
+                        }
+                    },
+                    "cardEffect": function(result, args, o) {
+                        if (args.useEffect) {
+                            if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                            result.adMoveCardToZone.push({
+                                pX: args.actionArgs.pX,
+                                card: args.card,
+                                cause: 'cardEffect',
+                                from: Actions.cardPath({
+                                    card: args.card,
+                                    path: {
+                                        zones: ['village', 'attack', 'block'],
+                                        players: [args.actionArgs.pX]
+                                    }
+                                }).zone,
+                                to: 'chackra',
+                                team: null
+                            });
+                            result.adMoveCardToZone.push({
+                                pX: args.actionArgs.pX,
+                                card: args.actionArgs.card,
+                                cause: 'cardEffect',
+                                from: args.actionArgs.zone,
+                                to: 'hand',
+                                team: null
+                            });
+                        }
+                        else {
+                            if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                            result.adMoveCardToZone.push(args.actionArgs);
+                        }
                     }
                 }]
             }
@@ -966,9 +1236,9 @@ var CardBase = {
             "effects": [{
                 "effect": "Пстоянная"
             }, {
-                "when": ["Attacker", "Mission"],
+                "when": "Атакующий, Фаза миссии",
                 "cost": "Выберите тип карты. Затем откройте верхнюю карту вашей колоды.",
-                "effect": "Если открытая карты имеет загаданный вами тип, положите ее в свою руку.",
+                "effect": "Если открытая карта имеет загаданный вами тип, положите ее в свою руку.",
             }]
         },
         "effect": {
@@ -976,11 +1246,19 @@ var CardBase = {
             "activate": [{
                 "can": function(args, o) {
                     var owner = o.Known[o.Accordance[args.card]].owner;
-                    if (o.S.activePlayer == owner && o.S.phase == "mission" && Actions.cardPath({
-                        card: args.card,
-                        path : {players: [owner],
-                        zones: ['mission']}
-                    }, o)) {
+                    if (o.S.activePlayer == owner 
+                        && (!module
+                            && o.S.activePlayer == you)
+                        && o.S.phase == "mission" 
+                        && (!o.S.statuses[args.card] 
+                            || !o.S.statuses[args.card].atEndOfTurn
+                            || !o.S.statuses[args.card].atEndOfTurn.activateUsed0 )
+                        && Actions.cardPath({
+                            card: args.card,
+                            path : {players: [owner],
+                            zones: ['mission']}
+                            }, o)
+                    ) {
                         return {
                             "result": true
                         };
@@ -989,6 +1267,169 @@ var CardBase = {
                         "result": false
                     };
                 },
+                "prepareEffect": function(args, o) {
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    result = {
+                        'prepareEffect': [{
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0
+                        }]
+                    }
+                    return result;
+                },
+                "question" : function(args, o) {
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    if (args.pX == you) {
+                        AN.stop = true;
+                        if (!('primal' in Answers)) Answers.primal = {};
+                        if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                        var condidateCount = [];
+                        $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите тип карты.');                       
+                        var clickFunction = function(type){
+                            var type = type;
+                            return function() {
+                                args.selectedType = type;
+                                Answers.primal.cardEffect.push(args)
+                                AN.hideNoir({
+                                    condidateCount: []
+                                });
+                                AN.preStack.countDown();                                
+                            }
+                        }
+
+                        AN.selectFromThree({
+                            'text1': 'Ниндзя',
+                            'func1': clickFunction('N'),
+                            'text2': 'Техника',
+                            'func2': clickFunction('J'),
+                            'text3': 'Миссия',
+                            'func3': clickFunction('M')
+                        });
+                    } else {
+                        AN.preStack.countDown();
+                    }
+                },
+                "cardEffect": function(result, args, o) {
+                    // console.log('args'.red)
+                    // console.log(args)
+                    if (!('applyUpd' in result)) result.applyUpd = [];
+                    result.applyUpd.push({
+                        forPlayer: 'pA',
+                        cards: [o.S[args.pX].deck[0]]
+                    })
+                    result.applyUpd.push({
+                        forPlayer: 'pB',
+                        cards: [o.S[args.pX].deck[0]]
+                    })
+
+                    if (!('prepareEffect' in result)) result.prepareEffect = [];
+                    result.prepareEffect.push({
+                        pX: o.Known[o.Accordance[args.card]].owner,
+                        card: args.card,
+                        effectType: 'activate',
+                        effectKey: 0,
+                        step: 1,
+                        selectedType: args.selectedType,
+                        isType : o.Known[o.Accordance[o.S[args.pX].deck[0]]].type
+                    })
+                    return result;
+                },
+                "question1" : function(args, o) {                        
+                    createCard({
+                        id: S[args.pX].deck[0],
+                        zona: 'deck',
+                        owner: args.pX,
+                        team: null,
+                        position: null,
+                        condition: 'look',
+                        X : G.you.deck.X,
+                        Y : G.you.deck.Y,
+                        W : G.you.deck.H,
+                    } )
+
+                    C[S[args.pX].deck[0]].animation({
+                        W: I.card.W * 2,
+                        X: G.you.deck.X + G.you.deck.H / 2 - I.card.W,
+                        Y: I.H / 2 - I.card.W
+                    })  
+
+                    if (args.pX == you) {
+                        if (!('primal' in Answers)) Answers.primal = {};
+                        if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                        Answers.primal.cardEffect.push(args)
+
+                        setTimeout( AN.preStack.countDown, 1350);
+                    } else {
+                        AN.preStack.countDown();
+                    }
+                },
+                "cardEffect1": function(result, args, o) {
+                    if (!('applyUpd' in result)) result.applyUpd = [];
+                    result.applyUpd.push({
+                        forPlayer: (args.pX == 'pA' ? 'pB' : 'pA'),
+                        cards: [o.S[args.pX].deck[0]],
+                        unknown : true
+                    })
+                    if (args.selectedType == args.isType) {
+                        if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                        result.adMoveCardToZone.push({
+                            pX: args.pX,
+                            card: o.S[args.pX].deck[0],
+                            cause: 'cardEffect',
+                            from: 'deck',
+                            to: 'hand',
+                            team: null
+                        })
+                    } 
+                    else {
+                        result.applyUpd.push({
+                            forPlayer: (args.pX == 'pA' ? 'pB' : 'pA'),
+                            cards: [o.S[args.pX].deck[0]],
+                            unknown : true
+                        })
+
+                        if (!('prepareEffect' in result)) result.prepareEffect = [];
+                        result.prepareEffect.push({
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0,
+                            step: 2
+                        })
+                    }
+                    return result;
+                },
+                "question2" : function(args, o) {
+                    C[S[args.pX].deck[0]].animation({
+                        W: G[args.pX == you ? 'you' : 'opp'].deck.H,
+                        X: G[args.pX == you ? 'you' : 'opp'].deck.X,
+                        Y: G[args.pX == you ? 'you' : 'opp'].deck.Y,
+                        opacity : 0,
+                        duration: 600, 
+                        additional: {
+                            after: {
+                                func : function() {
+                                    C[S[args.pX].deck[0]].destroyCard()
+                                }
+                            }
+                        }
+                        
+                    }) 
+
+                    if (args.pX == you) {
+                        setTimeout( AN.preStack.countDown, 600)
+                    } else {
+                        AN.preStack.countDown();
+                    }
+                }
             }]
         }
     }
