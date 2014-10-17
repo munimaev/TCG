@@ -944,7 +944,10 @@ function Card(o) {
         var animateOptions = {};
 
         o.isInclining = false;
-        if (('x' in o && o.x !== this.params.incline.x) || ('y' in o && o.y !== this.params.incline.y) || ('z' in o && o.z !== this.params.incline.z) || ('deg' in o && o.deg !== this.params.incline.deg)) {
+        if (('x' in o && o.x !== this.params.incline.x) 
+            || ('y' in o && o.y !== this.params.incline.y) 
+            || ('z' in o && o.z !== this.params.incline.z) 
+            || ('deg' in o && o.deg !== this.params.incline.deg)) {
 
             o.isInclining = true;
             mainAnimation = 'inclining';
@@ -1399,6 +1402,7 @@ function Card(o) {
 
     this.destroyCard = function() {
         this.$id.remove();
+        delete C[this.id];
     };
 
     this.onOff3D('off');
@@ -1512,18 +1516,27 @@ function Card(o) {
             }
             if (known.effectText.effects) {
                 for (var i in known.effectText.effects) {
-                    var effect = '';
-                    if (known.effectText.effects[i].effect) {
-                        effect = known.effectText.effects[i].effect;
+                    if (known.effectText.effects[i].when) {
+                        $p = $('<p>', {}); 
+                        $p.append('<b>'+ known.effectText.effects[i].when + '</b></br>')
+                        $p.append('<b><i>' + known.effectText.effects[i].cost + '</i></b>')
+                        $p.append(known.effectText.effects[i].effect)
+                        $prewContent.append($p);
                     }
-                    if (known.effectText.effects[i].valid) {
-                        effect = "Дйствительный: " + effect;
+                    else {
+                        var effect = '';
+                        if (known.effectText.effects[i].effect) {
+                            effect = known.effectText.effects[i].effect;
+                        }
+                        if (known.effectText.effects[i].valid) {
+                            effect = "Дйствительный: " + effect;
+                        }
+                        $prewContent.append(
+                            $('<p>', {
+                                'text': effect
+                            })
+                        );
                     }
-                    $prewContent.append(
-                        $('<p>', {
-                            'text': effect
-                        })
-                    );
                 }
             }
         }
@@ -1825,7 +1838,7 @@ function Card(o) {
     };
 
     this.showAction = function() {
-        Log(1, 'showAction');
+        //Log(1, 'showAction');
 
         var offset = this.$id.offset()
 
@@ -1866,7 +1879,7 @@ function Card(o) {
         }, {
             'duration': 125,
         })
-        Log(-1, 'showAction');
+        //Log(-1, 'showAction');
     }
 
     this.actionFill = function($c) {
@@ -1947,10 +1960,10 @@ function Card(o) {
             var id = this.id;
             var activate = Known[Accordance[this.id]].effect.activate;
             for (var i in activate) {
-                console.log(';;')
-                console.log(activate[i].can({card: this.id},
-                    getUniversalObject()
-                ).result)
+                // console.log(';;')
+                // console.log(activate[i].can({card: this.id},
+                //     getUniversalObject()
+                // ).result)
                 if (activate[i].can({card: this.id},
                     getUniversalObject()
                 ).result) {
