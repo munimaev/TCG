@@ -264,10 +264,10 @@ function createCard(o) {
     if (!o || !('id' in o) || !o.id || !('zona' in o) || !o.zona || !('owner' in o) || !o.owner || !('position' in o)) return false;
     var constr = {
             id: o.id,
-            X: 0,
-            Y: 0,
-            H: I.card.W,
-            W: I.card.W,
+            X: o.X || 0,
+            Y: o.Y || 0,
+            H: o.W || I.card.W,
+            W: o.W || I.card.W,
             faceUp: true,
             owner: o.owner,
             zona: o.zona,
