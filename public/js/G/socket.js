@@ -66,7 +66,7 @@ socket.on('bothIsJoin', function(d) {
 	// Accordance = d.Accordance;
 	// Known = d.Known;
 	applyUpd({upd:{Known : d.Known, Accordance : d.Accordance}})
-	console.log('bothIsJoin',d)
+	// console.log('bothIsJoin',d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
 })
@@ -89,10 +89,14 @@ function get_arg(txt) {
 
 
 function applyUpd(d) {
-	console.log("d.upd.meta",d)
+	// console.log("d.upd.meta",d)
 	if (d.upd) {
-		//console.log("↳ upd ",d.upd)
+		// console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
+			if (!d.upd.Known[i]) {
+				delete Known[i];
+				continue;
+			}
 			//Known[i] = d.upd.Known[i];
 			// console.log(i);
 			Known[i] = CardBase[d.upd.Known[i].number];
@@ -100,6 +104,10 @@ function applyUpd(d) {
 			// console.log(Known)
 		}
 		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
+			if (!d.upd.Accordance[i]) {
+				delete Accordance[i];
+				continue;
+			}
 			Accordance[i] = d.upd.Accordance[i];
 		}
 		if (d.upd.meta) for (var i in d.upd.meta) {
@@ -120,7 +128,7 @@ socket.on('action',function(d) {
 
 function applyAct(d) {
 	if (d.acts) {
-		//console.log("↳ acts ",d.acts)
+		// console.log("↳ acts ",d.acts)
 		for (var i in d.acts) {
 			for (var i2 in d.acts[i].arg) {
 				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
@@ -136,7 +144,7 @@ var stackPrepAfter = {
 	afterQuestion : []
 };
 function applyStackAfter() {
-	console.log('applyStackAfter',stackPrepAfter);	
+	// console.log('applyStackAfter',stackPrepAfter);	
 	var stackPrep = stackPrepAfter;
 	AN.preStack.count = 1;
 	for (var func in stackPrep) {
@@ -225,10 +233,10 @@ function applyStackPrep(d) {
 var updactTimeStart = 0;
 socket.on('updact',function(d) {
 	updactTimeStart = Date.now();
-	console.log('t = ' + updactTimeStart)
-	console.log("")
-	console.log("")
-	console.log("↳ updact ",d.stackPrep)
+	// console.log('t = ' + updactTimeStart)
+	// console.log("")
+	// console.log("")
+	console.log("↳ updact ",d)
 	applyUpd(d);
 	applyAct(d);
 	applyStackPrep(d);
@@ -239,3 +247,9 @@ socket.on('updact',function(d) {
 function save() {
 		socket.emit('save',{u:Client});
 }
+function getS(){
+		socket.emit('getS',{u:Client});
+}
+socket.on('getS',function(d) {
+	console.log(d)
+})
