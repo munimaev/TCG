@@ -31,76 +31,88 @@ var AN = {
 	pB : {
 		handPrewiev : []
 	},
-	playerDrawCards : function(o) {
+	playerDrawCards: function(o) {
 		LogI['playerDrawCards'] = 0;
-		Log( 1, 'playerDrawCards' );
-		Log( 0, 'o' ,o);
+		Log(1, 'playerDrawCards');
+		Log(0, 'o', o);
 		var Y = 0;
-		if ( !('cards' in o) )
-		return false;
+		if (!('cards' in o))
+			return false;
 
-		var $deck = $( '.deck', '#youBar' );
+		var $deck = $('.deck', '#youBar');
 		var position = $deck.offset();
 		for (var i in o.cards) {
 			var id = o.cards[i];
 			//console.log(o, you)
 			var construct = {};
 			if (you == o.pX) {
-				Y =  I.H * 2 / 3 - I.card.W / 2;
-				construct =  Known[Accordance[id]];
+				Y = I.H * 2 / 3 - I.card.W / 2;
+				construct = Known[Accordance[id]];
 				construct.faceUp = true;
 			} else {
-				Y =  I.H * 1 / 3 + I.card.W / 2;
+				Y = I.H * 1 / 3 + I.card.W / 2;
 			}
 			construct.id = id;
 			construct.owner = o.pX;
-		C[id] = new Card(construct);
-		C[id].animation( {
-		'X': I.W / 2 - I.card.W / 2,
-		'Y': Y,
-		'W': I.card.W,
-		x: 0, y: 0, z: 0, deg: 0,
-		duration: 1000,
-		additional: { incline: true, curveMoving: 'Y' }
-		} )
-		}
-
-		setTimeout( function() {
-		AN.moveToPreview( { cards: o.cards , pX :o.pX } );
-		}, 1005 );
-
-		setTimeout( function() {
-		AN.moveToHand( {  cards: o.cards , pX :o.pX }  )
-		}, 1765 );
-		//AnimationNext(1005)
-		Log( -1, 'playerDrawCards' );
-	},
-	moveToHand : function(o) {
-		LogI['moveToHand'] = 0;
-		Log( 1, 'moveToHand' );
-		Log( 0, 'C' , C);
-		//console.log(I.hand);
-		var needenCardsId = [ ];
-		var needenCardsIdObj = { };
-
-		for ( var i in S[o.pX].hand ) {
-		needenCardsIdObj[S[o.pX].hand[i]] = true;
-		}
-		if ( 'cards' in o ) {
-		for ( var i in o.cards ) {
-		needenCardsIdObj[o.cards[i]] = true;
-		}
-		}
-		for ( var i in needenCardsIdObj ) {
-		needenCardsId.push( i );
-		createCard({
-			id:i,
-			zona:'hand',
-			owner:o.pX,
-			position:"hand"
+			C[id] = new Card(construct);
+			C[id].animation({
+				'X': I.W / 2 - I.card.W / 2,
+				'Y': Y,
+				'W': I.card.W,
+				x: 0,
+				y: 0,
+				z: 0,
+				deg: 0,
+				duration: 1000,
+				additional: {
+					incline: true,
+					curveMoving: 'Y'
+				}
 			})
-			C[i].setZIndex( 800 )
-		C[i].changeZone( 'movingHand' )
+		}
+
+		setTimeout(function() {
+			AN.moveToPreview({
+				cards: o.cards,
+				pX: o.pX
+			});
+		}, 1005);
+
+		setTimeout(function() {
+			AN.moveToHand({
+				cards: o.cards,
+				pX: o.pX
+			})
+		}, 1765);
+		//AnimationNext(1005)
+		Log(-1, 'playerDrawCards');
+	},
+	moveToHand: function(o) {
+		LogI['moveToHand'] = 0;
+		Log(1, 'moveToHand');
+		Log(0, 'C', C);
+		//console.log(I.hand);
+		var needenCardsId = [];
+		var needenCardsIdObj = {};
+
+		for (var i in S[o.pX].hand) {
+			needenCardsIdObj[S[o.pX].hand[i]] = true;
+		}
+		if ('cards' in o) {
+			for (var i in o.cards) {
+				needenCardsIdObj[o.cards[i]] = true;
+			}
+		}
+		for (var i in needenCardsIdObj) {
+			needenCardsId.push(i);
+			createCard({
+				id: i,
+				zona: 'hand',
+				owner: o.pX,
+				position: "hand"
+			})
+			C[i].setZIndex(800)
+			C[i].changeZone('movingHand')
 		}
 
 		var totalNumberOfCard = needenCardsId.length;
@@ -112,50 +124,51 @@ var AN = {
 			coordinateY = -6 + I.hand.H / 2 - I.card.W / 2;
 		}
 		var margin = 0;
-		if ( totalNumberOfCard > 4 ) {
-		var step = (I.hand.W - I.card.W) / (totalNumberOfCard - 1);
+		if (totalNumberOfCard > 4) {
+			var step = (I.hand.W - I.card.W) / (totalNumberOfCard - 1);
 		} else {
-		var margin = (I.hand.W - I.card.W * totalNumberOfCard) / 2;
-		var step = I.card.W;
+			var margin = (I.hand.W - I.card.W * totalNumberOfCard) / 2;
+			var step = I.card.W;
 		}
-		for ( var i in needenCardsId ) {
-		C[needenCardsId[i]].animation( {
-		'X': I.hand.X + margin + Number( i ) * step,
-		'Y': coordinateY,
-		duration: 50,
-		additional : {
-			after: {
-			func: (function() {
-			var card = C[needenCardsId[i]];
+		for (var i in needenCardsId) {
+			C[needenCardsId[i]].animation({
+				'X': I.hand.X + margin + Number(i) * step,
+				'Y': coordinateY,
+				'W': I.card.W,
+				duration: 50,
+				additional: {
+					after: {
+						func: (function() {
+							var card = C[needenCardsId[i]];
 
-			return function() {
-			card.changeZone( 'hand' );
-			card.setZIndex( 400 );
-					card.$id.
-					css( '-webkit-transform', 'rotate3d(0,0,0,0deg)' ).
-					css( '-moz-transform', 'rotate3d(0,0,0,0deg)' );
-			};
-			})()
-			}
-			}
-		})
+							return function() {
+								card.changeZone('hand');
+								card.setZIndex(400);
+								card.$id.
+								css('-webkit-transform', 'rotate3d(0,0,0,0deg)').
+								css('-moz-transform', 'rotate3d(0,0,0,0deg)');
+							};
+						})()
+					}
+				}
+			})
 		}
 
-		Log( -1, 'moveToHand' );
+		Log(-1, 'moveToHand');
 	},
-	moveToPreview : function( o ) {
+	moveToPreview: function(o) {
 		LogI['moveToPreview'] = 0;
-		Log( 1, 'moveToPreview' );
-		Log( 0, 'S' ,S[o.pX]);
-		Log( 0, 'pX' ,o.pX);
+		Log(1, 'moveToPreview');
+		Log(0, 'S', S[o.pX]);
+		Log(0, 'pX', o.pX);
 
 		var total = S[o.pX].hand.length;
-		var rows = Math.ceil( total / 9 );
+		var rows = Math.ceil(total / 9);
 		var margin = I.W / 9 - I.card.W;
-		if ( true ) { // полтные карты превью
-		margin = 1;
+		if (true) { // полтные карты превью
+			margin = 1;
 		}
-		var cardInRow = Math.round( total / rows )
+		var cardInRow = Math.round(total / rows)
 		var sideMargin = I.W - (margin + I.card.W) * cardInRow - margin / 2;
 		var bottomMargin = margin;
 
@@ -164,31 +177,35 @@ var AN = {
 		} else {
 			Y = /*I.hand.Y +*/ 0 // + I.card.W /*- margin / 2*/ - bottomMargin
 		}
-		for ( var i in S[o.pX].hand ) {
+		for (var i in S[o.pX].hand) {
 			if (!C[S[o.pX].hand[i]]) {
 				//console.log('!card') ;continue;
 			}
-		bottomMargin = (Math.ceil( (Number( i ) + 1) / cardInRow ) - 1) * (I.card.W + margin);
-		C[S[o.pX].hand[i]].animation( {
-		X: sideMargin / 2 + (margin + I.card.W) * (Number( i ) % cardInRow),
-		Y: Y,
-		duration: 50,
-		additional: { curveMoving: 'Y', incline: true },
-		after: {
-		func: (function() {
-		var card = C[S[o.pX].hand[i]];
-		var id = S[o.pX].hand[i];
-		return function() {
-		card.changeZone( 'handPrewiev' );
-		};
-		})()
+			bottomMargin = (Math.ceil((Number(i) + 1) / cardInRow) - 1) * (I.card.W + margin);
+			C[S[o.pX].hand[i]].animation({
+				X: sideMargin / 2 + (margin + I.card.W) * (Number(i) % cardInRow),
+				Y: Y,
+				W: I.card.W,
+				duration: 50,
+				additional: {
+					curveMoving: 'Y',
+					incline: true
+				},
+				after: {
+					func: (function() {
+						var card = C[S[o.pX].hand[i]];
+						var id = S[o.pX].hand[i];
+						return function() {
+							card.changeZone('handPrewiev');
+						};
+					})()
+				}
+			});
 		}
-		} );
-		}
-		Log( -1, 'moveToPreview' );
+		Log(-1, 'moveToPreview');
 	},
 	moveCardToZone : function(args, o) {
-		//console.log('>--', o)
+		console.log('>--', args)
 		
 		if ( !isZoneSimple(args.from)) {
 			if ( isZoneSimple(args.to) ){
@@ -219,8 +236,9 @@ var AN = {
 		} 
 		else if ( isZoneSimple(args.from) ) {
 			if ( isZoneSimple(args.to) ) {
-				if (args.to != 'stack' &&  args.to != 'mission' ) {
+				if (args.to != 'stack' &&  args.to != 'mission' && !C[args.card]) {
 					AN.moveCardFaceDownToZone(args)
+						console.log('msg')
 					if (args.from == "mission") {
 						AnimationPush({func:function() {
 							 updTable();
@@ -229,8 +247,13 @@ var AN = {
 				} 
 				else {
 					if (args.from != 'stack' &&  args.to != 'mission') {
-						AN.moveCardToCenter(args);
+						if (args.to == 'hand') {
+							AN.moveCardToCenter(args);      // deck -> hand
+						} else {
+							AN.moveCardFaceDownToZone(args) // hand -> discard
+						}
 					}
+						
 					AnimationPush({func:function() {
 						 updTable();
 					}, time:600, name: 'updTeams'});
@@ -249,6 +272,12 @@ var AN = {
 	},
 	moveCardToCenter : function(args) {
 
+		if (args.to == 'hand' || args.to == 'discard') {
+			var outCard = false;
+		} else {
+			var outCard = true;
+		}
+
 		if (you == args.pX) {
 				C[args.card].setZIndex(825);
 				C[args.card].animation( { 
@@ -256,44 +285,52 @@ var AN = {
 					Y: I.table.H / 2 - I.card.W, 
 					H: I.card.W * 2, 
 					additional: {
-					outCard:true
+					outCard:outCard
 				}
 			})
 		}
-		else if  (you != args.pX) {
-				C[args.card].setZIndex(825);
-				C[args.card].animation( { 
-				X: I.table.W / 2 + I.table.Y - I.card.W, 
-				Y: I.table.H / 2 - I.card.W, 
-				H: I.card.W * 2, 
-				y:1,
-				deg:90,
-				duration:600,
-				additional: { 
-					incline: true,  
-					after: { func: function() {
-						C[args.card].setNewParams(Known[Accordance[args.card]]);
-						C[args.card].params.incline.y = -1;
-						C[args.card].params.incline.deg = 90;
-						C[args.card].params.W = I.card.W * 2 ;
-						C[args.card].$id.empty();
-						C[args.card].fillAsFaceUp( C[args.card].$id );
-						C[args.card].updateLinks();
-						C[args.card].updateMouse();
-						C[args.card].animation({
-							y:0,
-							deg:0,
-							duration:600,
-							additional: { 
-								outCard:true,
-								after : {
-									func: function(){
-										//console.log(C[o.card].params.incline)
+		else if (you != args.pX) {
+			C[args.card].setZIndex(825);
+			C[args.card].animation({
+				X: I.table.W / 2 + I.table.Y - I.card.W,
+				Y: I.table.H / 2 - I.card.W,
+				H: I.card.W * 2,
+				y: 1,
+				deg: 90,
+				duration: 600,
+				additional: {
+					incline: true,
+					after: {
+						func: function() {
+							C[args.card].setNewParams(Known[Accordance[args.card]]);
+							C[args.card].params.incline.y = -1;
+							C[args.card].params.incline.deg = 90;
+							C[args.card].params.W = I.card.W * 2;
+							C[args.card].$id.empty();
+							if (args.to == 'hand' || args.to == 'discard') {
+								C[args.card].fillAsFaceDown(C[args.card].$id);
+								C[args.card].params.faceUp = false;
+							} else {
+								C[args.card].fillAsFaceUp(C[args.card].$id);
+							}
+
+							C[args.card].updateLinks();
+							C[args.card].updateMouse();
+							C[args.card].animation({
+								y: 0,
+								deg: 0,
+								duration: 600,
+								additional: {
+									//outCard: outCard,
+									after: {
+										func: function() {
+											//console.log(C[o.card].params.incline)
+										}
 									}
 								}
-							} 
-						});
-		   			}} 
+							});
+						}
+					}
 				}
 			})
 		}
@@ -305,20 +342,20 @@ var AN = {
 		if (you == args.pX) var z = G.you[args.to]
 		else var z = G.opp[args.to];
 		var afterAfterFunc = function() {
-							C[args.card].animation( 
-								{ X: z.X + 4, Y: z.Y + 2, H: z.H, duration: 300, additional: {
-									fadeIn: true, 
-									curveMoving: 'Y',
-									incline: false, 
-									after : {
-										func : function() {
-											C[args.card].destroyCard();
-											delete C[args.card];
-										}
-									}
-								}
-							} )
+			C[args.card].animation( 
+				{ X: z.X + 4, Y: z.Y + 2, H: z.H, duration: 300, additional: {
+					fadeIn: true, 
+					curveMoving: 'Y',
+					incline: false, 
+					after : {
+						func : function() {
+							C[args.card].destroyCard();
+							delete C[args.card];
 						}
+					}
+				}
+			} )
+		}
 		C[args.card].setZIndex(825);
 		C[args.card].params.teamPosition = null;
 		C[args.card].removeTeamPower();
@@ -354,32 +391,32 @@ var AN = {
 		if (o.winner == opp) o.bigBannerPics = "public/pics/lose.jpg";
 		AN.bigBanner(o);
 	},
-	bigBanner : function(o) {
-	var sprite = $('<div />', {})
-	.css('width', I.scroll.W)
-	.css('height', I.scroll.H)
-	.css('top', I.scroll.Y)
-	.css('left', I.scroll.X)
-	.css('position', 'absolute')
-	.css('opacity',0)
-	.append($('<img />',{
-	src : o.bigBannerPics,
-	width :  I.scroll.W,
-	height :  I.scroll.H,
-	}))
-	H.animate.append(sprite);
-	sprite.animate({
-	opacity: 1,
-	}, 600, 
-	function() {
-	sprite.animate({
+	bigBanner: function(o) {
+		var sprite = $('<div />', {})
+			.css('width', I.scroll.W)
+			.css('height', I.scroll.H)
+			.css('top', I.scroll.Y)
+			.css('left', I.scroll.X)
+			.css('position', 'absolute')
+			.css('opacity', 0)
+			.append($('<img />', {
+				src: o.bigBannerPics,
+				width: I.scroll.W,
+				height: I.scroll.H,
+			}))
+		H.animate.append(sprite);
+		sprite.animate({
+				opacity: 1,
+			}, 600,
+			function() {
+				sprite.animate({
 
-	opacity: 0,
-	}, 600, 
-	function() {
-	sprite.remove()
-	});
-	});
+						opacity: 0,
+					}, 600,
+					function() {
+						sprite.remove()
+					});
+			});
 	},
 	autoNextPhase : function(o) {
 		if (Can.pressNextBtn(o)){
@@ -438,7 +475,6 @@ var AN = {
 
 
 		AN.updCostBar(Meta.playingJutsu )
-
 	},
 	updCostBar : function(playingJutsu) {
 
@@ -469,6 +505,91 @@ var AN = {
 				barConteiner.css('width', barConteiner.width() + (elementSize + 2))
 			}
 		}
+	},
+	/**
+	 * [description]
+	 * @param  {[type]} args {
+	 *                       	cardLeft : idCard1,
+	 *                       	cardRight: idCard2,
+	 *                       	choseLeftText : 'txt',
+	 *                       	choseRigthText: 'txt'
+	 *                       }
+	 * @return {[type]}      [description]
+	 */
+	'selectFromTwo' : function(args) {
+		var cellSize = I.H / 5;
+
+		C[args.card1].animation({
+			X:I.W / 2 - 2.5 * cellSize, Y:cellSize, W:cellSize*2, /*deg:30, y:1, x:0.5, additional: {incline:true}*/
+		})
+		C[args.card2].animation({
+			X:I.W / 2 + 0.5 * cellSize, Y:cellSize, W:cellSize*2, /*deg:30, y:-1, x:0.5, additional: {incline:true}*/
+		})
+		var $text1 = $('<div />', {
+				'text': args.text1 || ''
+			})
+			.css('width', 2 * cellSize)
+			.css('height', cellSize)
+			.css('position', 'absolute')
+			.css('top', cellSize * 3.5)
+			.css('left', I.W / 2 - 2.5 * cellSize)
+
+		var $text2 = $('<div />', {
+				'text': args.text2 || ''
+			})
+			.css('width', 2 * cellSize)
+			.css('height', cellSize)
+			.css('position', 'absolute')
+			.css('top', cellSize * 3.5)
+			.css('left', I.W / 2 + 0.5 * cellSize)
+
+		$('#noir').append($text1)
+		$('#noir').append($text2)
+
+		$text1.animate({opacity:1},500)
+		$text2.animate({opacity:1},500)
+
+	},
+	'selectFromThree' : function(args) {
+		var cellSize = I.H / 10;
+
+		var $text1 = $('<div />', {
+				'text': args.text1 || '',
+				'class' : 'styledButton',
+				'click' : args.func1 || function(){}
+			})
+			.css('width', 2 * cellSize)
+			.css('position', 'absolute')
+			.css('top', cellSize * 3.5)
+			.css('left', I.W / 2 - 4 * cellSize)
+
+		var $text2 = $('<div />', {
+				'text': args.text2 || '',
+				'class' : 'styledButton',
+				'click' : args.func2 || function(){}
+			})
+			.css('width', 2 * cellSize)
+			.css('position', 'absolute')
+			.css('top', cellSize * 3.5)
+			.css('left', I.W / 2 - cellSize)
+
+		var $text3 = $('<div />', {
+				'text': args.text3 || '',
+				'class' : 'styledButton',
+				'click' : args.func3 || function(){}
+			})
+			.css('width', 2 * cellSize)
+			.css('position', 'absolute')
+			.css('top', cellSize * 3.5)
+			.css('left', I.W / 2 + 2 * cellSize)
+
+		$('#noir').append($text1)
+		$('#noir').append($text2)
+		$('#noir').append($text3)
+
+		$text1.animate({opacity:1},500)
+		$text2.animate({opacity:1},500)
+		$text3.animate({opacity:1},500)
 
 	},
 	Questions : {
@@ -992,8 +1113,11 @@ var AN = {
 		'prepareEffect' : function(args) {
 			// console.log('---!--- prepareEffect')
 			// console.log(args);
+			var question = 'question' + (args.step || '');
 				if (args.effectType == 'trigger')
-				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey].question(args, getUniversalObject());
+				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey][question](args, getUniversalObject());
+				if (args.effectType == 'activate')
+				Known[Accordance[args.card]].effect.activate[args.effectKey][question](args, getUniversalObject());
 		},
 		'adEndOfTurn' : function() {
 			AN.preStack.countDown();
@@ -1014,6 +1138,9 @@ var AN = {
 		'discardMission' : function(args) {
 			Actions.discardMission(args, getUniversalObject());
 			setTimeout(AN.preStack.countDown,760)
+		},
+		'adMoveCardToZone' : function(args) {
+			AN.preStack.countDown();
 		}
 	}
 }
