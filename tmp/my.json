@@ -1,27 +1,28 @@
 {
     "S": {
-        "activePlayer": "pA",
-        "phase": "mission",
+        "activePlayer": "pB",
+        "phase": "jutsu",
         "stop": false,
-        "turnNumber": 0,
+        "turnNumber": 2,
         "counters": {
-            "playedNinjaActivePlayer": 1
+            "playedNinjaActivePlayer": 0
         },
         "pA": {
             "counters": {
-                "playedMission": 1
+                "playedMission": 0,
+                "getBattleRewards": []
             },
             "isDrawCardAtStartTurn": false,
             "isNewGame": false,
             "rewards": 0,
-            "turnCounter": 2,
+            "turnCounter": 3,
             "hand": [
                 "c002",
                 "c003",
-                "c005"
+                "c005",
+                "c007"
             ],
             "deck": [
-                "c007",
                 "c008",
                 "c009",
                 "c010",
@@ -60,38 +61,40 @@
             ],
             "client": [],
             "village": {
-                "team": {
-                    "undefined": [
-                        "c001"
-                    ]
-                }
+                "team": {}
             },
             "attack": {
                 "team": {}
             },
             "block": {
-                "team": {}
+                "team": {
+                    "1": [
+                        "c001"
+                    ]
+                }
             }
         },
-        "battlefield": {},
+        "battlefield": {
+            "2": null,
+            "3": "1"
+        },
         "stack": [],
         "pB": {
             "counters": {
-                "playedMission": 0
+                "playedMission": 0,
+                "getBattleRewards": []
             },
             "isDrawCardAtStartTurn": false,
             "isNewGame": false,
             "rewards": 0,
-            "turnCounter": 2,
+            "turnCounter": 3,
             "hand": [
-                "c101",
-                "c102",
+                "c102"
+            ],
+            "deck": [
                 "c103",
                 "c104",
                 "c105",
-                "c106"
-            ],
-            "deck": [
                 "c107",
                 "c108",
                 "c109",
@@ -100,9 +103,6 @@
                 "c112",
                 "c113",
                 "c114",
-                "c115",
-                "c116",
-                "c117",
                 "c118",
                 "c119",
                 "c120",
@@ -115,7 +115,9 @@
                 "c127",
                 "c128"
             ],
-            "chackra": [],
+            "chackra": [
+                "c101"
+            ],
             "discard": [],
             "mission": [],
             "client": [],
@@ -123,7 +125,16 @@
                 "team": {}
             },
             "attack": {
-                "team": {}
+                "team": {
+                    "2": [
+                        "c117",
+                        "c116",
+                        "c115"
+                    ],
+                    "3": [
+                        "c106"
+                    ]
+                }
             },
             "block": {
                 "team": {}
