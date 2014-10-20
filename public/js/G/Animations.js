@@ -339,6 +339,7 @@ var AN = {
 			// }, time:1200, name: 'updTeams'});
 	},
 	moveCardFaceDownToZone : function(args) {
+		if (!C[args.card]) return false; //перемещение между закрытыми областями
 		if (you == args.pX) var z = G.you[args.to]
 		else var z = G.opp[args.to];
 		var afterAfterFunc = function() {
@@ -458,14 +459,20 @@ var AN = {
 		var barConteiner = $('<div />',{'id':'costBarConteiner'});
 
 		barConteiner.css('height', elementSize + 2)
-		var jutsu = o.Known[o.Accordance[args.card]];
 		
 		if(!('playingJutsu' in Meta)) Meta.playingJutsu = []
 		
-		for (var i in jutsu.cost) {
+		if (args.card) {
+			var jutsu = o.Known[o.Accordance[args.card]];
+			var needenCost = jutsu.cost;
+		} 
+		if (args.cost) {
+			var needenCost = args.cost;
+		}
+		for (var i in needenCost) {
 			Meta.playingJutsu.push([])
-			for (var j in jutsu.cost[i]) {
-				Meta.playingJutsu[i].push({element:jutsu.cost[i][j], card: null})
+			for (var j in needenCost[i]) {
+				Meta.playingJutsu[i].push({element:needenCost[i][j], card: null})
 			}
 		}
 		barCheck.append(barConteiner)
