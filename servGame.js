@@ -1173,7 +1173,10 @@ function activateEffect(d) {
 		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can
 	){
 		var canResult = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can(d.arg, o);
-		if (!canResult.result) return;
+		if (!canResult.result) {
+			console.log(canResult.cause.red)
+			return;
+		}
 		
 
 		var table = StartedGames[d.u.table];
