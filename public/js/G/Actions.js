@@ -180,8 +180,23 @@ var Actions = {
 					});
 				}
 			} else if (!isZoneSimple(args.from)) {
-
 				// console.log('h->h')
+				Actions.organisation({
+					nochange : true,
+					c1: {
+						position: args.cardInArray == 0 ? 'leader' : 'support',
+						owner: args.pX,
+						zone: args.from,
+						team: Actions.cardPath({card:args.card, path:{players:[args.pX], zones:[args.from]}},o).team,
+						card : args.card
+					},
+					c2: {
+						position: 'support',
+						owner: args.pX,
+						zone: args.to,
+						team: args.team,
+					}
+				} ,o);
 
 			}
 			if (!o.S[args.pX][args.from].team[args.team].length) {
@@ -230,7 +245,7 @@ var Actions = {
 						}
 					}
 					if (!module) {
-						C[args.card].params.zona = args.to;
+						if (C[args.card]) C[args.card].params.zona = args.to;
 						console.log('AnimationPush')
 						AnimationPush({
 							func: function() {
@@ -243,7 +258,8 @@ var Actions = {
 					}
 					// console.log("\n\n\nSTACK")
 					// console.log(o.S.stack)
-				} else if (!isZoneSimple(args.to)) {
+				} 
+				else if (!isZoneSimple(args.to)) {
 					 // console.log('s->h')
 
 					result.updTable[0] = {};
@@ -331,22 +347,25 @@ var Actions = {
 		};
 	},
 	'preparePlayJutsu': function(args, o) {
-		return {
-			'playJutsu': [{
-				pX: args.pX,
-				from: args.from,
-				to: args.to,
-				card: args.card,
-				cause: 'playJutsu'
-			}],
-			'applyUpd': [{
-				forPlayer: 'pB',
-				cards: [args.card]
-			}, {
-				forPlayer: 'pA',
-				cards: [args.card]
-			}]
+		if (args.card) {
+			return {
+				'playJutsu': [{
+					pX: args.pX,
+					from: args.from,
+					to: args.to,
+					card: args.card,
+					cause: 'playJutsu'
+				}],
+				'applyUpd': [{
+					forPlayer: 'pB',
+					cards: [args.card]
+				}, {
+					forPlayer: 'pA',
+					cards: [args.card]
+				}]
+			}
 		}
+		return {};
 
 	},
 	'prepareCharge': function(args, o) {
@@ -406,6 +425,28 @@ var Actions = {
 		args.nochange = true;
 		Actions.organisation(args, o);
 	},
+	/**
+	 * [description]
+	 * @param  {[type]} args {
+	 *                      nonchange: default false ,
+	 *                      c1 : {
+	 *                      	position : 'leader' / 'support',
+	 *                      	owner: 'pA' / 'pB',
+	 *                      	zone: 'attack',
+	 *                      	team: 1,
+	 *                      	card : 'c001'
+	 *                      },
+	 *                      c2 : {
+	 *                      	position : 'leader' / 'support',
+	 *                      	owner: 'pA' / 'pB',
+	 *                      	zone: 'attack',
+	 *                      	team: 1,
+	 *                      	card : 'c001'
+	 *                      }
+	 * 					}
+	 * @param  {[type]} o    [description]
+	 * @return {[type]}      [description]
+	 */
 	'organisation': function(args, o) {
 		console.log('nochange', nochange)
 		var nochange = args.nochange || false;
@@ -448,6 +489,7 @@ var Actions = {
 		}
 	},
 	'removeSelfFromTeam': function(S, c2) {
+		console.log('-*- removeSelfFromTeam')
 		var team = S[c2.owner][c2.zone].team[c2.team];
 		for (var i in team) {
 			if (team[i] == c2.card) {
@@ -455,6 +497,7 @@ var Actions = {
 				return true;
 			}
 		}
+		console.log(c2)
 		return false;
 	},
 	'moveTeamToAttack': function(o) {
@@ -1346,7 +1389,9 @@ var Actions = {
 	},
 	'addJutsuToStack': function(args, o) {
 		args.team = null;
-		Actions.moveCardToZone(args, o);
+		if (args.card) { // если цена вдруг не за технику
+			Actions.moveCardToZone(args, o);
+		}
 		for (var i in args.chackra) {
 			var args2 = {
 				pX: args.pX,
@@ -1557,16 +1602,23 @@ var Actions = {
 		var pXs = args.path.players || defaultPlayers;
 
 		for (var pX in pXs) {
+			// console.log(pXs[pX])
 			for (var zone in zones) {
+				// console.log(zones[zone])
+				// console.log(!isZoneSimple(zones[zone]))
 				if (!isZoneSimple(zones[zone])) {
-					for (var team in o.S[pXs[pX]][zones[zone]]) {
-						for (var cardId in o.S[pXs[pX]][zones[zone]][team]) {
-							if (args.card == o.S[pXs[pX]][zones[zone]][team][cardId]) {
+						// console.log(o.S[pXs[pX]][zones[zone]].team)
+					for (var team in o.S[pXs[pX]][zones[zone]].team) {
+						// console.log(o.S[pXs[pX]][zones[zone]].team[team])
+						for (var cardId in o.S[pXs[pX]][zones[zone]].team[team]) {
+						// console.log(o.S[pXs[pX]][zones[zone]].team[team][cardId])
+						// console.log(args.card)
+							if (args.card == o.S[pXs[pX]][zones[zone]].team[team][cardId]) {
 								return {
 									player: pXs[pX],
 									zone: zones[zone],
 									team: team,
-									key: cardId
+									cardInArray: cardId
 								};
 							}
 						}
@@ -1577,7 +1629,7 @@ var Actions = {
 							return {
 								player: pXs[pX],
 								zone: zones[zone],
-								key: cardId
+								cardInArray: cardId
 							};
 						}
 					}
@@ -1672,6 +1724,93 @@ var Actions = {
 			return true;
 		}
 
+	},
+	/**
+	 * [description]
+	 * @param  {[type]} args {
+	 *                       statuses : ['Puppet'],
+	 *                       path : {
+	 *                       	players : ['pA', 'pB'],
+	 *                       	zones : ['attack', 'block']
+	 *                       },
+	 * }
+	 * @param  {[type]} o    [description]
+	 * @return {[type]}      [description]
+	 */
+	'getCardForCondition' : function(args, o) {
+		var defaultZones = ['deck', 'stack', 'village', 'hand', 'discard', 'mission', 'attack', 'block'];
+		var defaultPlayers = ['pA', 'pB'];
+		args.path = args.path || {
+			path: {
+				player: defaultPlayers,
+				zones: defaultZones
+			}
+		};
+		var zones = args.path.zones || defaultZones;
+		var pXs = args.path.players || defaultPlayers;
+		var result = [];
+
+		function check(card, args) {
+			var statusCheck = true;
+			if (args.statuses && args.statuses.length)  {
+				if (card.statuses && card.statuses.length) {
+					var checked = 0;
+					for (var stat in args.statuses) {
+						if (~card.statuses.indexOf(args.statuses[stat])) {
+							checked++;
+						}
+					}
+				} else {
+					statusCheck = false;
+				}
+				if (args.statuses.length == checked) {
+					statusCheck == true;
+				}
+			}
+			return statusCheck;
+		}
+
+		for (var pX in pXs) {
+			for (var zone in zones) {
+				if (!isZoneSimple(zones[zone])) {
+					for (var team in o.S[pXs[pX]][zones[zone]].team) {
+						for (var cId in o.S[pXs[pX]][zones[zone]].team[team]) {
+							var cardId = o.S[pXs[pX]][zones[zone]].team[team][cId];
+							var card = o.Known[o.Accordance[cardId]];
+							if (check(card, args)) {
+								result.push(cardId)
+							};
+						}
+					}
+				} else {
+					for (var cId in o.S[pXs[pX]][zones[zone]]) {
+						var cardId = o.S[pXs[pX]][zones[zone]][cId];
+						var card = o.Known[o.Accordance[cardId]];
+						if (check(card, args)) {
+							result.push(cardId)
+						};
+					}
+				}
+
+			}
+		}
+		return result;
+
+	},
+	/**
+	 * [description]
+	 * @param  {[type]} dict [['текст ошибки',function(){return true/false}],...]
+	 * @return {[type]}      [description]
+	 */
+	'canCheckDict':function(dict) {
+        for (var i in dict) {
+            if (dict[i][1]()) continue;
+            return {
+                "cause" : dict[i][0],
+                "result": false
+            }
+        }
+        return {"result": true};
 	}
 };
 if (module) {
