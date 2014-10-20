@@ -320,9 +320,18 @@ var Can = {
 
         return result;
     },
+    /**
+     * [description]
+     * @param  {[type]} args {
+     *                       cost : ['1'] || card : 'c011',
+     *                       pX: 'pA'
+     * }
+     * @param  {[type]} o    [description]
+     * @return {[type]}      [description]
+     */
     'enoughChakra' : function(args, o) {
         var result = true;
-       	var costs = o.Known[o.Accordance[args.card]].cost;
+       	var costs = args.cost || o.Known[o.Accordance[args.card]].cost;
 
        	var chackraDefault = []
        	for (var i in o.S[args.pX].chackra) {
@@ -333,24 +342,26 @@ var Can = {
 
        		var chackra = [];
        		for (var i in chackraDefault) chackra.push(chackraDefault[i]);
-
+            
        		var cost = [];
-       		for (var i in costs[c]) cost.push(costs[c][i]);
+           	for (var i in costs[c]) {
+                cost.push(costs[c][i]);
+            }
 
-       		console.log(cost, chackraDefault);
+            //console.log(cost, chackraDefault);
 
        		nextElementInCost:
        		for (var i in cost) { // перебираем элементы в цене
        			var itIs = false;
        			nextCardInChackra:
        			for (var j = chackraDefault.length - 1; j >= 0; j--) { // перебираем карты в чакре
-       				console.log(cost[i] , chackraDefault[j])
+       				// console.log(cost[i] , chackraDefault[j])
        				if (cost[i] == '1') {
        					itIs = true;
        					chackraDefault.splice(j,0)
        					continue nextElementInCost;
        				}
-       				for (var k in chackraDefault[j]) { // перебираем элементы в картые чакры
+       				for (var k in chackraDefault[j]) { // перебираем элементы в карте чакры
        					if (chackraDefault[j][k] == cost[i]) {
 	       					itIs = true;
        						chackraDefault.splice(j,0)
@@ -364,6 +375,7 @@ var Can = {
        		}
 
        	}
+        console.log('can', result)
         return result;
     },
     removeFromTeam : function(o){
