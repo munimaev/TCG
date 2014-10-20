@@ -1,3 +1,7 @@
+
+if (module) {
+    var Can = require('./Can.js');;
+}
 var CardBase = {
     "n1092": {
         "type": "N",
@@ -132,108 +136,131 @@ var CardBase = {
             "effects": [{
                 "when" : "Обмен техниками",
                 "cost" : "1",
-                "effect": "переместите целевую марионетку из другой вашей отправленной в сражение в команду этого ниндзя на любую позицию.",
+                "effect": "Переместите целевую марионетку из другой вашей отправленной в сражение в команду этого ниндзя на любую позицию.",
             }]
         },
+        "statuses" : [],
         "effect": {
             "activate": [{
                 "can": function(args, o) {
                     var owner = o.Known[o.Accordance[args.card]].owner;
-                    if (o.S.activePlayer == owner 
-                        && (!module
-                            && o.S.activePlayer == you)
-                        && o.S.phase == "mission" 
-                        && (!o.S.statuses[args.card] 
-                            || !o.S.statuses[args.card].atEndOfTurn
-                            || !o.S.statuses[args.card].atEndOfTurn.activateUsed0 )
-                        && Actions.cardPath({
-                            card: args.card,
-                            path : {players: [owner],
-                            zones: ['mission']}
-                            }, o)
-                    ) {
-                        return {
-                            "result": true
-                        };
-                    }
-                    return {
-                        "result": false
-                    };
+                    var battle = owner == o.S.activePlayer ? 'attack' : 'block';
+                    var cards = Actions.getCardForCondition({
+                        path: {
+                            players: [owner],
+                            zones: [battle]
+                        },
+                        statuses: ['Puppet']
+                    }, o)
+                    var dict = [
+                        ['Нет марионеток.',
+                            function() {
+                                return Actions.getCardForCondition({
+                                    path: {
+                                        players: [owner],
+                                        zones: [battle]
+                                    },
+                                    statuses: ['Puppet']
+                                }, o).length;
+                            }
+                        ],
+                        ['Не достаточно чакры.',
+                            function() {return Can.enoughChakra({cost: [['1']],pX: owner},o)}
+                        ],
+                        ['Вы не контролируете эту карту.',
+                            function() {if (!module) {return args.pX == owner} else return true;}
+                        ],
+                        ['Вы уже испоользовали эту способность.',
+                            function() {
+                                return !(o.S.statuses[args.card] 
+                                && o.S.statuses[args.card].atEndOfTurn 
+                                && o.S.statuses[args.card].atEndOfTurn.activateUsed0)}
+                        ],
+                        ['Ниндзя должен бать отправлен в сражение.',
+                            function() {
+                                return Actions.cardPath({
+                                    card: args.card,
+                                    path: {players: [owner],
+                                        zones: ['attack', 'block']}
+                                }, o)
+                            }
+                        ]
+                    ]
+                    return Actions.canCheckDict(dict);
                 },
                 "prepareEffect": function(args, o) {
-                    // if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
-                    // if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
-                    // o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
 
-                    // result = {
-                    //     'prepareEffect': [{
-                    //         pX: o.Known[o.Accordance[args.card]].owner,
-                    //         card: args.card,
-                    //         effectType: 'activate',
-                    //         effectKey: 0
-                    //     }]
-                    // }
-                    // return result;
+                    result = {
+                        'prepareEffect': [{
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0
+                        }]
+                    }
+                    return result;
                 },
                 "question" : function(args, o) {
-                    // if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
-                    // if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
-                    // o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
 
-                    // if (args.pX == you) {
-                    //     AN.stop = true;
-                    //     if (!('primal' in Answers)) Answers.primal = {};
-                    //     if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
-                    //     var condidateCount = [];
-                    //     $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите тип карты.');                       
-                    //     var clickFunction = function(type){
-                    //         var type = type;
-                    //         return function() {
-                    //             args.selectedType = type;
-                    //             Answers.primal.cardEffect.push(args)
-                    //             AN.hideNoir({
-                    //                 condidateCount: []
-                    //             });
-                    //             AN.preStack.countDown();                                
-                    //         }
-                    //     }
+                    var owner = o.Known[o.Accordance[args.card]].owner;
+                    if (args.pX == you) {
 
-                    //     AN.selectFromThree({
-                    //         'text1': 'Ниндзя',
-                    //         'func1': clickFunction('N'),
-                    //         'text2': 'Техника',
-                    //         'func2': clickFunction('J'),
-                    //         'text3': 'Миссия',
-                    //         'func3': clickFunction('M')
-                    //     });
-                    // } else {
-                    //     AN.preStack.countDown();
-                    // }
+                        AnimationPush({func:function() {
+                            AN.Questions.selectChackra({cost:['1'], pX: owner}, o, getUniversalObject());
+                        }, time:100, name: 'Questions - selectChackra'});
+
+                        AnimationPush({func: function() {
+                            AN.stop = true;
+                            if (!('primal' in Answers)) Answers.primal = {};
+                            if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+
+                            var owner = o.Known[o.Accordance[args.card]].owner;
+                            var battle = owner == o.S.activePlayer ? 'attack' : 'block';
+                            var condidateCount = Actions.getCardForCondition({
+                                path: {
+                                    players: [owner],
+                                    zones: [battle]
+                                },
+                                statuses: ['Puppet']
+                            }, o);
+                            $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите марионетку.');
+                            for ( var i in condidateCount) {
+                                C[condidateCount[i]].setZIndex(1202);
+                            }
+
+                            Context.workingUnit = 'card';
+                            Context.clickAction = function( card ) {
+                                args.selectedPuppet = card.id;
+                                Answers.primal.cardEffect.push(args);
+                                AN.hideNoir({ condidateCount:condidateCount });
+                                AN.preStack.countDown();
+                            }
+                        }, time:1000, name: 'Questions - selectChackra'});
+                    } else {
+                        AN.preStack.countDown();
+                    }
                 },
                 "cardEffect": function(result, args, o) {
-                    // console.log('args'.red)
-                    // console.log(args)
-                    // if (!('applyUpd' in result)) result.applyUpd = [];
-                    // result.applyUpd.push({
-                    //     forPlayer: 'pA',
-                    //     cards: [o.S[args.pX].deck[0]]
-                    // })
-                    // result.applyUpd.push({
-                    //     forPlayer: 'pB',
-                    //     cards: [o.S[args.pX].deck[0]]
-                    // })
-
-                    // if (!('prepareEffect' in result)) result.prepareEffect = [];
-                    // result.prepareEffect.push({
-                    //     pX: o.Known[o.Accordance[args.card]].owner,
-                    //     card: args.card,
-                    //     effectType: 'activate',
-                    //     effectKey: 0,
-                    //     step: 1,
-                    //     selectedType: args.selectedType,
-                    //     isType : o.Known[o.Accordance[o.S[args.pX].deck[0]]].type
-                    // })
-                    // return result;
+                    console.log('CARDEFFECT'.bold)
+                    if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                    var path = Actions.cardPath({card:args.card}, o);
+                    console.log(args, path);
+                    result.adMoveCardToZone.push({
+                        pX: path.player,
+                        card: args.selectedPuppet,
+                        cause: 'cardEffect',
+                        from: path.zone,
+                        to: path.zone,
+                        team: path.team,
+                        cardInArray : path.cardInArray
+                    })
+                    return result;
                 },
                 "question1" : function(args, o) {                        
                     // createCard({
@@ -353,6 +380,7 @@ var CardBase = {
         "number": "n1322",
         "elements": "W",
         "name": "Black Ant",
+        "statuses" : ['Puppet'],
         "effectText": "",
         "effect": {}
     },
