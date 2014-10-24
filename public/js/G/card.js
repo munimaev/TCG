@@ -1964,27 +1964,37 @@ function Card(o) {
                 // console.log(activate[i].can({card: this.id},
                 //     getUniversalObject()
                 // ).result)
-                if (activate[i].can({card: this.id},
-                    getUniversalObject()
-                ).result) {
+                var canResult = activate[i].can({
+                        card: this.id
+                    },
+                    getUniversalObject())
+                console.log(canResult)
+
+                if (canResult.result) {
                     $c.append(
                         $('<div />', {
-                            class: 'actionIcon n' + ( 3 + Number(i) )+ ' activateEffect' + (Number(i) + 1),
+                            class: 'actionIcon n' + (3 + Number(i)) + ' activateEffect' + (Number(i) + 1),
                             'click': (function() {
                                 return function() {
                                     C[id].hideAction();
                                     socket.emit('activateEffect', {
                                         u: Client,
                                         arg: {
-                                            card : id,
+                                            card: id,
                                             pX: you,
-                                            effectKey : i
+                                            effectKey: i
                                         }
                                     })
                                 }
                             })()
                         }))
-
+                }
+                else {
+                    $c.append(
+                        $('<div />', {
+                            class: 'actionIcon n' + (3 + Number(i)) + ' disable activateEffect' + (Number(i) + 1),
+                            title : canResult.cause
+                        }))
                 }
             }
         }
