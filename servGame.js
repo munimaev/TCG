@@ -54,6 +54,7 @@ exports.initLobbi = function(sio, socket, session_store_) {
 	gameSocket.on('addAnswers', addAnswers);
 	gameSocket.on('save', saveGame);
 	gameSocket.on('getS', getS);
+	gameSocket.on('known', known);
 	gameSocket.on('activateEffect', activateEffect);
 	//gameSocket.on('load',loadGame);
 	//-----------------------------------------
@@ -680,7 +681,7 @@ function getStartMeta(S) {
 		for (var zone in zones)
 			for (var number in S.Snapshot[pXs[pX]][zones[zone]].team)
 				if (result.teamCounter <= number) result.teamCounter = number;
-
+	console.log(('getStartMeta ' + result.teamCounter).bold)
 	return result;
 }
 
@@ -1245,13 +1246,20 @@ function drawCardAtStartTurn(d) {
 	}
 	// TODO возможно надо реагировать
 }
-
+/**
+ * [getUniversalObject description]
+ * @param  {Number} tableID индификатор стола
+ * @param  {Object} obj     Необязательный параметр свойства которого будут 
+ * добавлены в возвражемый объект.
+ * @return {[type]}         [description]
+ */
 function getUniversalObject(tableID, obj) {
 	var table = StartedGames[tableID];
 	var res = {
 		Accordance: table.Accordance,
 		Known: table.Known,
 		S: table.Snapshot,
+		Meta: table.Meta,
 		Stadies: Stadies,
 	}
 	var obj = obj || {};
@@ -1502,4 +1510,11 @@ function saveGame(d) {
 function getS(d) {
 	var table = StartedGames[d.u.table];
 	io.sockets.in(table.room).emit('getS',  table.Snapshot);
+}
+function known(d) {
+	var table = StartedGames[d.u.table];
+	if (d.args.card)
+	io.sockets.in(table.room).emit('known',  table.Known[table.Accordance[d.args.card]]);
+	else
+	io.sockets.in(table.room).emit('known',  table.Known);
 }
