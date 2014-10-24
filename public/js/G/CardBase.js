@@ -152,7 +152,26 @@ var CardBase = {
                         },
                         statuses: ['Puppet']
                     }, o)
+                    console.log(args)
                     var dict = [
+                        ['Вы не контролируете эту карту.',
+                            function() {if (!module) {return you == owner} else return true;}
+                        ],
+                        ['Вы уже испоользовали эту способность.',
+                            function() {
+                                return !(o.S.statuses[args.card] 
+                                && o.S.statuses[args.card].atEndOfTurn 
+                                && o.S.statuses[args.card].atEndOfTurn.activateUsed0)}
+                        ],
+                        ['Ниндзя должен быть отправлен в сражение.',
+                            function() {
+                                return Actions.cardPath({
+                                    card: args.card,
+                                    path: {players: [owner],
+                                        zones: ['attack', 'block']}
+                                }, o)
+                            }
+                        ],
                         ['Нет марионеток.',
                             function() {
                                 return Actions.getCardForCondition({
@@ -166,26 +185,9 @@ var CardBase = {
                         ],
                         ['Не достаточно чакры.',
                             function() {return Can.enoughChakra({cost: [['1']],pX: owner},o)}
-                        ],
-                        ['Вы не контролируете эту карту.',
-                            function() {if (!module) {return args.pX == owner} else return true;}
-                        ],
-                        ['Вы уже испоользовали эту способность.',
-                            function() {
-                                return !(o.S.statuses[args.card] 
-                                && o.S.statuses[args.card].atEndOfTurn 
-                                && o.S.statuses[args.card].atEndOfTurn.activateUsed0)}
-                        ],
-                        ['Ниндзя должен бать отправлен в сражение.',
-                            function() {
-                                return Actions.cardPath({
-                                    card: args.card,
-                                    path: {players: [owner],
-                                        zones: ['attack', 'block']}
-                                }, o)
-                            }
                         ]
                     ]
+                    console.log(o.Known[o.Accordance[args.card]].type.bold);
                     return Actions.canCheckDict(dict);
                 },
                 "prepareEffect": function(args, o) {
@@ -201,6 +203,7 @@ var CardBase = {
                             effectKey: 0
                         }]
                     }
+                    console.log(o.Known[o.Accordance[args.card]].type.bold);
                     return result;
                 },
                 "question" : function(args, o) {
@@ -260,6 +263,7 @@ var CardBase = {
                         team: path.team,
                         cardInArray : path.cardInArray
                     })
+                    console.log(o.Known[o.Accordance[args.card]].type.bold);
                     return result;
                 },
                 "question1" : function(args, o) {                        
@@ -620,7 +624,7 @@ var CardBase = {
                 "instedMoveCardToZone": [{
                     "condition": function(args, o) {
                         var mission = o.Known[o.Accordance[args.card]]; 
-                        if (mission.type = 'M'
+                        if (mission.type == 'M'
                             && ~mission.elements.indexOf('E')
                             && args.from == "mission"
                             && args.cause == "discardMission"
@@ -1274,26 +1278,37 @@ var CardBase = {
             "activate": [{
                 "can": function(args, o) {
                     var owner = o.Known[o.Accordance[args.card]].owner;
-                    if (o.S.activePlayer == owner 
-                        && (!module
-                            && o.S.activePlayer == you)
-                        && o.S.phase == "mission" 
-                        && (!o.S.statuses[args.card] 
-                            || !o.S.statuses[args.card].atEndOfTurn
-                            || !o.S.statuses[args.card].atEndOfTurn.activateUsed0 )
-                        && Actions.cardPath({
-                            card: args.card,
-                            path : {players: [owner],
-                            zones: ['mission']}
-                            }, o)
-                    ) {
-                        return {
-                            "result": true
-                        };
-                    }
-                    return {
-                        "result": false
-                    };
+                    console.log(owner, args)
+                    var dict = [
+                        ['Вы не контролируете эту карту.',
+                            function() {if (!module) {return you == owner} else return true;}
+                        ],
+                        ['Применяеться только в ваш ход.',
+                            function() {
+                                if (!module) return o.S.activePlayer == owner && o.S.activePlayer == you
+                                return o.S.activePlayer == owner}
+                        ],
+                        ['Применяеться только в фазу миссии.',
+                            function() {return o.S.phase == "mission" }
+                        ],
+                        ['Вы уже испоользовали эту способность.',
+                            function() {
+                                return !(o.S.statuses[args.card] 
+                                && o.S.statuses[args.card].atEndOfTurn 
+                                && o.S.statuses[args.card].atEndOfTurn.activateUsed0)}
+                        ],
+                        ['Миссия должна находиться в игре.',
+                            function() {
+                                return Actions.cardPath({
+                                    card: args.card,
+                                    path : {players: [owner],
+                                    zones: ['mission']}
+                                    }, o)
+                            }
+                        ]
+                    ]
+                    return Actions.canCheckDict(dict);
+
                 },
                 "prepareEffect": function(args, o) {
                     if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
