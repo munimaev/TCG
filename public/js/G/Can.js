@@ -120,9 +120,14 @@ var Can = {
     orgAddToTeam : function(args, o){
         console.log(  o.S.phase == 'organisation'
              , o.Known[o.Accordance[args.c1.card]].type == 'N' 
-             , o.Known[o.Accordance[args.c2.card]].type == 'N' 
+             , o.Known[o.Accordance[args.c2.card]].type== 'N' 
+             , o.Known[o.Accordance[args.c1.card]].type  
+             , o.Known[o.Accordance[args.c2.card]].type
              , o.Known[o.Accordance[args.c1.card]].owner == args.pX 
-             , o.Known[o.Accordance[args.c2.card]].owner == args.pX )
+             , o.Known[o.Accordance[args.c2.card]].owner == args.pX 
+             , o.Known[o.Accordance[args.c1.card]].owner
+             , o.Known[o.Accordance[args.c2.card]].owner
+             , args.pX  )
         if ( o.S.phase == 'organisation'
              && o.Known[o.Accordance[args.c1.card]].type == 'N' 
              && o.Known[o.Accordance[args.c2.card]].type == 'N' 
@@ -135,6 +140,7 @@ var Can = {
                 }
             }
         }
+        console.log(args)
         return false;
     },
     /**
