@@ -71,6 +71,9 @@ body {
 .actionIcon.activateEffect1 {
     background-image: url('../pics/number1.png');   
 }
+.actionIcon.activateEffect1.disable {
+    background-image: url('../pics/numberdisable1.png');   
+}
 .actionClose {
     position: absolute;
     width: 20%;
