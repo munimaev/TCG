@@ -12,7 +12,9 @@ function AnimationPush(o) {
 	//console.log('-----------');
 	AnimationNext();
 }
-
+/**
+ * Запускае следующую анимацию
+ */
 function AnimationNext() {
 	if (AnimationIsRun || !Animations.length || AN.stop) return;
 	var animation = Animations.splice(0,1);
@@ -1054,7 +1056,7 @@ var AN = {
 		},
 		'drawCard' : function(args) {
 			// console.log(args);
-			Actions['Draw X cards'](args, getUniversalObject())
+			Actions['DrawXcards'](args, getUniversalObject())
 		},
 		'putCardInPlay' : function(args) {
 			if (args.pX == you) {
