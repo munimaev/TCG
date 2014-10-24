@@ -28,38 +28,6 @@ var Actions = {
 		console.log('hand', o.S[pX].hand)
 	},
 	/**
-	 * Возврашает обект с приготовленными дейстиями
-	 * @param  {[type]} args обект с а аргументами
-	 * @param  {[type]} args.numberOfCard
-	 * @param  {[type]} args.player
-	 * @param  {[type]} o	стандартный объект
-	 * @return {[type]}	  [description]
-	 */
-	'Draw X cards': function(args, o) {
-		args.numberOfCard = args.numberOfCard || 1;
-		var o2 = {
-			pX: args.player,
-			cards: []
-		};
-		for (var i = 1; i <= args.numberOfCard; i++) {
-			o2.cards.push(Actions['Draw Card'](args, o));
-		}
-		o.S[args.player].isNewGame = false;
-		if (!module) {
-			AnimationPush({
-				func: function() {
-					AN.playerDrawCards(o2);
-				},
-				time: 1500,
-				name: 'Draw X cards'
-			});
-			setTimeout(AN.preStack.countDown, 1510);
-		}
-		return {
-			//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
-		}
-	},
-	/**
 	 * [description]
 	 * @param  {[type]} args Объект с аргументами
 	 * @param  {[type]} args.phase Значение может быть либо "next" либо название фазы в которую надо перейти.
@@ -280,6 +248,7 @@ var Actions = {
 			}
 		}
 		// if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
+		
 		if (!result.updTable.length) delete result.updTable;
 		return result;
 	},
@@ -387,15 +356,23 @@ var Actions = {
 		};
 	},
 	/**
-	 * createTeamFromCard
-	 * @param  {[Object]} o.card
-	 * @param  {[Object]} o.pX
-	 * @param  {[Object]} o.S
-	 * @param  {[Object]} o.team
-	 * @param  {[Object]} o.teamCounter
-	 * @param  {[Object]} o.to
+	 * createTeamFromCard 
+	 * Используеться в {@link Action.moveCardToZone}, {@link Action.removeFromTeam},
+	 * @param  {[Object]} o 
+	 * @example 
+	 * { 
+	 *    card :'c001', 
+	 *    pX : 'pA',
+	 *    S : S,
+	 *    team : 3,
+	 *    teamCounter : 4,
+	 *    to : 'attack'/'block'/'viilage'
+	 * }
 	 */
 	'createTeamFromCard': function(args, o) {
+		if (!args.teamCounter) {
+			args.teamCounter = ++o.Meta.teamCounter
+		}
 		o.S[args.pX][args.to].team[args.teamCounter] = [args.card]
 	},
 	'updTable': function(o) {
@@ -458,6 +435,9 @@ var Actions = {
 		var team2 = args.c2.team;
 		var Team1 = o.S[owner][zone].team[team1];
 		var Team2 = o.S[owner][zone].team[team2];
+
+                    console.log(args.c1.card.bold);
+                    console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
 		// console.log('organisation'.red)
 		// console.log(owner,zone,team2)
 		// console.log(Team2)
@@ -487,6 +467,8 @@ var Actions = {
 			}
 			updTable();
 		}
+                    console.log(args.c1.card.bold);
+                    console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
 	},
 	'removeSelfFromTeam': function(S, c2) {
 		console.log('-*- removeSelfFromTeam')
@@ -1306,7 +1288,7 @@ var Actions = {
 		return {};
 	},
 	'drawCard': function(args, o) {
-		return Actions['Draw X cards'](args, o);
+		return Actions['DrawXcards'](args, o);
 	},
 	'putCardInPlay': function(args, o) {
 		//return Actions.moveCardToZone(args, o)
@@ -1813,6 +1795,42 @@ var Actions = {
         return {"result": true};
 	}
 };
+
+/**
+ * Возврашает обект с приготовленными дейстиями
+ * @param  {[type]} args обект с а аргументами
+ * @param  {[type]} o стандартный объект {@link getUniversalObject}
+ * @example 
+ * args {
+ *   numberOfCard : 2,
+ *   player : 'pA'/'pB'
+ * }
+ * @return {[type]}	  [description]
+ */
+Actions.DrawXcards = function(args, o) {
+		args.numberOfCard = args.numberOfCard || 1;
+		var o2 = {
+			pX: args.player,
+			cards: []
+		};
+		for (var i = 1; i <= args.numberOfCard; i++) {
+			o2.cards.push(Actions['Draw Card'](args, o));
+		}
+		o.S[args.player].isNewGame = false;
+		if (!module) {
+			AnimationPush({
+				func: function() {
+					AN.playerDrawCards(o2);
+				},
+				time: 1500,
+				name: 'DrawXcards'
+			});
+			setTimeout(AN.preStack.countDown, 1510);
+		}
+		return {
+			//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
+		}
+	}
 if (module) {
 	module.exports = Actions;
 }
