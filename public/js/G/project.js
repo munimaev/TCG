@@ -1971,7 +1971,8 @@ function getUniversalObject(obj) {
         Known: Known,
         S: S,
         pX: you,
-        Stadies: Stadies
+        Stadies: Stadies,
+        Meta:Meta
     }
     var obj = obj || {};
     for (var i in obj) {
