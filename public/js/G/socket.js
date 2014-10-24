@@ -1,255 +1,212 @@
-var socket = io();
-	socket.on('connected', function(d){
-});
-
-var Client = {};
-var actionLock = false;
-var you = "pX";
-var opp = "pX";
-var Animation = [];
-var Accordance = {};
-var Known = {};
-var Meta = {
-	toNextPhase : {
-		pB : false,
-		pA : false,
-	}
+{
+    "S": {
+        "activePlayer": "pA",
+        "phase": "mission",
+        "stop": false,
+        "turnNumber": 5,
+        "counters": {
+            "playedNinjaActivePlayer": 0
+        },
+        "pA": {
+            "counters": {
+                "playedMission": 0,
+                "getBattleRewards": []
+            },
+            "isDrawCardAtStartTurn": false,
+            "isNewGame": false,
+            "rewards": 0,
+            "turnCounter": 4,
+            "hand": [
+                "c002",
+                "c003",
+                "c007",
+                "c008",
+                "c009"
+            ],
+            "deck": [
+                "c010",
+                "c011",
+                "c012",
+                "c013",
+                "c014",
+                "c015",
+                "c016",
+                "c017",
+                "c018",
+                "c019",
+                "c020",
+                "c021",
+                "c022",
+                "c023",
+                "c024",
+                "c025",
+                "c026",
+                "c027",
+                "c028",
+                "c029",
+                "c030",
+                "c031",
+                "c032",
+                "c033",
+                "c034",
+                "c035"
+            ],
+            "chackra": [
+                "c006"
+            ],
+            "discard": [
+                "c001",
+                "c005"
+            ],
+            "mission": [
+                "c004"
+            ],
+            "client": [],
+            "village": {
+                "team": {}
+            },
+            "attack": {
+                "team": {}
+            },
+            "block": {
+                "team": {}
+            }
+        },
+        "battlefield": {},
+        "stack": [],
+        "pB": {
+            "counters": {
+                "playedMission": 0,
+                "getBattleRewards": []
+            },
+            "isDrawCardAtStartTurn": false,
+            "isNewGame": false,
+            "rewards": 5,
+            "turnCounter": 5,
+            "hand": [
+                "c103"
+            ],
+            "deck": [
+                "c104",
+                "c105",
+                "c107",
+                "c108",
+                "c109",
+                "c110",
+                "c111",
+                "c112",
+                "c113",
+                "c114",
+                "c118",
+                "c119",
+                "c120",
+                "c121",
+                "c122",
+                "c123",
+                "c124",
+                "c125",
+                "c126",
+                "c127",
+                "c128"
+            ],
+            "chackra": [
+                "c101"
+            ],
+            "discard": [],
+            "mission": [],
+            "client": [],
+            "village": {
+                "team": {
+                    "2": [
+                        "c102",
+                        "c117",
+                        "c106"
+                    ],
+                    "3": [
+                        "c116",
+                        "c115"
+                    ]
+                }
+            },
+            "attack": {
+                "team": {}
+            },
+            "block": {
+                "team": {}
+            }
+        },
+        "statuses": {
+            "c106": {},
+            "c001": {},
+            "c004": {
+                "permanent": null
+            },
+            "c005": {}
+        }
+    },
+    "Accordance": {
+        "c001": "c019",
+        "c002": "c020",
+        "c003": "c025",
+        "c004": "c012",
+        "c005": "c016",
+        "c006": "c030",
+        "c007": "c015",
+        "c008": "c024",
+        "c009": "c008",
+        "c010": "c035",
+        "c011": "c021",
+        "c012": "c005",
+        "c013": "c010",
+        "c014": "c026",
+        "c015": "c007",
+        "c016": "c002",
+        "c017": "c001",
+        "c018": "c011",
+        "c019": "c017",
+        "c020": "c003",
+        "c021": "c031",
+        "c022": "c013",
+        "c023": "c022",
+        "c024": "c034",
+        "c025": "c009",
+        "c026": "c004",
+        "c027": "c028",
+        "c028": "c018",
+        "c029": "c029",
+        "c030": "c014",
+        "c031": "c032",
+        "c032": "c033",
+        "c033": "c006",
+        "c034": "c023",
+        "c035": "c027",
+        "c101": "c107",
+        "c102": "c120",
+        "c103": "c127",
+        "c104": "c128",
+        "c105": "c106",
+        "c106": "c109",
+        "c107": "c124",
+        "c108": "c121",
+        "c109": "c102",
+        "c110": "c125",
+        "c111": "c117",
+        "c112": "c115",
+        "c113": "c108",
+        "c114": "c126",
+        "c115": "c112",
+        "c116": "c118",
+        "c117": "c116",
+        "c118": "c105",
+        "c119": "c104",
+        "c120": "c114",
+        "c121": "c113",
+        "c122": "c122",
+        "c123": "c123",
+        "c124": "c103",
+        "c125": "c110",
+        "c126": "c119",
+        "c127": "c101",
+        "c128": "c111"
+    }
 }
-var S = null; // snapshot
-var C = {}; // cards
-
-socket.on('C_init', function(d){
-	//console.log('C_init', d)
-	Client.you = you = d.you;
-	Client.opp = opp = d.opp;
-	Client.table = d.table
-	Client.ses = ses;
-	S = d.Snapshot;
-	updAllCount();
-    if (S && ready) {
-		socket.emit('imJoined',Client)
-	}
-	//console.log('Client',Client)
-});
-
-
-socket.on('goOut', function(d){
-        window.location.assign('/lobby')
-});
-
-
-// работа с интерфейсом
-function updAreaCount(player, area) {
-	var count =  S[Client[player]][area].length;
-	H[player][area].span.html(count)
-}
-function updRewardsCount(player) {
-	var count =  S[Client[player]].rewards;
-	H[player].rewards.span.html(count)
-}
-function updTurnCounter(player) {
-	var count =  S[Client[player]].turnCounter;
-	H[player].turnCounter.span.html(count)
-}
-function updAllCount() {
-	var P, A;
-	for (var p in P = ['you','opp']) {
-		for (var a in A = ['deck', 'discard', 'chackra']) {
-			updAreaCount(P[p],A[a]);
-		}
-		updRewardsCount(P[p]);
-		updTurnCounter(P[p]);
-	}
-}
-
-socket.on('bothIsJoin', function(d) {
-	// Accordance = d.Accordance;
-	// Known = d.Known;
-	applyUpd({upd:{Known : d.Known, Accordance : d.Accordance}})
-	// console.log('bothIsJoin',d)
-	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
-    	updTable();
-})
-
-socket.on('log', function(d){
-	console.log(d.txt)
-});
-
-function get_S()          { return S;}
-function get_you()        { return you;}
-function get_Stadies()    { return Stadies;}
-function get_Known()      { return Known;}
-function get_Accordance() { return Accordance;}
-
-function get_arg(txt) {
-	if (typeof(txt) == 'string' && txt.substr(0,4) == 'get_') return window[txt]();
-	return txt;
-}
-
-
-
-function applyUpd(d) {
-	// console.log("d.upd.meta",d)
-	if (d.upd) {
-		// console.log("↳ upd ",d.upd)
-		if (d.upd.Known) for (var i in d.upd.Known) {
-			if (!d.upd.Known[i]) {
-				delete Known[i];
-				continue;
-			}
-			//Known[i] = d.upd.Known[i];
-			// console.log(i);
-			Known[i] = CardBase[d.upd.Known[i].number];
-			Known[i].owner = d.upd.Known[i].owner;
-			// console.log(Known)
-		}
-		if (d.upd.Accordance) for (var i in d.upd.Accordance) {
-			if (!d.upd.Accordance[i]) {
-				delete Accordance[i];
-				continue;
-			}
-			Accordance[i] = d.upd.Accordance[i];
-		}
-		if (d.upd.meta) for (var i in d.upd.meta) {
-			Meta[i] = d.upd.meta[i];
-			if (i == 'toNextPhase') {
-			    updCurrentPhase();
-			}
-		}
-	}
-}
-socket.on('update',function(d) {
-	 applyUpd(d);
-})
-
-socket.on('action',function(d) {
-	 applyAct(d);
-})
-
-function applyAct(d) {
-	if (d.acts) {
-		// console.log("↳ acts ",d.acts)
-		for (var i in d.acts) {
-			for (var i2 in d.acts[i].arg) {
-				d.acts[i].arg[i2] = get_arg(d.acts[i].arg[i2])
-			}
-			Actions[d.acts[i].act](d.acts[i].arg, getUniversalObject())
-		}
-	}
-}
-
-var Answers = {};
-var stackPrepArfterIsRun = false;
-var stackPrepAfter = {
-	afterQuestion : []
-};
-function applyStackAfter() {
-	// console.log('applyStackAfter',stackPrepAfter);	
-	var stackPrep = stackPrepAfter;
-	AN.preStack.count = 1;
-	for (var func in stackPrep) {
-		for (var args in stackPrep[func]) {
-				console.log('+++++++++++')
-				console.log('-> ' + func)
-			AN.preStack.count++;
-			AN.preStack[func](stackPrep[func][args]);
-		}	
-	}
-	AN.preStack.countDown();
-}
-
-var stackPrepBeforIsRun = false;
-var stackPrepBefor = {};
-
-function applyStackBeafor() {
-	 console.log('stackPrepBefor',stackPrepBefor);	
-	var stackPrep = stackPrepBefor;
-	AN.preStack.count = 1;
-	for (var func in stackPrep) {
-		for (var args in stackPrep[func]) {
-				// console.log('+++++++++++')
-				// console.log('-> ' + func)
-			AN.preStack.count++;
-			AN.preStack[func](stackPrep[func][args]);
-		}	
-	}
-	console.log('COUNT' , AN.preStack.count)
-	AN.preStack.countDown();
-}
-
-var stackPrepNormal = {};
-
-
-function applyStackNormal() {
-	// console.log('stackPrepNormal',stackPrepNormal);	
-	var stackPrep = stackPrepNormal;
-	AN.preStack.count = 1;
-	for (var func in stackPrep) {
-		for (var args in stackPrep[func]) {
-			//console.log('-----------')
-			AN.preStack.count++;
-			//console.log('-> ' + AN.preStack.count +' '+ func)
-			AN.preStack[func](stackPrep[func][args]);
-		}	
-	}
-	AN.preStack.countDown();
-}
-
-
-function applyStackPrep(d) {
-	var stackPrep = d.stackPrep;
-
-	if (stackPrep) {
-		//console.log('=================')
-		// console.log('stackPrep',stackPrep)
-		stackPrepAfter.afterQuestion = [];
-		stackPrepAfter.befor = [];
-		for (var func in stackPrep) {
-			if (func == 'afterQuestion') {
-				//console.log('af')
-				stackPrepArfterIsRun = true;
-				stackPrepAfter[func] = stackPrepAfter[func].concat(stackPrep[func]);
-				delete stackPrep[func];
-			}
-			if ( func == 'befor') {
-				stackPrepBeforIsRun = true;
-				stackPrepBefor = stackPrep.befor;
-				delete stackPrep.befor;
-			}
-		}
-
-		stackPrepNormal = stackPrep;
-		
-		if (stackPrepBeforIsRun) {
-			applyStackBeafor();
-		} else {
-			applyStackNormal();
-		}
-
-	}
-}
-
-
-var updactTimeStart = 0;
-socket.on('updact',function(d) {
-	updactTimeStart = Date.now();
-	// console.log('t = ' + updactTimeStart)
-	// console.log("")
-	// console.log("")
-	console.log("↳ updact ",d)
-	applyUpd(d);
-	applyAct(d);
-	applyStackPrep(d);
-})
-
-
-
-function save() {
-		socket.emit('save',{u:Client});
-}
-function getS(){
-		socket.emit('getS',{u:Client});
-}
-socket.on('getS',function(d) {
-	console.log(d)
-})
