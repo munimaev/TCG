@@ -681,7 +681,7 @@ function getStartMeta(S) {
 		for (var zone in zones)
 			for (var number in S.Snapshot[pXs[pX]][zones[zone]].team)
 				if (result.teamCounter <= number) result.teamCounter = number;
-	console.log(('getStartMeta ' + result.teamCounter).bold)
+	// console.log(('getStartMeta ' + result.teamCounter).bold)
 	return result;
 }
 
@@ -1247,11 +1247,19 @@ function drawCardAtStartTurn(d) {
 	// TODO возможно надо реагировать
 }
 /**
- * [getUniversalObject description]
+ * Возвращает "универсальный объект". в этом объекте храняться как снимок игры 
+ * так и данные карт 
  * @param  {Number} tableID индификатор стола
  * @param  {Object} obj     Необязательный параметр свойства которого будут 
- * добавлены в возвражемый объект.
- * @return {[type]}         [description]
+ * добавлены в возвражемый объект. 
+ * @return {Object} 
+ * {\n
+ *    Accordance: table.Accordance,\n
+ *	  Known: table.Known,\n
+ *	  S: table.Snapshot,\n
+ * 	  Meta: table.Meta,\n
+ * 	  Stadies: Stadies,\n
+ * } \n
  */
 function getUniversalObject(tableID, obj) {
 	var table = StartedGames[tableID];
@@ -1259,7 +1267,7 @@ function getUniversalObject(tableID, obj) {
 		Accordance: table.Accordance,
 		Known: table.Known,
 		S: table.Snapshot,
-		Meta: table.Meta,
+		Meta: table.meta,
 		Stadies: Stadies,
 	}
 	var obj = obj || {};
