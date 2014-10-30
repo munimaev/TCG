@@ -90,178 +90,18 @@ var Actions = {
 			}
 		}
 	},
-	/**
-	 * [description]
-	 * @param  {[type]} args {
-	 * @param  {[type]} args.pX : 'pA' [description]
-	 * @param  {[type]} args.card [description]
-	 * @param  {[type]} args.cause [description]
-	 * @param  {[type]} args.from [description]
-	 * @param  {[type]} args.to [description]
-	 * @param  {[type]} args.team [description]
-	 * {pX : 'pA', card : 'c001', cause : 'cardEffect', from : 'hand', to : 'discard', team : null}
-	 * @param  {[type]} o	[description]
-	 * @return {[type]}	  [description]
-	 */
-	'moveCardToZone': function(args, o) {
-		// console.log('Move Card TO Zone')
-		// console.log(args, isZoneSimple(args.from),args.from)
-		
-		//Triggers
-
-		var result = {
-			updTable: [],
-		};
-
-		if (args.cause == 'play') {
-			if (o.Known[o.Accordance[args.card]].type == 'N') {
-				o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
-			}
-			if (o.Known[o.Accordance[args.card]].type == 'M') {
-				o.S[args.pX].counters.playedMission += 1;
-			}
-		}
-
-		// console.log(isZoneSimple(args.from))
-		if (!isZoneSimple(args.from)) {
-
-			result.updTable[0] = {};
-
-			if (isZoneSimple(args.to)) {
-				// console.log('h->s')
-				o.S[args.pX][args.from].team[args.team].splice(args.cardInArray, 1);
-				if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
-					o.S[args.pX][args.to].splice(0, 0, args.card)
-				} else {
-					o.S[args.pX][args.to].push(args.card);
-				}
-				o.S.statuses[args.card] = {};
-
-				if (!module) {
-					C[args.card].params.zona = args.to;
-					AnimationPush({
-						func: function() {
-							AN.moveCardToZone(args, o);
-						},
-						time: 760,
-						name: 'moveCardToZone'
-					});
-				}
-			} else if (!isZoneSimple(args.from)) {
-				// console.log('h->h')
-				Actions.organisation({
-					nochange : true,
-					c1: {
-						position: args.cardInArray == 0 ? 'leader' : 'support',
-						owner: args.pX,
-						zone: args.from,
-						team: Actions.cardPath({card:args.card, path:{players:[args.pX], zones:[args.from]}},o).team,
-						card : args.card
-					},
-					c2: {
-						position: 'support',
-						owner: args.pX,
-						zone: args.to,
-						team: args.team,
-					}
-				} ,o);
-
-			}
-			if (!o.S[args.pX][args.from].team[args.team].length) {
-				delete o.S[args.pX][args.from].team[args.team];
-				for (var i in o.S.battlefield) {
-					if (i == args.team || o.S.battlefield[i] == args.team) {
-						delete o.S.battlefield[i];
-					}
-				}
-			}
-		} else if (isZoneSimple(args.from)) {
-			// console.log(args.pX, args.from, args.card)
-			if (args.from == 'stack') {
-				var ind = true;
-				result.updTable[0] = {};
-			} else {
-				var ind = arraySearch(o.S[args.pX][args.from], args.card);
-			}
-			 // console.log('IND', ind)
-			if (ind !== null) {
-				if (args.from == 'stack') {
-					for (var i in o.S.stack) {
-						if (o.S.stack[i].card == args.card) {
-							o.S.stack.splice(i, 1);
-							break;
-						}
-					}
-				} else {
-					o.S[args.pX][args.from].splice(ind, 1)
-				}
-
-				if (isZoneSimple(args.to)) {
-					 console.log('s->s')
-					if (args.to == 'stack') {
-						o.S.stack.push({
-							card: args.card,
-							user: args.user,
-							target: args.target,
-							owner: args.pX
-						})
-					} else {
-						if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
-							o.S[args.pX][args.to].splice(0, 0, args.card)
-						} else {
-							o.S[args.pX][args.to].push(args.card);
-						}
-					}
-					if (!module) {
-						if (C[args.card]) C[args.card].params.zona = args.to;
-						console.log('AnimationPush')
-						AnimationPush({
-							func: function() {
-								AN.moveCardToZone(args, o);
-								AN.moveToHand(o);
-							},
-							time: 760,
-							name: 'moveCardToZone'
-						});
-					}
-					// console.log("\n\n\nSTACK")
-					// console.log(o.S.stack)
-				} 
-				else if (!isZoneSimple(args.to)) {
-					 // console.log('s->h')
-
-					result.updTable[0] = {};
-
-					Actions.createTeamFromCard(args, o);
-					if (!module) {
-						C[args.card].params.zona = args.to;
-						AnimationPush({
-							func: function() {
-								AN.moveCardToZone(args, o);
-								AN.moveToHand(o);
-							},
-							time: 760,
-							name: 'moveCardToZone'
-						});
-					}
-				}
-			}
-		}
-		// if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
-		
-		if (!result.updTable.length) delete result.updTable;
-		return result;
-	},
 	'adMoveCardToZone' : function (args, o) {
 		var result = {
-				'moveCardToZone': [args]
-			};
+			'moveCardToZone': [args]
+		};
 		result = Actions.addTriggerEffect(result, 'instedMoveCardToZone', args, o); // result change
+		result = Actions.addTriggerEffect(result, 'afterMoveCardToZone', args, o); // result change
 		return result;
 	},
 	'addConditionalEffect': function(result, trigger, args, o) {},
 	'addTriggerEffect': function(result, trigger, args, o) {
 
+		console.log('\ntrigger'.yellow)
 		var isInsted = trigger.substr(0,6) === 'insted';
 		insted:
 		for (var accCard in o.Accordance) {
@@ -269,20 +109,20 @@ var Actions = {
 				&& o.Known[o.Accordance[accCard]].effect.trigger 
 				&& o.Known[o.Accordance[accCard]].effect.trigger[trigger]
 			) {
-				var trigger = o.Known[o.Accordance[accCard]].effect.trigger[trigger];
-				for (var i in trigger) {
-					var conditionSelf = trigger[i].conditionSelf({
+				var triggerEffect = o.Known[o.Accordance[accCard]].effect.trigger[trigger];
+				for (var i in triggerEffect) {
+					var conditionSelf = triggerEffect[i].conditionSelf({
 						"card": accCard
 					}, o);
-					var condition = trigger[i].condition(args, o);
-					var ciclingCheck = trigger[i].ciclingCheck({
+					var condition = triggerEffect[i].condition(args, o);
+					var ciclingCheck = triggerEffect[i].ciclingCheck({
 						"card": accCard,
 						"actionArgs": args
 					}, o);
-					console.log('\nciclingCheck'.yellow)
-					console.log(ciclingCheck)
+					console.log((o.Known[o.Accordance[accCard]].number + 'ciclingCheck').yellow)
+					console.log(conditionSelf, condition, ciclingCheck)
 					if (conditionSelf && condition && ciclingCheck) {
-						result = trigger[i].resultChange(result, {
+						result = triggerEffect[i].resultChange(result, {
 							"card": accCard,
 							"actionArgs" : args
 						}, o)
@@ -294,6 +134,7 @@ var Actions = {
 			}
 
 		}
+		console.log(result)
 		return result;
 	},
 	'preparePutCardinPlay': function(args, o) {
@@ -354,26 +195,6 @@ var Actions = {
 				cards: [args.card]
 			}]
 		};
-	},
-	/**
-	 * createTeamFromCard 
-	 * Используеться в {@link Action.moveCardToZone}, {@link Action.removeFromTeam},
-	 * @param  {[Object]} o 
-	 * @example 
-	 * { 
-	 *    card :'c001', 
-	 *    pX : 'pA',
-	 *    S : S,
-	 *    team : 3,
-	 *    teamCounter : 4,
-	 *    to : 'attack'/'block'/'viilage'
-	 * }
-	 */
-	'createTeamFromCard': function(args, o) {
-		if (!args.teamCounter) {
-			args.teamCounter = ++o.Meta.teamCounter
-		}
-		o.S[args.pX][args.to].team[args.teamCounter] = [args.card]
 	},
 	'updTable': function(o) {
 		if (!module) {
@@ -436,8 +257,8 @@ var Actions = {
 		var Team1 = o.S[owner][zone].team[team1];
 		var Team2 = o.S[owner][zone].team[team2];
 
-                    console.log(args.c1.card.bold);
-                    console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
+                    // console.log(args.c1.card.bold);
+                    // console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
 		// console.log('organisation'.red)
 		// console.log(owner,zone,team2)
 		// console.log(Team2)
@@ -467,8 +288,8 @@ var Actions = {
 			}
 			updTable();
 		}
-                    console.log(args.c1.card.bold);
-                    console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
+                    // console.log(args.c1.card.bold);
+                    // console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
 	},
 	'removeSelfFromTeam': function(S, c2) {
 		console.log('-*- removeSelfFromTeam')
@@ -1393,7 +1214,7 @@ var Actions = {
 		return {};
 	},
 	'resolveJutsuInStack': function(args, o) {
-		console.log('ARGS', args)
+		// console.log('ARGS', args)
 		var result = {};
 		var jutsu = o.Known[o.Accordance[args.card]];
 		if (!module) {
@@ -1437,17 +1258,19 @@ var Actions = {
 			}
 		}
 		args2.team = null;
-		console.log('resolveMove'.red)
-		Actions.moveCardToZone(args2, o)
+		// console.log('resolveMove'.red)
+		if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+		result.adMoveCardToZone.push(args2);
+		// Actions.moveCardToZone(args2, o)
 		return result;
 	},
 	'increaseNinjaPower': function(args, o) {
 		var result = {};
 
 		if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
-		if (!('atEndOfTurn' in o.S.statuses[args.card])) o.S.statuses[args.card].atEndOfTurn = [];
-		o.S.statuses[args.card].atEndOfTurn.push({
-			type: 'changePower',
+		if (!('atEndOfTurn' in o.S.statuses[args.card])) o.S.statuses[args.card].atEndOfTurn = {};
+		if (!('changePower' in o.S.statuses[args.card])) o.S.statuses[args.card].atEndOfTurn.changePower = [];
+		o.S.statuses[args.card].atEndOfTurn.changePower.push({
 			attack: args.attack,
 			support: args.support
 		})
@@ -1468,7 +1291,6 @@ var Actions = {
 			});
 			AnimationPush({
 				func: function() {
-					console.log(S.statuses)
 					updTable();
 				},
 				time: 600,
@@ -1488,16 +1310,17 @@ var Actions = {
 		};
 		if (card in o.S.statuses) {
 			if ('atEndOfTurn' in o.S.statuses[card]) {
-				for (var i in o.S.statuses[card].atEndOfTurn) {
-					if (o.S.statuses[card].atEndOfTurn[i].type == 'changePower') {
-						result.attack += o.S.statuses[card].atEndOfTurn[i].attack;
-						result.support += o.S.statuses[card].atEndOfTurn[i].support;
-					}
+				for (var i in o.S.statuses[card].atEndOfTurn['changePower']) {
+					result.attack += o.S.statuses[card].atEndOfTurn.changePower[i].attack;
+					result.support += o.S.statuses[card].atEndOfTurn.changePower[i].support;
 				}
 			}
 		}
 		for (var accCard in o.Accordance) {
-			if (o.Known[o.Accordance[accCard]].effect && o.Known[o.Accordance[accCard]].effect.static && o.Known[o.Accordance[accCard]].effect.static.powerNinja) {
+			if (o.Known[o.Accordance[accCard]]
+				&& o.Known[o.Accordance[accCard]].effect 
+				&& o.Known[o.Accordance[accCard]].effect.static 
+				&& o.Known[o.Accordance[accCard]].effect.static.powerNinja) {
 				var powerNinja = o.Known[o.Accordance[accCard]].effect.static.powerNinja;
 				for (var i in powerNinja) {
 					var conditionSelf = powerNinja[i].conditionSelf({
@@ -1515,6 +1338,21 @@ var Actions = {
 				}
 			}
 
+		}
+		if (o.Known[o.Accordance[card]]
+			&& o.Known[o.Accordance[card]].effect
+			&& o.Known[o.Accordance[card]].effect.static
+			&& o.Known[o.Accordance[card]].effect.static.selfPower
+		) {
+			var selfPower = o.Known[o.Accordance[card]].effect.static.selfPower;
+			for (var i in selfPower) {
+				if (selfPower[i].condition({self:card},o)) {
+					var powerMod = selfPower[i].getPowerMod({self:card},o);
+					console.log('powerMod', powerMod)
+					result.attack += powerMod.attack;
+					result.support += powerMod.support;
+				}
+			}
 		}
 		return result;
 	},
@@ -1719,66 +1557,6 @@ var Actions = {
 	 * @param  {[type]} o    [description]
 	 * @return {[type]}      [description]
 	 */
-	'getCardForCondition' : function(args, o) {
-		var defaultZones = ['deck', 'stack', 'village', 'hand', 'discard', 'mission', 'attack', 'block'];
-		var defaultPlayers = ['pA', 'pB'];
-		args.path = args.path || {
-			path: {
-				player: defaultPlayers,
-				zones: defaultZones
-			}
-		};
-		var zones = args.path.zones || defaultZones;
-		var pXs = args.path.players || defaultPlayers;
-		var result = [];
-
-		function check(card, args) {
-			var statusCheck = true;
-			if (args.statuses && args.statuses.length)  {
-				if (card.statuses && card.statuses.length) {
-					var checked = 0;
-					for (var stat in args.statuses) {
-						if (~card.statuses.indexOf(args.statuses[stat])) {
-							checked++;
-						}
-					}
-				} else {
-					statusCheck = false;
-				}
-				if (args.statuses.length == checked) {
-					statusCheck == true;
-				}
-			}
-			return statusCheck;
-		}
-
-		for (var pX in pXs) {
-			for (var zone in zones) {
-				if (!isZoneSimple(zones[zone])) {
-					for (var team in o.S[pXs[pX]][zones[zone]].team) {
-						for (var cId in o.S[pXs[pX]][zones[zone]].team[team]) {
-							var cardId = o.S[pXs[pX]][zones[zone]].team[team][cId];
-							var card = o.Known[o.Accordance[cardId]];
-							if (check(card, args)) {
-								result.push(cardId)
-							};
-						}
-					}
-				} else {
-					for (var cId in o.S[pXs[pX]][zones[zone]]) {
-						var cardId = o.S[pXs[pX]][zones[zone]][cId];
-						var card = o.Known[o.Accordance[cardId]];
-						if (check(card, args)) {
-							result.push(cardId)
-						};
-					}
-				}
-
-			}
-		}
-		return result;
-
-	},
 	/**
 	 * [description]
 	 * @param  {[type]} dict [['текст ошибки',function(){return true/false}],...]
@@ -1808,29 +1586,314 @@ var Actions = {
  * @return {[type]}	  [description]
  */
 Actions.DrawXcards = function(args, o) {
-		args.numberOfCard = args.numberOfCard || 1;
-		var o2 = {
-			pX: args.player,
-			cards: []
-		};
-		for (var i = 1; i <= args.numberOfCard; i++) {
-			o2.cards.push(Actions['Draw Card'](args, o));
+	args.numberOfCard = args.numberOfCard || 1;
+	var o2 = {
+		pX: args.player,
+		cards: []
+	};
+	// console.log('drawXcard'.bold.red)
+	for (var i = 1; i <= args.numberOfCard; i++) {
+		o2.cards.push(Actions['Draw Card'](args, o));
+	}
+	// console.log(o2.cards)
+	o.S[args.player].isNewGame = false;
+	if (!module) {
+		AnimationPush({
+			func: function() {
+				AN.playerDrawCards(o2);
+			},
+			time: 1500,
+			name: 'DrawXcards'
+		});
+		setTimeout(AN.preStack.countDown, 1510);
+	}
+	return {
+		//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
+	}
+}
+
+/**
+ * createTeamFromCard 
+ * Используеться в {@link Action.moveCardToZone}, {@link Action.removeFromTeam},
+ * @param  {Object} args 
+ * { \n
+ *    card :'c001', \n
+ *    pX : 'pA',\n
+ *    S : S,\n
+ *    team : 3,\n
+ *    teamCounter : 4,\n
+ *    to : 'attack'/'block'/'viilage'\n
+ * }
+ * @param  {Object} o {@link getUniversalObject}
+ * @example 
+ */
+Actions.createTeamFromCard =  function(args, o) {
+	if (!args.teamCounter) {
+		args.teamCounter = ++o.Meta.teamCounter
+	}
+	o.S[args.pX][args.to].team[args.teamCounter] = [args.card]
+}
+
+Actions.getCardForCondition = function(args, o) {
+	var defaultZones = ['deck', 'stack', 'village', 'hand', 'discard', 'mission', 'attack', 'block'];
+	var defaultPlayers = ['pA', 'pB'];
+	args.path = args.path || {
+		path: {
+			player: defaultPlayers,
+			zones: defaultZones
 		}
-		o.S[args.player].isNewGame = false;
-		if (!module) {
-			AnimationPush({
-				func: function() {
-					AN.playerDrawCards(o2);
-				},
-				time: 1500,
-				name: 'DrawXcards'
-			});
-			setTimeout(AN.preStack.countDown, 1510);
+	};
+	var zones = args.path.zones || defaultZones;
+	var pXs = args.path.players || defaultPlayers;
+	var result = [];
+
+	function check(card, args) {
+		if (!card) return false;
+		var statusCheck = true;
+		if (args.statuses && args.statuses.length)  {
+			if (card.statuses && card.statuses.length) {
+				var checked = 0;
+				for (var stat in args.statuses) {
+					if (~card.statuses.indexOf(args.statuses[stat])) {
+						if (args.greedy) return true;
+						checked++;
+					}
+				}
+			} else {
+				statusCheck = false;
+			}
+			if (args.statuses.length == checked) {
+				statusCheck == true;
+			}
 		}
-		return {
-			//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}]
+		if (args.atributes && args.atributes.length ) {
+			if (card.atributes && card.atributes.length) {
+				var checked = 0;
+				for (var atr in args.atributes) {
+					if (~card.atributes.indexOf(args.atributes[atr])) {
+						if (args.greedy) return true;
+						checked++;
+					}
+				}
+			} else {
+				statusCheck = false;
+			}
+			if (args.statuses.length == checked) {
+				statusCheck == true;
+			}
+		}
+		return statusCheck;
+	}
+
+	for (var pX in pXs) {
+		for (var zone in zones) {
+			if (!isZoneSimple(zones[zone])) {
+				for (var team in o.S[pXs[pX]][zones[zone]].team) {
+					for (var cId in o.S[pXs[pX]][zones[zone]].team[team]) {
+						var cardId = o.S[pXs[pX]][zones[zone]].team[team][cId];
+						var card = o.Known[o.Accordance[cardId]];
+						if (check(card, args)) {
+							result.push(cardId)
+						};
+					}
+				}
+			} else {
+				for (var cId in o.S[pXs[pX]][zones[zone]]) {
+					var cardId = o.S[pXs[pX]][zones[zone]][cId];
+					var card = o.Known[o.Accordance[cardId]];
+					if (check(card, args)) {
+						result.push(cardId)
+					};
+				}
+			}
+
 		}
 	}
+	return result;
+
+}
+
+/**
+ * [description]
+ * @param  {Object} args 
+ * { \n
+ *    card :'c001', \n
+ *    pX : 'pA',\n
+ *    S : S,\n
+ *    cause : 3,\n
+ *    from : 4,\n
+ *    to : 'attack'/'block'/'viilage'\n
+ *    team : 'attack'/'block'/'viilage'\n
+ * }
+ * @param  {Object} o {@link getUniversalObject}
+ * @return {[type]}	  [description]
+ */
+Actions.moveCardToZone = function(args, o) {
+	// console.log('Move Card TO Zone')
+	// console.log(args)
+	
+	//Triggers
+
+	var result = {
+		updTable: [],
+	};
+
+	if (args.cause == 'play') {
+		if (o.Known[o.Accordance[args.card]].type == 'N') {
+			o.S.counters.playedNinjaActivePlayer = o.S.counters.playedNinjaActivePlayer + 1;
+		}
+		if (o.Known[o.Accordance[args.card]].type == 'M') {
+			o.S[args.pX].counters.playedMission += 1;
+		}
+	}
+
+	// console.log(isZoneSimple(args.from))
+	if (!isZoneSimple(args.from)) {
+
+		result.updTable[0] = {};
+
+		if (isZoneSimple(args.to)) {
+			// console.log('h->s')
+			o.S[args.pX][args.from].team[args.team].splice(args.cardInArray, 1);
+			if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+				o.S[args.pX][args.to].splice(0, 0, args.card)
+			} else {
+				o.S[args.pX][args.to].push(args.card);
+			}
+			o.S.statuses[args.card] = {};
+
+			if (!module) {
+				C[args.card].params.zona = args.to;
+				AnimationPush({
+					func: function() {
+						AN.moveCardToZone(args, o);
+					},
+					time: 760,
+					name: 'moveCardToZone'
+				});
+			}
+		} else if (!isZoneSimple(args.from)) {
+			// console.log('h->h')
+			Actions.organisation({
+				nochange : true,
+				c1: {
+					position: args.cardInArray == 0 ? 'leader' : 'support',
+					owner: args.pX,
+					zone: args.from,
+					team: Actions.cardPath({card:args.card, path:{players:[args.pX], zones:[args.from]}},o).team,
+					card : args.card
+				},
+				c2: {
+					position: 'support',
+					owner: args.pX,
+					zone: args.to,
+					team: args.team,
+				}
+			} ,o);
+
+		}
+		if (!o.S[args.pX][args.from].team[args.team].length) {
+			delete o.S[args.pX][args.from].team[args.team];
+			for (var i in o.S.battlefield) {
+				if (i == args.team || o.S.battlefield[i] == args.team) {
+					delete o.S.battlefield[i];
+				}
+			}
+		}
+	} else if (isZoneSimple(args.from)) {
+		// console.log(args.pX, args.from, args.card)
+		if (args.from == 'stack') {
+			var ind = true;
+			result.updTable[0] = {};
+		} else {
+			var ind = arraySearch(o.S[args.pX][args.from], args.card);
+		}
+		 // console.log('IND', ind)
+		if (ind !== null) {
+			if (args.from == 'stack') {
+				for (var i in o.S.stack) {
+					if (o.S.stack[i].card == args.card) {
+						o.S.stack.splice(i, 1);
+						break;
+					}
+				}
+			} else {
+				o.S[args.pX][args.from].splice(ind, 1)
+			}
+
+			if (isZoneSimple(args.to)) {
+				 // console.log('s->s')
+				if (args.to == 'stack') {
+					o.S.stack.push({
+						card: args.card,
+						user: args.user,
+						target: args.target,
+						owner: args.pX
+					})
+				} else {
+					if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
+						o.S[args.pX][args.to].splice(0, 0, args.card)
+					} else {
+						o.S[args.pX][args.to].push(args.card);
+					}
+				}
+				if (!module) {
+					if (C[args.card]) C[args.card].params.zona = args.to;
+					// console.log('AnimationPush')
+					AnimationPush({
+						func: function() {
+							AN.moveCardToZone(args, o);
+							AN.moveToHand(o);
+						},
+						time: 760,
+						name: 'moveCardToZone'
+					});
+				}
+				// console.log("\n\n\nSTACK")
+				// console.log(o.S.stack)
+			} 
+			else if (!isZoneSimple(args.to)) {
+				 // console.log('s->h')
+
+				result.updTable[0] = {};
+				Actions.createTeamFromCard(args, o);
+				if (!module) {
+					C[args.card].params.zona = args.to;
+					AnimationPush({
+						func: function() {
+							AN.moveCardToZone(args, o);
+							AN.moveToHand(o);
+						},
+						time: 760,
+						name: 'moveCardToZone'
+					});
+				}
+			}
+		}
+	}
+	// if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
+	
+	if (!result.updTable.length) delete result.updTable;
+	return result;
+}
+Actions.shuffle = function(args, o) {
+	var accK = [];
+	var accV = []
+	for (var i in o.S[args.pX][args.zone]) {
+		var card = o.S[args.pX][args.zone][i];
+		accK.push(card);
+		accV.push(o.Accordance[card]);
+	}
+	accV.sort(function() {
+		return Math.random() - 0.5
+	})
+	accK.sort(function() {
+		return Math.random() - 0.5
+	})
+	for (var i in accK) {
+		o.Accordance[accK[i]] = accV[i]; 
+	}
+}
 if (module) {
 	module.exports = Actions;
 }
