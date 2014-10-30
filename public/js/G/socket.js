@@ -91,7 +91,7 @@ function get_arg(txt) {
 function applyUpd(d) {
 	// console.log("d.upd.meta",d)
 	if (d.upd) {
-		// console.log("↳ upd ",d.upd)
+		 // console.log("↳ upd ",d.upd)
 		if (d.upd.Known) for (var i in d.upd.Known) {
 			if (!d.upd.Known[i]) {
 				delete Known[i];
@@ -162,7 +162,7 @@ var stackPrepBeforIsRun = false;
 var stackPrepBefor = {};
 
 function applyStackBeafor() {
-	 console.log('stackPrepBefor',stackPrepBefor);	
+	 // console.log('stackPrepBefor',stackPrepBefor);	
 	var stackPrep = stackPrepBefor;
 	AN.preStack.count = 1;
 	for (var func in stackPrep) {
@@ -173,7 +173,7 @@ function applyStackBeafor() {
 			AN.preStack[func](stackPrep[func][args]);
 		}	
 	}
-	console.log('COUNT' , AN.preStack.count)
+	// console.log('COUNT' , AN.preStack.count)
 	AN.preStack.countDown();
 }
 
