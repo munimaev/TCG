@@ -215,11 +215,13 @@ $(window).readyresize(function(width, height) {
 
 
 
-function btnArea(area,owner) {
+function btnArea(area,owner,args) {
+    var args = args || {};
     var o = {
         owner :owner,
         area : area,
         clicker : you,
+        args:args
     };
     areaClick(o);
 }
@@ -287,7 +289,9 @@ function fillScroll(o){
     }
     var params = {};
     for (var i in G) {
-        params = {'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:faceUp, zindex:600};
+        var thisFaceUp = faceUp;
+        if (o.args.faceUp && ~o.args.faceUp.indexOf(G[i])) thisFaceUp = true;
+        params = {'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:thisFaceUp, zindex:600};
         var preparams = Known[Accordance[G[i]]];
         for (var i2 in preparams) {
             params[i2] = preparams[i2];
@@ -299,10 +303,10 @@ function fillScroll(o){
 }
 
 function emptyScroll(o){
-    var G = S[Client[o.owner]][o.area].order;
+    var G = S[Client[o.owner]][o.area];
     for (var i in G) {
-        window[G[i]].destroyCard();
-        delete window[G[i]];
+        C[G[i]].destroyCard();
+        //delete window[G[i]];
     }
 }
 
