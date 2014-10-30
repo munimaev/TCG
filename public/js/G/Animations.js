@@ -12,6 +12,7 @@ function AnimationPush(o) {
 	//console.log('-----------');
 	AnimationNext();
 }
+
 /**
  * Запускае следующую анимацию
  */
@@ -56,7 +57,9 @@ var AN = {
 			}
 			construct.id = id;
 			construct.owner = o.pX;
-			C[id] = new Card(construct);
+			construct.zona = 'hand';
+			createCard(construct)
+			// C[id] = new Card(construct);
 			C[id].animation({
 				'X': I.W / 2 - I.card.W / 2,
 				'Y': Y,
@@ -92,7 +95,6 @@ var AN = {
 	moveToHand: function(o) {
 		LogI['moveToHand'] = 0;
 		Log(1, 'moveToHand');
-		Log(0, 'C', C);
 		//console.log(I.hand);
 		var needenCardsId = [];
 		var needenCardsIdObj = {};
@@ -207,7 +209,10 @@ var AN = {
 		Log(-1, 'moveToPreview');
 	},
 	moveCardToZone : function(args, o) {
-		console.log('>--', args)
+		// console.log('>--', args)
+		LogI['moveCardToZone'] = 1;
+		Log(1, 'moveCardToZone');
+		Log(0, 'args', args);
 		
 		if ( !isZoneSimple(args.from)) {
 			if ( isZoneSimple(args.to) ){
@@ -223,11 +228,7 @@ var AN = {
 					fadeIn: true, 
 					//curveMoving: 'Y', 
 					after: { func: function() {
-								C[o.card].destroyCard();	
-								//updateCardCount( { owner: o.owner, area: o.to } );
-								delete C[o.card];
-								//updTable();
-								//startTable();
+								C[o.card].destroyCard();
 								} 
 							} 
 						}
@@ -240,7 +241,6 @@ var AN = {
 			if ( isZoneSimple(args.to) ) {
 				if (args.to != 'stack' &&  args.to != 'mission' && !C[args.card]) {
 					AN.moveCardFaceDownToZone(args)
-						console.log('msg')
 					if (args.from == "mission") {
 						AnimationPush({func:function() {
 							 updTable();
@@ -248,17 +248,24 @@ var AN = {
 					}
 				} 
 				else {
-					if (args.from != 'stack' &&  args.to != 'mission') {
-						if (args.to == 'hand') {
-							AN.moveCardToCenter(args);      // deck -> hand
+					if (args.from != 'stack' && args.to != 'mission') {
+						if (args.to == 'hand' || (args.from == 'hand' && args.to == 'stack')) {
+							AN.moveCardToCenter(args); // deck -> hand
 						} else {
 							AN.moveCardFaceDownToZone(args) // hand -> discard
 						}
 					}
-						
-					AnimationPush({func:function() {
-						 updTable();
-					}, time:600, name: 'updTeams'});
+					if (args.from == 'stack' && args.to == 'chackra') {
+						AN.moveCardFaceDownToZone(args)
+					}
+
+					AnimationPush({
+						func: function() {
+							updTable();
+						},
+						time: 600,
+						name: 'updTeams'
+					});
 				}
 			}
 			else if ( !isZoneSimple(args.to) ) {
@@ -271,9 +278,9 @@ var AN = {
 			}
 		}
         updAllCount();
+		Log(-1, 'moveCardToZone');
 	},
 	moveCardToCenter : function(args) {
-
 		if (args.to == 'hand' || args.to == 'discard') {
 			var outCard = false;
 		} else {
@@ -345,19 +352,23 @@ var AN = {
 		if (you == args.pX) var z = G.you[args.to]
 		else var z = G.opp[args.to];
 		var afterAfterFunc = function() {
-			C[args.card].animation( 
-				{ X: z.X + 4, Y: z.Y + 2, H: z.H, duration: 300, additional: {
-					fadeIn: true, 
+			C[args.card].animation({
+				X: z.X + 4,
+				Y: z.Y + 2,
+				H: z.H,
+				duration: 300,
+				additional: {
+					fadeIn: true,
 					curveMoving: 'Y',
-					incline: false, 
-					after : {
-						func : function() {
+					incline: false,
+					after: {
+						func: function() {
 							C[args.card].destroyCard();
 							delete C[args.card];
 						}
 					}
 				}
-			} )
+			})
 		}
 		C[args.card].setZIndex(825);
 		C[args.card].params.teamPosition = null;
@@ -914,9 +925,10 @@ var AN = {
 		},
 
 		'selectHandCost' : function(args, o) {
-			if (!('selectHandCost' in Answers)) Answers.selectHandCost = [];
+			if (!('primal' in Answers)) Answers.primal = {};
+			if (!('selectHandCost' in Answers.primal)) Answers.primal.selectHandCost = [];
 			if (o.Known[o.Accordance[args.card]].hc == 0) {
-				Answers.selectHandCost.push({
+				Answers.primal.selectHandCost.push({
 					pX   : you,
 					card : args.card,
 					handCost : []
@@ -942,7 +954,7 @@ var AN = {
 			Context.workingUnit = 'card';
 			Context.clickAction = function( card ) {
 				var change = false;
-				Answers.selectHandCost.push({
+				Answers.primal.selectHandCost.push({
 					pX   : you,
 					card : args.card,
 					handCost : [card.id]
@@ -1092,6 +1104,7 @@ var AN = {
 			Actions.winner(args, getUniversalObject())
 		},
 		'winner' : function(args) {
+			Actions.winner(args, getUniversalObject())
 			Actions.winner(args, getUniversalObject())
 		},
 		'startDrawHand' : function(args) {
