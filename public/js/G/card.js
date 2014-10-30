@@ -1968,7 +1968,7 @@ function Card(o) {
                         card: this.id
                     },
                     getUniversalObject())
-                console.log(canResult)
+                // console.log(canResult)
 
                 if (canResult.result) {
                     $c.append(
@@ -2279,7 +2279,7 @@ Card.prototype = {
                 .css('top', '40%')
                 .css('left', '0%')
                 .css('text-align', 'center')
-            o.text = '+2/+2';
+            //o.text = '+2/+2';
             if (o.text) {
                 text.append(o.text)
             }
