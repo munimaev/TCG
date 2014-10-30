@@ -261,7 +261,9 @@ function createCard(o) {
         return true;
     }
 
-    if (!o || !('id' in o) || !o.id || !('zona' in o) || !o.zona || !('owner' in o) || !o.owner || !('position' in o)) return false;
+    if (!o 
+        || !('id' in o) 
+        || !o.id || !('zona' in o) || !o.zona || !('owner' in o) || !o.owner ) return false;
     var constr = {
             id: o.id,
             X: o.X || 0,
@@ -271,7 +273,7 @@ function createCard(o) {
             faceUp: true,
             owner: o.owner,
             zona: o.zona,
-            position: o.position
+            position: o.position || null
         }
         // Создание в положении зависящем от игровой зоны где карта должна появиться
     switch (o.zona) {
