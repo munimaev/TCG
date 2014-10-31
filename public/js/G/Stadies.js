@@ -1,106 +1,106 @@
 var Stadies = {
-    order: [ 'start', /*'draw',*/ 'mission', 'organisation', 'attack', 'block', 'jutsu', 'shutdown'/*, 'comeback', 'winner', 'end'*/ ],
+    order: ['start', /*'draw',*/ 'mission', 'organisation', 'attack', 'block', 'jutsu', 'shutdown' /*, 'comeback', 'winner', 'end'*/ ],
     current: 'organisation',
-    start : {
-        rusName : 'Начало хода',
-        workingUnit : 'card',
-        clickAction : null,
+    start: {
+        rusName: 'Начало хода',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
-    draw : {
-        rusName : 'Взятие карты',
-        workingUnit : 'card',
-        clickAction : null,
+    draw: {
+        rusName: 'Взятие карты',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
-    mission : {
-        rusName :  'Фаза миссии', //'Организовать команды'
-        workingUnit : 'card',
-        clickAction : null,
+    mission: {
+        rusName: 'Фаза миссии', //'Организовать команды'
+        workingUnit: 'card',
+        clickAction: null,
         party: 'both',
-        autoNextPhase : false,
+        autoNextPhase: false,
     },
     organisation: {
-        rusName :  'Фаза организации', //'Выбрать команды для сражения',//
+        rusName: 'Фаза организации', //'Выбрать команды для сражения',//
         workingUnit: 'card',
-        clickAction: function( _this ) {
-            organisationMove( _this );
+        clickAction: function(_this) {
+            organisationMove(_this);
         },
         party: 'attacker',
-        autoNextPhase : false,
+        autoNextPhase: false,
     },
-    attack : {
-        rusName : 'Фаза атаки',
-        workingUnit : 'team',
-        clickAction : function(_this){
-            var obj =  {
-                S : S,
-                Known : Known,
-                Accordance : Accordance,
-                card : _this.id,
-                pX : you,
-                team : _this.params.team,
-                from : _this.params.zona,
-                to : (_this.params.zona == 'village' ? 'attack' : 'village'),
+    attack: {
+        rusName: 'Фаза атаки',
+        workingUnit: 'team',
+        clickAction: function(_this) {
+            var obj = {
+                S: S,
+                Known: Known,
+                Accordance: Accordance,
+                card: _this.id,
+                pX: you,
+                team: _this.params.team,
+                from: _this.params.zona,
+                to: (_this.params.zona == 'village' ? 'attack' : 'village'),
             };
             if (Can.moveTeamToAttack(obj)) {
                 obj.S = obj.Known = obj.Accordance = null;
-                socket.emit('moveTeamToAttack',{
-                    u:Client, 
-                    arg: obj 
+                socket.emit('moveTeamToAttack', {
+                    u: Client,
+                    arg: obj
                 })
             }
         },
         party: 'attacker',
-        autoNextPhase : false,
+        autoNextPhase: false,
     },
-    block : {
-        rusName : 'Фаза блока',
-        workingUnit : 'team',
-        clickAction : function(_this){
+    block: {
+        rusName: 'Фаза блока',
+        workingUnit: 'team',
+        clickAction: function(_this) {
             blockMove(_this);
         },
         party: 'blocker',
-        autoNextPhase : false,
+        autoNextPhase: false,
     },
-    jutsu : {
-        rusName : 'Обмен техниками',
-        workingUnit : 'card',
-        clickAction : null,
+    jutsu: {
+        rusName: 'Обмен техниками',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'both',
-        autoNextPhase : false,
+        autoNextPhase: false,
     },
-    shutdown : {
-        rusName : 'Фаза подсчета',
-        workingUnit : 'card',
-        clickAction : null,
+    shutdown: {
+        rusName: 'Фаза подсчета',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
-    comeback : {
-        rusName : 'Фаза возврата',
-        workingUnit : 'card',
-        clickAction : null,
+    comeback: {
+        rusName: 'Фаза возврата',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
-    winner : {
-        rusName : 'Фаза побы',
-        workingUnit : 'card',
-        clickAction : null,
+    winner: {
+        rusName: 'Фаза побы',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
-    end : {
-        rusName : 'Закончить хад',//'Конца хода',
-        workingUnit : 'card',
-        clickAction : null,
+    end: {
+        rusName: 'Закончить хад', //'Конца хода',
+        workingUnit: 'card',
+        clickAction: null,
         party: 'attacker',
-        autoNextPhase : true,
+        autoNextPhase: true,
     },
 }
 if (module) {
-        module.exports = Stadies;
+    module.exports = Stadies;
 }
