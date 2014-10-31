@@ -1816,25 +1816,18 @@ function Card(o) {
     this.injure = function() {
         LogI['injure'] = 0;
         Log(1, 'injure');
-        var result = 0;
-        //if ( this.params.isHealt ) {
-        $('.center.ceb', this.$romb).append(
-            $('<div />', {
-                'class': 'injured',
-            })
-        )
-        this.$power.addClass('powerInjured');
-        this.$power.html(Actions.getInjuredPower({
-            cardID: this.id,
-            S: S,
-            Accordance: Accordance,
-            Known: Known
-        }));
-
+        this.changePower(true);
         this.params.isHealt = false;
-        //}
         Log(-1, 'injure');
-        return result;
+        // return result;
+    };
+    this.heal = function() {
+        LogI['heal'] = 0;
+        Log(1, 'heal');
+        this.changePower(false);
+        this.params.isHealt = true;
+        Log(-1, 'heal');
+        // return result;
     };
 
     this.showAction = function() {
@@ -2161,11 +2154,13 @@ Card.prototype = {
             });
         }
     },
-    changePower: function(mod) {
+    changePower: function(injure) {
         if (this.params.type == 'N') {
             var currentPower = (this.$power.html()).split('/');
             var mod = Actions.getNinjaModPower(this.id, getUniversalObject());
-            if (parseInt(currentPower[0]) != mod.attack || parseInt(currentPower[1]) != mod.support) {
+            if (parseInt(currentPower[0]) != mod.attack 
+                || parseInt(currentPower[1]) != mod.support
+                || injure == this.params.isHealt) {
                 var newPower = '';
                 newPower += mod.attack + '/' + mod.support;
                 var cardObj = C[this.id];
@@ -2174,6 +2169,11 @@ Card.prototype = {
                     },
                     250,
                     function() {
+                        if (injure) {
+                            cardObj.$power.addClass('powerInjured');
+                        } else {
+                            cardObj.$power.removeClass('powerInjured');
+                        }
                         cardObj.$power.html(newPower);
                         cardObj.instPower();
                     }
