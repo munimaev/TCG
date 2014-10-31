@@ -1163,6 +1163,20 @@ var AN = {
 		},
 		'adMoveCardToZone' : function(args) {
 			AN.preStack.countDown();
-		}
+		},
+		'adHealingNinja' : function(args) {
+			AN.preStack.countDown();
+		},
+		'healingNinja' : function(args) {
+			Actions.healingNinja(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,500)
+		},
+		'adRemoveCardFromGame' : function(args) {
+			AN.preStack.countDown();
+		},
+		'removeCardFromGame' : function(args) {
+			Actions.removeCardFromGame(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,500)
+		},
 	}
 }
