@@ -333,9 +333,145 @@ var CardBase = {
         "img": "n1474",
         "number": "n1474",
         "elements": "W",
-        "name": "Epidemic Prevention Officer",
-        "effectText": "",
-        "effect": {}
+        "name": "Офицер эпидемиологоической защииты",
+        "effectText": {
+            effectName: "Лечащие техники",
+            "effects": [{
+                "when" : "Обмен техниками или Ффаза миссии.",
+                "cost" : "Удалите этого ниндзя в вашей руке из игры.",
+                "effect": "Исцелите вашего ранненго ниндзя.",
+            }]
+        },
+        "effect": {
+            "activate": [{
+                "can": function(args, o) {
+                    var owner = o.Known[o.Accordance[args.card]].owner;
+                    var dict = [
+                        ['Вы не контролируете эту карту.',
+                            function() {if (!module) {return you == owner} else return true;}
+                        ],
+                        ['Вы уже испоользовали эту способность.',
+                            function() {
+                                return !(o.S.statuses[args.card] 
+                                && o.S.statuses[args.card].atEndOfTurn 
+                                && o.S.statuses[args.card].atEndOfTurn.activateUsed0)}
+                        ],
+                        ['Ниндзя должен быть в руке.',
+                            function() {
+                                return Actions.cardPath({
+                                    card: args.card,
+                                    path: {players: [owner],
+                                        zones: ['hand']}
+                                }, o)
+                            }
+                        ],
+                        ['Применяеться только в фазу миссии или обмена техниками.',
+                            function() {
+                                return o.S.phase === 'jutsu' || o.S.phase === 'mission';
+                            }
+                        ],
+                        ['Нету раненных ниндзя.',
+                            function() {
+                                return Actions.getCardForCondition({
+                                    path: {
+                                        players: [owner],
+                                        zones: ['attack','block','village']
+                                    },
+                                    injured: true
+                                }, o).length;
+                            }
+                        ]
+                    ]
+                    // console.log(o.Known[o.Accordance[args.card]].type.bold);
+                    return Actions.canCheckDict(dict);
+                },
+                "prepareEffect": function(args, o) {
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    result = {
+                        'prepareEffect': [{
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0
+                        }]
+                    }
+
+                    if (!('applyUpd' in result)) result.applyUpd = [];
+                    result.applyUpd.push({
+                        forPlayer: args.owner == 'pA' ? 'pB' : 'pA',
+                        cards: [args.card]
+                    })
+                    
+                    // console.log(o.Known[o.Accordance[args.card]].type.bold);
+                    return result;
+                },
+                "question" : function(args, o) {
+                    if (!(args.card in o.S.statuses)) o.S.statuses[args.card] = {};
+                    if (!('atEndOfTurn' in o.S.statuses)) o.S.statuses[args.card].atEndOfTurn = {};
+                    o.S.statuses[args.card].atEndOfTurn.activateUsed0 = true; 
+
+                    var owner = o.Known[o.Accordance[args.card]].owner;
+                    if (args.pX == you) {
+                        AN.stop = true;
+                        if (!('primal' in Answers)) Answers.primal = {};
+                        if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+
+                        var owner = o.Known[o.Accordance[args.card]].owner;
+                        var condidateCount = Actions.getCardForCondition({
+                            path: {
+                                players: [owner],
+                                zones: ['attack','block','village']
+                            },
+                            injured: true
+                        }, o)
+                        $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите раненного ниндзя.');
+                        for ( var i in condidateCount) {
+                            C[condidateCount[i]].setZIndex(1202);
+                        }
+
+                        Context.workingUnit = 'card';
+                        Context.clickAction = function( card ) {
+                            args.selectedCard = card.id;
+                            Answers.primal.cardEffect.push(args);
+                            AN.hideNoir({ condidateCount:condidateCount });
+                            AN.preStack.countDown();
+                        }
+                    } else {
+                        AN.preStack.countDown();
+                    }
+                },
+                "cardEffect": function(result, args, o) {
+                    // console.log('CARDEFFECT'.bold)
+                    
+                    var path = Actions.cardPath({card:args.selectedCard}, o);
+                    if (!('adHealingNinja' in result)) result.adHealingNinja = [];
+                    result.adHealingNinja.push({
+                        pX: path.player,
+                        card: args.selectedCard,
+                        cause: 'cardEffect',
+                        from: path.zone,
+                        to: path.zone,
+                        team: path.team,
+                        cardInArray : path.cardInArray
+                    })
+
+
+                    var path = Actions.cardPath({card:card.selectedCard}, o);
+                    if (!('adRemoveCardFromGame' in result)) result.adRemoveCardFromGame = [];
+                    result.adRemoveCardFromGame.push({
+                        pX: args.pX,
+                        card: args.card,
+                        cause: 'cardEffect',
+                        from: 'hand'
+                    })
+
+                    return result;
+                }
+            }]
+        }
     },
     "n1321": {
         "type": "N",
@@ -726,6 +862,420 @@ var CardBase = {
                         if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
                         // console.log('args'.red)
                         // console.log(args)
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j517": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j517",
+        "number": "j517",
+        "elements": "E",
+        "name": "Formation",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j697": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j697",
+        "number": "j697",
+        "elements": "E",
+        "name": "Expansion Jutsu: Super Slap!",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j710": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j710",
+        "number": "j710",
+        "elements": "E",
+        "name": "Shikamaru's Judjment",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j890": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j890",
+        "number": "j890",
+        "elements": "E",
+        "name": "Formidable Team",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j504": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j504",
+        "number": "j504",
+        "elements": "W",
+        "name": "Secret White Move: Chikamatsu's Ten Puppets",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j447": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j447",
+        "number": "j447",
+        "elements": "W",
+        "name": "Substitution by puppet",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j631": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j631",
+        "number": "j631",
+        "elements": "W",
+        "name": "Wind Scythe jutsu",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j914": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j914",
+        "number": "j914",
+        "elements": "W",
+        "name": "WindStyle: Pressure Damage",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
+                        result.toStack.increaseNinjaPower.push({
+                            card: args.target[0],
+                            attack: 5,
+                            support: 2,
+                        });
+                        return result;
+                    }
+                }]
+            }
+        }
+    },
+    "j100": {
+        "type": "J",
+        "ec": 0,
+        "hc": 0,
+        "ah": 3,
+        "sh": 0,
+        "ai": 2,
+        "si": 0,
+        "img": "j100",
+        "number": "j100",
+        "elements": "W",
+        "name": "Sand burai",
+        "cost": [
+            ['1']
+        ],
+        "costText": [
+            ['1']
+        ],
+        "effectText": "",
+        "requirement": function(card, o) {
+            return true;
+        },
+        "target": [{
+            player: 'you',
+            zone: 'battle',
+            func: function() {
+                return true;
+            }
+        }],
+        "effect": {
+            "trigger": {
+                "resolve": [{
+                    func: function(result, args, o) {
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
                         result.toStack.increaseNinjaPower.push({
                             card: args.target[0],
                             attack: 5,
@@ -1839,6 +2389,101 @@ var CardBase = {
                 }
             }]
         }
+    },
+    "m424": {
+        "type": "M",
+        "ec": 0,
+        "hc": 0,
+        "img": "m424",
+        "number": "m424",
+        "elements": "W",
+        "name": "Puppet Show",
+        "effectText": {
+            "effects": [{
+                "effect": "Пстоянная"
+            }, {
+                "when": "-",
+                "cost": "-",
+                "effect": "-",
+            }]
+        },
+        "effect": {}
+    },
+    "m843": {
+        "type": "M",
+        "ec": 0,
+        "hc": 0,
+        "img": "m843",
+        "number": "m843",
+        "elements": "W",
+        "name": "A master's death",
+        "effectText": {
+            "effects": [{
+                "effect": "Пстоянная"
+            }, {
+                "when": "-",
+                "cost": "-",
+                "effect": "-",
+            }]
+        },
+        "effect": {}
+    },
+    "m375": {
+        "type": "M",
+        "ec": 0,
+        "hc": 0,
+        "img": "m375",
+        "number": "m375",
+        "elements": "W",
+        "name": "Sasori if the Red Sand",
+        "effectText": {
+            "effects": [{
+                "effect": "Пстоянная"
+            }, {
+                "when": "-",
+                "cost": "-",
+                "effect": "-",
+            }]
+        },
+        "effect": {}
+    },
+    "m815": {
+        "type": "M",
+        "ec": 0,
+        "hc": 0,
+        "img": "m815",
+        "number": "m815",
+        "elements": "W",
+        "name": "A Gift",
+        "effectText": {
+            "effects": [{
+                "effect": "Пстоянная"
+            }, {
+                "when": "-",
+                "cost": "-",
+                "effect": "-",
+            }]
+        },
+        "effect": {}
+    },
+    "m633": {
+        "type": "M",
+        "ec": 0,
+        "hc": 0,
+        "img": "m633",
+        "number": "m633",
+        "elements": "W",
+        "name": "Loss",
+        "effectText": {
+            "effects": [{
+                "effect": "Пстоянная"
+            }, {
+                "when": "-",
+                "cost": "-",
+                "effect": "-",
+            }]
+        },
+        "effect": {}
     }
 };
 if (module) {
