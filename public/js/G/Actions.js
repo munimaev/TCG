@@ -55,6 +55,18 @@ var Actions = {
 		}
 		//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
 		o.S.phase = o.Stadies.order[newKey];
+
+		if (o.S.phase == 'organisation') {
+			var count = 0;
+			for (var i in o.S[o.S.activePlayer].village.team) {
+				for (var j in o.S[o.S.activePlayer].village.team[i]) {
+					count++;
+					break;
+				}
+			}
+			if (count < 2) return Actions.toNextPhase(args, o);			
+		}
+
 		if (o.S.phase == 'attack') {
 			var count = 0;
 			for (var i in o.S[o.S.activePlayer].village.team) {
@@ -66,6 +78,16 @@ var Actions = {
 		if (o.S.phase == 'block') {
 			var count = 0;
 			for (var i in o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].village.team) {
+				count++;
+			}
+			for ( var i in o.S.battlefield) {
+				count++;
+			}
+			if (!count) return Actions.toNextPhase(args, o);
+		}
+		if (o.S.phase == 'jutsu') {
+			var count = 0;
+			for ( var i in o.S.battlefield) {
 				count++;
 			}
 			if (!count) return Actions.toNextPhase(args, o);
@@ -96,6 +118,18 @@ var Actions = {
 		};
 		result = Actions.addTriggerEffect(result, 'instedMoveCardToZone', args, o); // result change
 		result = Actions.addTriggerEffect(result, 'afterMoveCardToZone', args, o); // result change
+		return result;
+	},
+	'adHealingNinja' : function(args, o) {
+		var result = {
+			'healingNinja': [args]
+		};
+		return result;
+	},
+	'adRemoveCardFromGame' : function(args, o) {
+		var result = {
+			'removeCardFromGame': [args]
+		};
 		return result;
 	},
 	'addConditionalEffect': function(result, trigger, args, o) {},
@@ -136,6 +170,24 @@ var Actions = {
 		}
 		console.log(result)
 		return result;
+	},
+	'healingNinja' : function (args, o) {
+		if (o.S.statuses[args.card]) {
+			delete o.S.statuses[args.card].injured;
+		}
+		if (!module) {
+			C[args.card].heal();
+		}
+	},
+	'removeCardFromGame' : function (args, o) {
+		if (isZoneSimple(args.zone)) {
+			delete o.S[args.pX][args.zone]	
+		} else {
+			delete o.S[args.pX][args.zone].team[args.team][args.cardInArray]
+		}
+		if (!module) {
+			AN.moveCardToCenter(args);
+		}
 	},
 	'preparePutCardinPlay': function(args, o) {
 		return {
@@ -304,12 +356,17 @@ var Actions = {
 		return false;
 	},
 	'moveTeamToAttack': function(o) {
-		o.S[o.pX][o.to].team[o.team] = o.S[o.pX][o.from].team[o.team];
-		if (o.to == 'attack') o.S.battlefield[o.team] = null;
-		if (o.to == 'village') delete o.S.battlefield[o.team];
-		delete o.S[o.pX][o.from].team[o.team];
-		if (!module) {
-			updTable();
+		try {
+			o.S[o.pX][o.to].team[o.team] = o.S[o.pX][o.from].team[o.team];
+			if (o.to == 'attack') o.S.battlefield[o.team] = null;
+			if (o.to == 'village') delete o.S.battlefield[o.team];
+			delete o.S[o.pX][o.from].team[o.team];
+			if (!module) {
+				updTable();
+			}
+		} catch(e) {
+			console.log('\n- = - ERROR - = -\nmoveTeamToAttack'.bold.red)
+			console.log(o.pX)
 		}
 	},
 	/**
@@ -1348,7 +1405,7 @@ var Actions = {
 			for (var i in selfPower) {
 				if (selfPower[i].condition({self:card},o)) {
 					var powerMod = selfPower[i].getPowerMod({self:card},o);
-					console.log('powerMod', powerMod)
+					// console.log('powerMod', powerMod)
 					result.attack += powerMod.attack;
 					result.support += powerMod.support;
 				}
@@ -1364,13 +1421,23 @@ var Actions = {
 	},
 	'getNinjaDefaultAttack': function(card, o) {
 		var isHealt = true;
-		if (card in o.S.statuses && o.S.statuses.card) isHealt = false;
+		if (card in o.S.statuses 
+			&& o.S.statuses[card]
+			&& o.S.statuses[card].injured
+		) {
+			isHealt = false;
+		}
 		var cardObj = o.Known[o.Accordance[card]];
 		return isHealt ? cardObj.ah : cardObj.ai;
 	},
 	'getNinjaDefaultSupport': function(card, o) {
 		var isHealt = true;
-		if (card in o.S.statuses && o.S.statuses.card) isHealt = false;
+		if (card in o.S.statuses 
+			&& o.S.statuses[card]
+			&& o.S.statuses[card].injured
+		) {
+			isHealt = false;
+		}
 		var cardObj = o.Known[o.Accordance[card]];
 		return isHealt ? cardObj.sh : cardObj.si;
 	},
@@ -1647,9 +1714,10 @@ Actions.getCardForCondition = function(args, o) {
 	var pXs = args.path.players || defaultPlayers;
 	var result = [];
 
-	function check(card, args) {
+	function check(card, args, cardId) {
 		if (!card) return false;
 		var statusCheck = true;
+
 		if (args.statuses && args.statuses.length)  {
 			if (card.statuses && card.statuses.length) {
 				var checked = 0;
@@ -1660,12 +1728,14 @@ Actions.getCardForCondition = function(args, o) {
 					}
 				}
 			} else {
-				statusCheck = false;
+				if (!args.greedy) return false;
+				statusCheck == false;
 			}
 			if (args.statuses.length == checked) {
 				statusCheck == true;
 			}
 		}
+
 		if (args.atributes && args.atributes.length ) {
 			if (card.atributes && card.atributes.length) {
 				var checked = 0;
@@ -1676,10 +1746,23 @@ Actions.getCardForCondition = function(args, o) {
 					}
 				}
 			} else {
-				statusCheck = false;
+				if (!args.greedy) return false;
+				statusCheck == false;
 			}
 			if (args.statuses.length == checked) {
 				statusCheck == true;
+			}
+		}
+		if (args.injured) {
+			if (o.S.statuses[cardId] && o.S.statuses[cardId].injured) {
+				if (args.greedy) {
+					return true;
+				}
+				statusCheck == true;
+			}
+			else {
+				if (!args.greedy) return false;
+				statusCheck == false;
 			}
 		}
 		return statusCheck;
@@ -1692,7 +1775,7 @@ Actions.getCardForCondition = function(args, o) {
 					for (var cId in o.S[pXs[pX]][zones[zone]].team[team]) {
 						var cardId = o.S[pXs[pX]][zones[zone]].team[team][cId];
 						var card = o.Known[o.Accordance[cardId]];
-						if (check(card, args)) {
+						if (check(card, args, cardId)) {
 							result.push(cardId)
 						};
 					}
@@ -1701,7 +1784,7 @@ Actions.getCardForCondition = function(args, o) {
 				for (var cId in o.S[pXs[pX]][zones[zone]]) {
 					var cardId = o.S[pXs[pX]][zones[zone]][cId];
 					var card = o.Known[o.Accordance[cardId]];
-					if (check(card, args)) {
+					if (check(card, args, cardId)) {
 						result.push(cardId)
 					};
 				}
