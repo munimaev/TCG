@@ -462,9 +462,19 @@ function getStartSnapshot(table) {
 var CardBase = require('./public/js/G/CardBase.js');
 
 var Decks = {
+	//earth
 	pA: [{
-		"count": 1,
-		"number": "j001"
+		"count": 2,
+		"number": "j517"
+	},{
+		"count": 2,
+		"number": "j697"
+	},{
+		"count": 2,
+		"number": "j710"
+	},{
+		"count": 2,
+		"number": "j890"
 	}, {
 		"count": 2,
 		"number": "m466"
@@ -532,9 +542,37 @@ var Decks = {
 		"count": 1,
 		"number": "pr046"
 	}, ],
+	//wind
 	pB: [{
 		"count": 2,
-		"number": "j001"
+		"number": "j504"
+	},{
+		"count": 2,
+		"number": "j447"
+	},{
+		"count": 2,
+		"number": "j631"
+	},{
+		"count": 2,
+		"number": "j914"
+	},{
+		"count": 1,
+		"number": "j100"
+	},{
+		"count": 1,
+		"number": "m424"
+	},{
+		"count": 1,
+		"number": "m843"
+	},{
+		"count": 1,
+		"number": "m375"
+	},{
+		"count": 1,
+		"number": "m815"
+	},{
+		"count": 1,
+		"number": "m633"
 	}, {
 		"count": 1,
 		"number": "n1086"
