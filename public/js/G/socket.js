@@ -65,7 +65,8 @@ function updAllCount() {
 socket.on('bothIsJoin', function(d) {
 	// Accordance = d.Accordance;
 	// Known = d.Known;
-	applyUpd({upd:{Known : d.Known, Accordance : d.Accordance}})
+	var data = {upd:{Known : d.Known, Accordance : d.Accordance}};
+	applyUpd(data)
 	// console.log('bothIsJoin',d)
 	if (d.isNewGame) socket.emit('startDrawHand', {u:Client});
     	updTable();
@@ -114,6 +115,16 @@ function applyUpd(d) {
 			Meta[i] = d.upd.meta[i];
 			if (i == 'toNextPhase') {
 			    updCurrentPhase();
+			}
+		}
+		if (d.upd.S) for (var pX in d.upd.S) { //
+			for (var zone in d.upd.S[pX]) {
+				if (isZoneSimple(zone)) {
+					S[pX][zone] = [];
+					for (var card in d.upd.S[pX][zone]) {
+						S[pX][zone].push(d.upd.S[pX][zone][card]);
+					}
+				}
 			}
 		}
 	}
