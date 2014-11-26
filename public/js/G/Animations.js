@@ -115,6 +115,9 @@ var AN = {
 				owner: o.pX,
 				position: "hand"
 			})
+			if (C[i].params.zona == 'presentation') {
+				continue;
+			}
 			C[i].setZIndex(800)
 			C[i].changeZone('movingHand')
 		}
@@ -135,6 +138,9 @@ var AN = {
 			var step = I.card.W;
 		}
 		for (var i in needenCardsId) {
+			if (C[needenCardsId[i]].params.zona == 'presentation') {
+				continue;
+			}
 			C[needenCardsId[i]].animation({
 				'X': I.hand.X + margin + Number(i) * step,
 				'Y': coordinateY,
@@ -185,6 +191,7 @@ var AN = {
 			if (!C[S[o.pX].hand[i]]) {
 				//console.log('!card') ;continue;
 			}
+			if (C[S[o.pX].hand[i]].params.zona == 'presentation') continue;
 			bottomMargin = (Math.ceil((Number(i) + 1) / cardInRow) - 1) * (I.card.W + margin);
 			C[S[o.pX].hand[i]].animation({
 				X: sideMargin / 2 + (margin + I.card.W) * (Number(i) % cardInRow),
@@ -210,7 +217,7 @@ var AN = {
 	},
 	moveCardToZone : function(args, o) {
 		// console.log('>--', args)
-		LogI['moveCardToZone'] = 1;
+		LogI['moveCardToZone'] = 0;
 		Log(1, 'moveCardToZone');
 		Log(0, 'args', args);
 		
@@ -281,32 +288,56 @@ var AN = {
 		Log(-1, 'moveCardToZone');
 	},
 	moveCardToCenter : function(args) {
-		if (args.to == 'hand' || args.to == 'discard') {
-			var outCard = false;
+		if ('outCard' in args) {
+			var outCard = args.outCard;
 		} else {
-			var outCard = true;
+			if (args.to == 'hand' || args.to == 'discard') {
+				var outCard = false;
+			} else {
+				var outCard = true;
+			}
 		}
+		// console.log('outCard',outCard)
+		var X = args.presentation == true ? I.card.W/ 2 : I.table.W / 2 + I.table.Y - I.card.W;
 
 		if (you == args.pX) {
-				C[args.card].setZIndex(825);
-				C[args.card].animation( { 
-					X: I.table.W / 2 + I.table.Y - I.card.W, 
-					Y: I.table.H / 2 - I.card.W, 
-					H: I.card.W * 2, 
-					additional: {
-					outCard:outCard
+			C[args.card].setZIndex(825);
+			var animationArgs = {
+				X: X,
+				Y: I.table.H / 2 - I.card.W,
+				H: I.card.W * 2,
+				duration: 820,
+				additional: {
+					outCard: outCard,
+					after: {}
 				}
-			})
+			}
+			if (args.afterFunc) {
+				animationArgs.additional.after.func = args.afterFunc;
+			}
+			C[args.card].animation(animationArgs);
 		}
 		else if (you != args.pX) {
 			C[args.card].setZIndex(825);
-			C[args.card].animation({
-				X: I.table.W / 2 + I.table.Y - I.card.W,
+			var afterAnimationArgs = {
+				y: 0,
+				deg: 0,
+				duration: 410,
+				additional: {
+					//outCard: outCard,
+					after: {}
+				}
+			};
+			if (args.afterFunc) {
+				afterAnimationArgs.additional.after.func = args.afterFunc;
+			}
+			var animationArgs = {
+				X: X,
 				Y: I.table.H / 2 - I.card.W,
 				H: I.card.W * 2,
 				y: 1,
 				deg: 90,
-				duration: 600,
+				duration: 410,
 				additional: {
 					incline: true,
 					after: {
@@ -325,23 +356,12 @@ var AN = {
 
 							C[args.card].updateLinks();
 							C[args.card].updateMouse();
-							C[args.card].animation({
-								y: 0,
-								deg: 0,
-								duration: 600,
-								additional: {
-									//outCard: outCard,
-									after: {
-										func: function() {
-											//console.log(C[o.card].params.incline)
-										}
-									}
-								}
-							});
+							C[args.card].animation(afterAnimationArgs);
 						}
 					}
 				}
-			})
+			}
+			C[args.card].animation(animationArgs)
 		}
 			// AnimationPush({func:function() {
 			//	 updTeams();
@@ -363,8 +383,8 @@ var AN = {
 					incline: false,
 					after: {
 						func: function() {
+							// console.log('+++DESTROY+++', args.card)
 							C[args.card].destroyCard();
-							delete C[args.card];
 						}
 					}
 				}
@@ -1144,6 +1164,9 @@ var AN = {
 		'adEndOfTurn' : function() {
 			AN.preStack.countDown();
 		},
+		'adJutsu' : function() {
+			AN.preStack.countDown();
+		},
 		'discardCardFromHand' : function() {
 			if (args.pX == you) {
 				AnimationPush({func:function() {
@@ -1169,7 +1192,7 @@ var AN = {
 		},
 		'healingNinja' : function(args) {
 			Actions.healingNinja(args, getUniversalObject());
-			setTimeout(AN.preStack.countDown,500)
+			setTimeout(AN.preStack.countDown,1500)
 		},
 		'adRemoveCardFromGame' : function(args) {
 			AN.preStack.countDown();
