@@ -80,6 +80,8 @@ var Actions = {
 			for (var i in o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].village.team) {
 				count++;
 			}
+			if (!count) return Actions.toNextPhase(args, o);
+			var count = 0;
 			for ( var i in o.S.battlefield) {
 				count++;
 			}
@@ -113,6 +115,7 @@ var Actions = {
 		}
 	},
 	'adMoveCardToZone' : function (args, o) {
+		console.log('adMoveCardToZone'.red)
 		var result = {
 			'moveCardToZone': [args]
 		};
@@ -135,7 +138,7 @@ var Actions = {
 	'addConditionalEffect': function(result, trigger, args, o) {},
 	'addTriggerEffect': function(result, trigger, args, o) {
 
-		console.log('\ntrigger'.yellow)
+		console.log(('\ntrigger ' + trigger).yellow)
 		var isInsted = trigger.substr(0,6) === 'insted';
 		insted:
 		for (var accCard in o.Accordance) {
@@ -146,15 +149,15 @@ var Actions = {
 				var triggerEffect = o.Known[o.Accordance[accCard]].effect.trigger[trigger];
 				for (var i in triggerEffect) {
 					var conditionSelf = triggerEffect[i].conditionSelf({
-						"card": accCard
+						"card": accCard,
+						"actionArgs": args
 					}, o);
 					var condition = triggerEffect[i].condition(args, o);
 					var ciclingCheck = triggerEffect[i].ciclingCheck({
 						"card": accCard,
 						"actionArgs": args
 					}, o);
-					console.log((o.Known[o.Accordance[accCard]].number + 'ciclingCheck').yellow)
-					console.log(conditionSelf, condition, ciclingCheck)
+					console.log((accCard + '['+o.Known[o.Accordance[accCard]].number + '] ciclingCheck').yellow, conditionSelf, condition, ciclingCheck)
 					if (conditionSelf && condition && ciclingCheck) {
 						result = triggerEffect[i].resultChange(result, {
 							"card": accCard,
@@ -168,7 +171,7 @@ var Actions = {
 			}
 
 		}
-		console.log(result)
+		console.log('result'.yellow, result)
 		return result;
 	},
 	'healingNinja' : function (args, o) {
@@ -180,18 +183,44 @@ var Actions = {
 		}
 	},
 	'removeCardFromGame' : function (args, o) {
-		if (isZoneSimple(args.zone)) {
-			delete o.S[args.pX][args.zone]	
+		var outZone = args.zone || args.from;
+		if (isZoneSimple(outZone)) {
+			var cardInArray = args.cardInArray || o.S[args.pX][outZone].indexOf(args.card);
+			if (cardInArray > -1) {
+				o.S[args.pX][outZone].splice(cardInArray,1)
+			}
 		} else {
-			delete o.S[args.pX][args.zone].team[args.team][args.cardInArray]
+			var cardInArray = args.cardInArray || o.S[args.pX][outZone].team[args.team].indexOf(args.card);
+			if (cardInArray > -1) {
+				o.S[args.pX][outZone].team[args.team].splice(cardInArray,1)
+			}
 		}
-		if (!module) {
-			AN.moveCardToCenter(args);
+		console.log(cardInArray)
+		if (!module && C[args.card]) {
+			C[args.card].puff();
+			// C[args.card].params.zona = 'deleting';
+			// args.outCard = false;
+			// args.afterFunc = function() {
+			// 	setTimeout(function(){
+			// 	C[args.card].animation({
+			// 		duration: 500,
+			// 		additional: {
+			// 			fadeIn:true,
+			// 			after: {
+			// 				func: function() {
+			// 					C[args.card].destroyCard();
+			// 				}
+			// 			}
+			// 		}
+			// 	})
+			// },100)
+			// }
+ 		// 	AN.moveCardToCenter(args);
 		}
 	},
 	'preparePutCardinPlay': function(args, o) {
 		return {
-			'putCardInPlay': [{
+			'adMoveCardToZone': [{
 				pX: args.pX,
 				from: args.from,
 				to: args.to,
@@ -410,17 +439,6 @@ var Actions = {
 		o.S.counters.playedNinjaActivePlayer = 0;
 
 		var result = {
-			'clearAtEndOfTurnEffect': [{}],
-			'returnToVillaje': [{
-				team: 'all',
-			}],
-			'updTable': [{
-				players: 'all'
-			}],
-			'adEndOfTurn': [{}],
-		};
-
-		var result = {
 			toStack: [{
 				'clearAtEndOfTurnEffect': [{}]
 			}, {
@@ -487,23 +505,22 @@ var Actions = {
 		// console.log('STATUS')
 		// console.log(o.S.statuses)
 	},
-	'adEndOfTurn': function(args, o) {
-		var result = {
-			'toStack': {
-				'removePermanentCounter': [{}]
-			},
-		};
+	'addPhaseTrigger': function(result, args, o){
+		if (!args.triggerPhase) {
+			return result;
+		}
 		for (var accCard in o.Accordance) {
 			if (o.Known[o.Accordance[accCard]].effect 
 				&& o.Known[o.Accordance[accCard]].effect.trigger 
-				&& o.Known[o.Accordance[accCard]].effect.trigger.atEndOfTurn) {
-				var atEndOfTurn = o.Known[o.Accordance[accCard]].effect.trigger.atEndOfTurn;
-				for (var i in atEndOfTurn) {
-					var conditionSelf = atEndOfTurn[i].conditionSelf({
+				&& o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase]) {
+				var triggerPhase = o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase];
+				for (var i in triggerPhase) {
+					var conditionSelf = triggerPhase[i].conditionSelf({
 						"card": accCard
 					}, o);
+					console.log('conditionSelf'.red, conditionSelf)
 					if (conditionSelf) {
-						atEndOfTurn[i].func(result, {
+						triggerPhase[i].func(result, {
 							"card": accCard
 						}, o)
 					}
@@ -511,6 +528,24 @@ var Actions = {
 			}
 
 		}
+		return result;
+	},
+	'adJutsu': function(args, o) {
+		var result = {};
+		args.triggerPhase = 'atJutsu';
+		result = Actions.addPhaseTrigger(result, args, o);
+		delete args.triggerPhase;
+		return result;
+	},
+	'adEndOfTurn': function(args, o) {
+		var result = {
+			'toStack': {
+				'removePermanentCounter': [{}]
+			},
+		};
+		args.triggerPhase = 'atEndOfTurn';
+		result = Actions.addPhaseTrigger(result, args, o);
+		delete args.triggerPhase;
 		return result;
 	},
 	'missionAtStart': function(o) {
@@ -535,12 +570,11 @@ var Actions = {
 				}],
 				'applyUpd': [{
 					forPlayer: args.player,
-					cards: [o.S[args.player].deck[0]]
+					cards: o.S[args.player].deck.slice(0,args.number)
 				}]
 			};
 		} else {
 			return {
-				//'endGame' : [{player: args.player, condition:'lose', cause:'empty deck'}] //TODO почистить
 				'winner': [{
 					winner: args.player == 'pA' ? 'pB' : 'pA',
 					loser: args.player,
@@ -552,6 +586,16 @@ var Actions = {
 	'comebackAtStart': function(o) {},
 	'applyToReult': function(o) {
 
+	},
+	'jutsuAtStart': function(o) {
+
+		var result = {
+			toStack: [{
+				'adJutsu': [{}]
+			}]
+		}
+		return result;
+		//}
 	},
 	'shutdownAtStart': function(o) {
 		var result = {}; //{'arg':{}, 'act':{}};
@@ -868,8 +912,15 @@ var Actions = {
 		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
 		o.S.statuses[cardID].injured = true;
 		if (!module) {
-			C[cardID].injure();
-			setTimeout(AN.preStack.countDown, 500);
+			AnimationPush({
+				func: function() {
+					C[cardID].injure({noAnimation:true});
+					updTable();
+					setTimeout(AN.preStack.countDown, 600+5)
+				},
+				time: 250 + 5,
+				name: 'injureTarget C[' + cardID + '].injure'
+			});
 		}
 	},
 	'killTarget': function(cardID, o) {
@@ -1419,25 +1470,22 @@ var Actions = {
 			support: Actions.getNinjaDefaultSupport(card, o)
 		}
 	},
-	'getNinjaDefaultAttack': function(card, o) {
-		var isHealt = true;
+	'isHealt' : function(card, o) {
 		if (card in o.S.statuses 
 			&& o.S.statuses[card]
 			&& o.S.statuses[card].injured
 		) {
-			isHealt = false;
+			return false;
 		}
+		return true;
+	},
+	'getNinjaDefaultAttack': function(card, o) {
+		var isHealt = Actions.isHealt(card, o);
 		var cardObj = o.Known[o.Accordance[card]];
 		return isHealt ? cardObj.ah : cardObj.ai;
 	},
 	'getNinjaDefaultSupport': function(card, o) {
-		var isHealt = true;
-		if (card in o.S.statuses 
-			&& o.S.statuses[card]
-			&& o.S.statuses[card].injured
-		) {
-			isHealt = false;
-		}
+		var isHealt = Actions.isHealt(card, o);
 		var cardObj = o.Known[o.Accordance[card]];
 		return isHealt ? cardObj.sh : cardObj.si;
 	},
@@ -1961,12 +2009,22 @@ Actions.moveCardToZone = function(args, o) {
 }
 Actions.shuffle = function(args, o) {
 	var accK = [];
-	var accV = []
+	var accV = [];
+	var exept = args.exept || [];
+	if (typeof exept === 'string') {
+		exept = [exept];
+	}
+
+	// console.log('exept'.red, exept)
 	for (var i in o.S[args.pX][args.zone]) {
 		var card = o.S[args.pX][args.zone][i];
-		accK.push(card);
-		accV.push(o.Accordance[card]);
+	// console.log('indexOf'.red, ~exept.indexOf(card))
+		if (!~exept.indexOf(card)) {
+			accK.push(card);
+			accV.push(o.Accordance[card]);
+		}
 	}
+	// console.log(accV, accK)
 	accV.sort(function() {
 		return Math.random() - 0.5
 	})
@@ -1976,6 +2034,12 @@ Actions.shuffle = function(args, o) {
 	for (var i in accK) {
 		o.Accordance[accK[i]] = accV[i]; 
 	}
+	// console.log(accV, accK)
+}
+Actions.randomSort = function(args, o) {
+	o.S[args.pX][args.zone].sort(function() {
+		return Math.random() - 0.5
+	})
 }
 if (module) {
 	module.exports = Actions;
