@@ -263,18 +263,21 @@ function createCard(o) {
 
     if (!o 
         || !('id' in o) 
-        || !o.id || !('zona' in o) || !o.zona || !('owner' in o) || !o.owner ) return false;
-    var constr = {
-            id: o.id,
-            X: o.X || 0,
-            Y: o.Y || 0,
-            H: o.W || I.card.W,
-            W: o.W || I.card.W,
-            faceUp: true,
-            owner: o.owner,
-            zona: o.zona,
-            position: o.position || null
-        }
+        || !o.id || !('zona' in o) || !o.zona || !('owner' in o) || !o.owner 
+    ) {
+        return false;
+    }
+    var constr = Known[Accordance[o.id]] || {type:'N'};
+        constr.id = o.id,
+        constr.X = o.X || 0,
+        constr.Y = o.Y || 0,
+        constr.H = o.W || I.card.W,
+        constr.W = o.W || I.card.W,
+        constr.faceUp = true,
+        constr.owner = o.owner,
+        constr.zona = o.zona,
+        constr.position = o.position || null
+
         // Создание в положении зависящем от игровой зоны где карта должна появиться
     switch (o.zona) {
         case 'villlage':
@@ -298,6 +301,7 @@ function createCard(o) {
         constr.faceUp = false;
     }
     if (constr.zona == '') {};
+    Known[Accordance[G[i]]];
     C[o.id] = new Card(constr);
     C[o.id].setZIndex(825)
 }
@@ -1345,6 +1349,7 @@ function getTeamSize(team) {
 }
 
 function updPosition(position, sqr) {
+    console.log('updPosition')
     var msqr = sqr;
     var isFight = false;
     if (S.phase == 'attack' || S.phase == 'block' || S.phase == 'jutsu' || S.phase == 'shutdown' || S.phase == 'comeback') isFight = true
@@ -1562,6 +1567,8 @@ function updPosition(position, sqr) {
             });
         }
     }
+
+    console.log('-updPosition')
 }
 
 function getMaxWidthForTwoTeam(team1, team2) {
@@ -1702,7 +1709,7 @@ function createteam(o, o2) {
         C[o[i]].params.team = o2.team;
         C[o[i]].params.teamPosition = 'support';
         C[o[i]].removeTeamPower(o2.player);
-        C[o[0]].changePower();
+        C[o[i]].changePower();
     }
     if (o[0]) {
         C[o[0]].addTeamPower(o2.player);
@@ -1741,7 +1748,7 @@ function updHands() {
 }
 
 function updTable() {
-    //console.log('updTable')
+    console.log('updTable')
     if (G.selectedTeam) {
         G.selectedTeam = null;
     }
