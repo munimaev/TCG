@@ -70,7 +70,7 @@ function Card(o) {
             status: 'card',
             team: ('team' in o) ? o.team : null,
             teamPosition: ('position' in o) ? o.position : null,
-            type: ('type' in o) ? o.type : 'N',
+            type: this.setParam('type', 'N', upd),
             W: I.card.W,
             zindex: this.setParam('zindex', 0, upd),
             zona: ('zona' in o) ? o.zona : 'deck',
@@ -200,8 +200,7 @@ function Card(o) {
 
     this.fillAsFaceUpNinja = function(link) {
         var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
-        var currentAttack = this.params.isHealt ? this.params.ah : this.params.ai;
-        var currentSupport = this.params.isHealt ? this.params.sh : this.params.si;
+        var currentPower = Actions.getNinjaModPower(this.id);
 
         link
             .append($('<div />', {
@@ -270,7 +269,7 @@ function Card(o) {
                 .append(
                     $('<div />', {
                         'class': 'powerCurrent power ' + (this.params.isHealt ? '' : 'powerInjured'),
-                        'text': currentAttack + '/' + currentSupport
+                        'text': currentPower.attack + '/' + currentPower.support
                     }) // end create 'power'
                     .css('fontSize', this.params.W / 4 + 'px')
                     .css('lineHeight', this.params.W / 4 + 'px')
@@ -580,65 +579,66 @@ function Card(o) {
     };
 
     this.getBG = function(str) {
+        var elements = this.params.elements || Known[Accordance[this.id]].elements;
         switch (str) {
             case 'corner top':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].dark;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
                 } else {
-                    return '#' + D.colors[this.params.elements[1]].dark;
+                    return '#' + D.colors[elements[1]].dark;
                 }
                 break;
             case 'side top left':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].light;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
                 } else {
-                    return '#' + D.colors[this.params.elements[0]].light
-                        //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[this.params.elements[0]].light+'), color-stop(100%,#'+D.colors[this.params.elements[1]].light+'))';
+                    return '#' + D.colors[elements[0]].light
+                        //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[elements[0]].light+'), color-stop(100%,#'+D.colors[elements[1]].light+'))';
                 }
                 break;
             case 'side top right':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].light;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #' + D.colors[this.params.elements[0]].light + ' 0%,#' + D.colors[this.params.elements[1]].light + ' 100%)'
-                        //TODO //+ ';background:-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%)';
+                    return '-webkit-linear-gradient(left, #' + D.colors[elements[0]].light + ' 0%,#' + D.colors[elements[1]].light + ' 100%)'
+                        //TODO //+ ';background:-moz-linear-gradient(left, #'+D.colors[elements[0]].light+' 0%,#'+D.colors[elements[1]].light+' 100%)';
                 }
                 break;
             case 'corner left':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].dark;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
                 } else {
-                    return '#' + D.colors[this.params.elements[0]].dark;
+                    return '#' + D.colors[elements[0]].dark;
                 }
                 break;
             case 'corner right':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].dark;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
                 } else {
-                    return '#' + D.colors[this.params.elements[0]].dark;
+                    return '#' + D.colors[elements[0]].dark;
                 }
                 break;
             case 'side bottom left':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].light;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
                 } else {
-                    return '#' + D.colors[this.params.elements[1]].light;
-                    //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[this.params.elements[1]].light+'), color-stop(100%,#'+D.colors[this.params.elements[0]].light+'))';
+                    return '#' + D.colors[elements[1]].light;
+                    //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[elements[1]].light+'), color-stop(100%,#'+D.colors[elements[0]].light+'))';
                 }
                 break;
             case 'side bottom right':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].light;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
                 } else {
-                    return '-webkit-linear-gradient(left, #' + D.colors[this.params.elements[0]].light + ' 0%,#' + D.colors[this.params.elements[1]].light + ' 100%)'
-                        //TODO  //  + 'background:-moz-linear-gradient(left, #'+D.colors[this.params.elements[0]].light+' 0%,#'+D.colors[this.params.elements[1]].light+' 100%);';
+                    return '-webkit-linear-gradient(left, #' + D.colors[elements[0]].light + ' 0%,#' + D.colors[elements[1]].light + ' 100%)'
+                        //TODO  //  + 'background:-moz-linear-gradient(left, #'+D.colors[elements[0]].light+' 0%,#'+D.colors[elements[1]].light+' 100%);';
                 }
                 break;
             case 'corner bottom':
-                if (this.params.elements.length == 1) {
-                    return '#' + D.colors[this.params.elements].dark;
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
                 } else {
-                    return '#' + D.colors[this.params.elements[1]].dark;
+                    return '#' + D.colors[elements[1]].dark;
                 }
                 break;
 
@@ -677,9 +677,6 @@ function Card(o) {
     };
 
     this.create = function(id) {
-        var cbg = this.glossary.colors.card.bg[this.params.type];
-        cbg.a = this.params.status === 'card' ? 1 : 0;
-        cbg.a = 0;
         var $card = $('<div /> ', {
                 'class': 'card',
                 'id': id
@@ -690,8 +687,11 @@ function Card(o) {
             .css('height', this.params.W)
             .css('font-size', this.params.W / 8 + 'px')
             .css('line-height', this.params.W / 4 + 'px')
-            .css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
         if (this.params.faceUp) {
+            var cbg = this.glossary.colors.card.bg[this.params.type];
+            cbg.a = this.params.status === 'card' ? 1 : 0;
+            cbg.a = 0;
+            $card.css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
             this.fillAsFaceUp($card);
         } else {
             this.fillAsFaceDown($card);
@@ -1403,6 +1403,7 @@ function Card(o) {
     this.destroyCard = function() {
         this.$id.remove();
         delete C[this.id];
+        delete this;
     };
 
     this.onOff3D('off');
@@ -1642,53 +1643,73 @@ function Card(o) {
     };
 
     this.flipUp = function() {
-        if (this.params.faceUp)
+        if (this.params.faceUp){
             return false;
-        this.setAllParams();
-        var _this = C[this.id];
+        }
+        this.setAllParams(Known[Accordance[this.id]]);
+        var card = C[this.id];
+        var afterFunc = function() {
+                            var _this = card;
+                            _this.$id.empty();
+                            _this.fillAsFaceUp(_this.$id);
+                            _this.updateLinks();
+                            _this.updateMouse();
+                            _this.animation({
+                                y: 1,
+                                deg: 0
+                            });
+                        }
+
         this.animation({
             y: 1,
             deg: -90,
-            after: {
-                func: (function() {
-                    return function() {
-                        console.log(1, _this)
-                        var _this = _this;
-                        _this.$id.empty();
-                        _this.fillAsFaceUp(_this.$id);
-                        _this.updateLinks();
-                        _this.updateMouse();
-                        _this.animation({
-                            y: 1,
-                            deg: 0
-                        });
-                    }
-                })()
+            additional : {
+                after: {
+                    func: afterFunc
+                    // (function() {
+                    //     return function() {
+                    //         console.log(1, _this)
+                    //         var _this = this;
+                    //         _this.$id.empty();
+                    //         _this.fillAsFaceUp(_this.$id);
+                    //         _this.updateLinks();
+                    //         _this.updateMouse();
+                    //         _this.animation({
+                    //             y: 1,
+                    //             deg: 0
+                    //         });
+                    //     }
+                    // })()
+                }
             }
         });
         this.params.faceUp = true;
     }
 
     this.flipDown = function() {
-        if (!this.params.faceUp)
+        if (!this.params.faceUp){
+            console.log(this.params.faceUp)
             return false;
-        var _this = this;
+        }
+        var card = C[this.id];
+        var afterFunc = function() {
+                            var _this = card;
+                            _this.$id.empty();
+                            _this.fillAsFaceDown(_this.$id);
+                            _this.updateLinks();
+                            _this.updateMouse();
+                            _this.animation({
+                                y: 1,
+                                deg: 0
+                            });
+                        }
         this.animation({
             y: 1,
             deg: -90,
-            after: {
-                func: (function() {
-                    return function() {
-                        _this.$id.empty();
-                        _this.fillAsFaceDown(_this.$id);
-                        _this.updateLinks();
-                        _this.updateMouse();
-                        _this.animation({
-                            y: 1,
-                            deg: 0
-                        });
-                    };
-                })()
+            additional : {
+                after: {
+                    func: afterFunc
+                }
             }
         });
         this.params.faceUp = false;
@@ -1813,20 +1834,56 @@ function Card(o) {
     };
 
 
-    this.injure = function() {
+    this.injure = function(args) {
         LogI['injure'] = 0;
         Log(1, 'injure');
-        this.changePower(true);
+        var args = args || {};
         this.params.isHealt = false;
+        if (!args.noAnimation) {
+            this.changePower(true);
+        }
         Log(-1, 'injure');
         // return result;
     };
-    this.heal = function() {
+    this.heal = function(args) {
         LogI['heal'] = 0;
         Log(1, 'heal');
-        this.changePower(false);
-        this.params.isHealt = true;
+        var args = args || {};
+        self.params.isHealt = true;
+        if (!args.noAnimation) {
+            this.effect({type:'heal'});
+            var self = this;
+            setTimeout(function() {
+                self.changePower(false);
+            }, 1000)
+        }
         Log(-1, 'heal');
+        // return result;
+    };
+    this.puff = function(appearance) {
+        LogI['puff'] = 0;
+        Log(1, 'puff');
+        var appearance = !!appearance || false;
+        this.effect({type:'puff'});
+        // var self = this;
+        // setTimeout(function() {
+        //     self.changePower(false);
+        //     self.params.ispufft = true;
+        // }, 1000)
+        Log(-1, 'puff');
+        // return result;
+    };
+    this.concentrate = function(appearance) {
+        LogI['concentrate'] = 0;
+        Log(1, 'concentrate');
+        var appearance = !!appearance || false;
+        this.effect({type:'concentrate'});
+        // var self = this;
+        // setTimeout(function() {
+        //     self.changePower(false);
+        //     self.params.isconcentratet = true;
+        // }, 1000)
+        Log(-1, 'concentrate');
         // return result;
     };
 
@@ -2155,6 +2212,7 @@ Card.prototype = {
         }
     },
     changePower: function(injure) {
+        console.log('changePower', this.id)
         if (this.params.type == 'N') {
             var currentPower = (this.$power.html()).split('/');
             var mod = Actions.getNinjaModPower(this.id, getUniversalObject());
@@ -2169,10 +2227,10 @@ Card.prototype = {
                     },
                     250,
                     function() {
-                        if (injure) {
-                            cardObj.$power.addClass('powerInjured');
-                        } else {
+                        if (cardObj.params.isHealt) {
                             cardObj.$power.removeClass('powerInjured');
+                        } else {
+                            cardObj.$power.addClass('powerInjured');
                         }
                         cardObj.$power.html(newPower);
                         cardObj.instPower();
@@ -2319,5 +2377,139 @@ Card.prototype = {
                 }
             );
         }
+        if (o.type == 'heal') {
+            var pic = "public/pics/heal.png";
+            var $img = $('<img />', {
+                src: pic,
+                width: _this.params.W,
+                height: _this.params.H,
+            })
+            .css({
+                position: "absolute"
+            })
+            var $heal = $('<div />', {
+                'class':'effectHealCircle'
+            })
+            .css({//'background-color': '#0FF', 
+                width: 0,
+                height: 0,
+                position: "absolute",
+                top: (_this.params.H - 2) / 2 + 'px',
+                left: (_this.params.W - 2)/ 2 + 'px',
+                borderRadius: '50%',
+                'border': '1px solid #0FF'
+            })
+            var sprite = $('<div />', {})
+                .css('width', _this.params.W)
+                .css('height', _this.params.H)
+                .css('top', _this.params.position.Y)
+                .css('left', _this.params.position.X)
+                .css('position', 'absolute')
+                .css('opacity', 0)
+                .append($heal)
+                .append($img)
+
+            H.animate.append(sprite);
+            sprite.animate({
+                    opacity: 1,
+                },
+                200,
+                function() {
+                    $heal.animate({
+                        width: _this.params.W,
+                        height: _this.params.H,
+                        top: '0%',
+                        left: '0%',
+                    },500,function(){
+
+                    })
+                    setTimeout(
+                        function() {
+
+                            sprite.animate({
+                                    opacity: 0,
+                                }, 200,
+                                function() {
+                                    sprite.remove();
+                                    afterFunc();
+                                })
+                        }, 700
+                    )
+                });
+        }
+        if (o.type == 'puff') {
+            console.log('ANIMATE PUFF')
+            var sprite = $('<div />', {})
+                .css('width', _this.params.W * 1.2)
+                .css('height', _this.params.H * 1.2)
+                .css('top', _this.params.position.Y -_this.params.H * 0.1 )
+                .css('left', _this.params.position.X -_this.params.W * 0.1)
+                .css('position', 'absolute')
+                .css('opacity', 1)
+                .css('background-image', "url('public/pics/puff.png')")
+                .css('background-size', "480% 105%")
+                console.log('msg')
+            H.animate.append(sprite);
+            setTimeout(function(){
+                _this.destroyCard();
+                setTimeout(function(){
+                   sprite.css('background-position','30% 0%')
+                    setTimeout(function(){
+                       sprite.css('background-position','58% 0%')
+                        setTimeout(function(){
+                           sprite.css('background-position','83% 0%')
+                            setTimeout(function(){
+                               sprite.css('background-size','518% 105%')
+                               sprite.css('background-position','102% 0%')
+                                setTimeout(function(){
+                                    sprite.remove();
+                                }, 60)
+                            }, 60)
+                        }, 60)
+                    }, 60)
+                }, 25)
+            }, 25)
+        }
+        //animation length 8 * 60 = 480 ms
+        if (o.type == 'concentrate') {
+
+            // console.log('ANIMATE concentrate')
+            var sprite = $('<div />', {})
+                .css('width', _this.params.W)
+                .css('height', _this.params.H)
+                .css('top', _this.params.position.Y )
+                .css('left', _this.params.position.X)
+                .css('position', 'absolute')
+                .css('opacity',1)
+                .css('background-size', "800% 100%");
+
+            sprite.css('background-image', "url('public/pics/concentrate.png')")
+
+            H.animate.append(sprite);
+            setTimeout(function() {
+                sprite.css('background-position', '14% 0%')
+                setTimeout(function() {
+                    sprite.css('background-position', '28% 0%')
+                    setTimeout(function() {
+                        sprite.css('background-position', '43% 0%')
+                        setTimeout(function() {
+                            sprite.css('background-position', '57% 0%')
+                            setTimeout(function() {
+                                sprite.css('background-position', '72% 0%')
+                                setTimeout(function() {
+                                    sprite.css('background-position', '86% 0%')
+                                    setTimeout(function() {
+                                        sprite.css('background-position', '100% 0%')
+                                        setTimeout(function() {
+                                            sprite.remove();
+                                        }, 60)
+                                    }, 60)
+                                }, 60)
+                            }, 60)
+                        }, 60)
+                    }, 60)
+                }, 60)
+            }, 60)
+        };
     } // end effect
 }
