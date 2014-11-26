@@ -1225,21 +1225,24 @@ function activateEffect(d) {
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
 		var upds = getUpdatesForPlayers(table, actReuslt);
+		// console.log('upds',upds)
 		delete actReuslt.applyUpd;
 		var dataA = {
 			'stackPrep': actReuslt,
 		};
-		if (upds && upds.A) {
+		if (upds && upds.pA) {
 			dataA.upd = upds.pA
 		}
+		// console.log('dataA',dataA)
 		io.sockets.in(table.roompA).emit('updact', dataA);
 
 		var dataB = {
 			'stackPrep': actReuslt,
 		};
-		if (upds && upds.B) {
+		if (upds && upds.pB) {
 			dataB.upd = upds.pB
 		}
+		// console.log('dataB',dataB)
 		io.sockets.in(table.roompB).emit('updact', dataB);
 
 	}
@@ -1379,23 +1382,37 @@ function getUpdatesForPlayers(table, actReuslt) {
 	console.log('\ngetUpdatesForPlayers'.cyan);
 	console.log(actReuslt.applyUpd);
 	var obj = {};
+
 	for (var i in actReuslt.applyUpd) {
 		obj = actReuslt.applyUpd[i];
-		if (!(obj.forPlayer in result)) result[obj.forPlayer] = {
-			Accordance: {},
-			Known: {}
-		};
-		for (var card in obj.cards) {
+		if (obj.S) {
+			if (!result.pA) {
+				result.pA = {};
+			}
+			if (!result.pB) {
+				result.pB = {};
+			}
+			result.pA.S = obj.S;
+			result.pB.S = obj.S;
+		}
+		else {
+			if (!(obj.forPlayer in result)) result[obj.forPlayer] = {
+				Accordance: {},
+				Known: {}
+			};
+			for (var card in obj.cards) {
 
-			result[obj.forPlayer].Accordance[obj.cards[card]] 
-				= table[obj.forPlayer].Accordance[obj.cards[card]] 
-				= actReuslt.applyUpd[i].unknown ? null : table.Accordance[obj.cards[card]];
+				result[obj.forPlayer].Accordance[obj.cards[card]] 
+					= table[obj.forPlayer].Accordance[obj.cards[card]] 
+					= actReuslt.applyUpd[i].unknown ? null : table.Accordance[obj.cards[card]];
 
-			result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
-				= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
-				= actReuslt.applyUpd[i].unknown ? null : table.Known[table.Accordance[obj.cards[card]]];
+				result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+					= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
+					= actReuslt.applyUpd[i].unknown ? null : table.Known[table.Accordance[obj.cards[card]]];
+			}
 		}
 	}
+	console.log(result)
 	delete actReuslt.applyUpd;
 	return result;
 }
