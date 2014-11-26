@@ -23,6 +23,7 @@ var CardBase = {
                 "effect": "Найдите в вашей колоде ниндзя с 'Марионетка' положите ее в свою руку. Затем претасуйте колоду.",
             }]
         },
+        "statuses":['Sand'],
         "atributes":['Manipulation'],
         "effect": {
             "activate": [{
@@ -318,9 +319,48 @@ var CardBase = {
         "img": "n602",
         "number": "n602",
         "elements": "W",
-        "name": "Matsuri",
-        "effectText": "",
-        "effect": {}
+        "name": "Матсури",
+        "effectText": {
+            effectName: "Последоавтель",
+            "effects": [{
+                "effect": "Ваши другие ниндзя с 'Песок'' получают +0/+1.",
+            }]
+        },
+        "statuses":['Sand'],
+        "effect": {
+            "static": { // подконтрольная облась powerNinja
+                "powerNinja": [{
+                    "condition": function(args, o) {
+                        if (args.card != args.self
+                            && Actions.isHealt(args.self, o)
+                            && o.Known[o.Accordance[args.card]].statuses 
+                            && ~o.Known[o.Accordance[args.card]].statuses.indexOf('Sand')) {
+                            return Actions.cardPath({
+                                card: args.card,
+                                path: {
+                                    players: [o.Known[o.Accordance[args.self]].owner],
+                                    zones: ['village', 'attack', 'block'],
+                                }
+                            }, o);
+                        }
+                        return false;
+                    },
+                    "conditionSelf": function(args, o) {
+                        return Actions.cardPath({
+                            card: args.self,
+                            path: {
+                                players: [o.Known[o.Accordance[args.self]].owner],
+                                zones: ['village', 'attack', 'block']
+                            }
+                        }, o);
+                    },
+                    "powerMod": {
+                        attack: 0,
+                        support: 1,
+                    }
+                }]
+            }
+        }
     },
     "n1474": {
         "type": "N",
@@ -437,10 +477,24 @@ var CardBase = {
                             args.selectedCard = card.id;
                             Answers.primal.cardEffect.push(args);
                             AN.hideNoir({ condidateCount:condidateCount });
-                            AN.preStack.countDown();
+                            card.params.zona = 'presentation';
+                            AN.moveCardToCenter({
+                                card: args.card,
+                                pX : owner,
+                                from: 'hand',
+                                presentation : true,
+                                afterFunc : AN.preStack.countDown
+                            })
                         }
                     } else {
-                        AN.preStack.countDown();
+                        C[args.card].params.zona = 'presentation';
+                        AN.moveCardToCenter({
+                            card: args.card,
+                            pX : owner,
+                            from: 'hand',
+                            presentation : true,
+                            afterFunc : AN.preStack.countDown
+                        })
                     }
                 },
                 "cardEffect": function(result, args, o) {
@@ -459,7 +513,58 @@ var CardBase = {
                     })
 
 
-                    var path = Actions.cardPath({card:card.selectedCard}, o);
+                    if (!('prepareEffect' in result)) result.prepareEffect = [];
+                    result.prepareEffect.push({
+                            pX: o.Known[o.Accordance[args.card]].owner,
+                            card: args.card,
+                            effectType: 'activate',
+                            effectKey: 0,
+                            step: 1
+                        })
+
+                    // var path = Actions.cardPath({card:card.selectedCard}, o);
+                    // if (!('adRemoveCardFromGame' in result)) result.adRemoveCardFromGame = [];
+                    // result.adRemoveCardFromGame.push({
+                    //     pX: args.pX,
+                    //     card: args.card,
+                    //     cause: 'cardEffect',
+                    //     from: 'hand'
+                    // })
+
+                    return result;
+                },
+                "question1" : function(args, o) {
+                        if (!('primal' in Answers)) Answers.primal = {};
+                        if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                    Answers.primal.cardEffect.push(args);
+                    AN.preStack.countDown();
+                },
+                "cardEffect1": function(result, args, o) {
+                    // console.log('CARDEFFECT'.bold)
+                    
+                    // var path = Actions.cardPath({card:args.selectedCard}, o);
+                    // if (!('adHealingNinja' in result)) result.adHealingNinja = [];
+                    // result.adHealingNinja.push({
+                    //     pX: path.player,
+                    //     card: args.selectedCard,
+                    //     cause: 'cardEffect',
+                    //     from: path.zone,
+                    //     to: path.zone,
+                    //     team: path.team,
+                    //     cardInArray : path.cardInArray
+                    // })
+
+
+                    // if (!('prepareEffect' in result)) result.prepareEffect = [];
+                    // result.prepareEffect.push({
+                    //         pX: o.Known[o.Accordance[args.card]].owner,
+                    //         card: args.card,
+                    //         effectType: 'activate',
+                    //         effectKey: 0,
+                    //         step: 1
+                    //     })
+
+                    // var path = Actions.cardPath({card:card.selectedCard}, o);
                     if (!('adRemoveCardFromGame' in result)) result.adRemoveCardFromGame = [];
                     result.adRemoveCardFromGame.push({
                         pX: args.pX,
@@ -469,7 +574,7 @@ var CardBase = {
                     })
 
                     return result;
-                }
+                },
             }]
         }
     },
@@ -652,7 +757,280 @@ var CardBase = {
         "elements": "W",
         "name": "Temari",
         "effectText": "",
-        "effect": {}
+        "statuses":['Sand'],
+        "effectText": {
+            "effectName": "Коса ветра",
+            "effects": [{
+                "effect": "Когда этот ниндзя входит в игру, вы можете посмотреть все карты в руке оппонента, выберите 1 карту технкиик и перместите ее в чакру владельца.",
+            }]
+        },
+        "effect": {
+            "trigger": {
+                "afterMoveCardToZone": [{
+                    "condition": function(args, o) {
+                        var card = o.Known[o.Accordance[args.card]]; 
+                        if (card.number == 'nus025'
+                            && args.cause == "play"
+                        ) {
+                            return true;
+                        }
+                        console.log(args)
+                        console.log(card.number == 'nus025'
+                            && args.cause == "play")
+                        return false;
+                    },
+                    "conditionSelf": function(args, o) {
+                        if (args.card == args.actionArgs.card) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    "ciclingCheck": function(args, o) {
+                        return o.S.turnNumber + args.card + args.actionArgs.card;
+                    },
+                    "resultChange": function(result, args, o) {
+                        var owner = o.Known[o.Accordance[args.card]].owner;
+                        var opp = owner == 'pA' ? 'pB' : 'pA';
+                        if(!('toStack' in result)) result.toStack = {};
+                        if(!('prepareEffect' in result.toStack)) result.toStack.prepareEffect = [];
+                        result.toStack.prepareEffect.push({
+                            pX: owner,
+                            card: args.card,
+                            effectType: 'trigger',
+                            trigger: 'afterMoveCardToZone',
+                            effectKey: 0,
+                            actionArgs: args.actionArgs
+                        })
+
+                        if (!('applyUpd' in result.toStack)) result.toStack.applyUpd = [];
+                        result.toStack.applyUpd.push({
+                            forPlayer: owner,
+                            cards: o.S[opp].hand
+                        })
+
+                        console.log('resultChange'.bold.yellow)
+                        console.log(result)
+                        return result;
+                    },
+                    "question" : function(args, o) {
+
+                        AnimationPush({func: function() {
+                            C[args.card].concentrate();
+                        }, time:500, name: 'Questions - card effect concentrate'});
+
+                        AnimationPush({func: function() {
+                            var owner = o.Known[o.Accordance[args.card]].owner;
+                            var opp = owner == 'pA' ? 'pB' : 'pA';
+                            AN.moveToPreview({
+                                pX: opp
+                            });
+                            Card.moveToPreviewToHandBlocker = true;
+                        }, time:500, name: 'Questions - card effect concentrate'});
+
+                        var condidateCount = Actions.getCardForCondition({
+                            path: {
+                                players: [opp],
+                                zones: ['hand']
+                            }
+                        }, o);
+
+                        AnimationPush({func: function() {
+                            for ( var i in condidateCount) {
+                                C[condidateCount[i]].setZIndex(1202);
+                                C[condidateCount[i]].flipUp(); 
+                            }
+
+                        }, time:1000, name: 'Questions - card effect flip'});
+
+                        AnimationPush({func: function() {
+                            var owner = o.Known[o.Accordance[args.card]].owner;
+                            var opp = owner == 'pA' ? 'pB' : 'pA';
+                            // console.log(owner, you, owner===you)
+                            if (owner === you) {
+                                AN.stop = true;
+                                if (!('primal' in Answers)) Answers.primal = {};
+                                if (!('cardEffect' in Answers.primal)) Answers.primal.cardEffect = [];
+                                var owner = o.Known[o.Accordance[args.card]].owner;
+                                var opp = owner == 'pA' ? 'pB' : 'pA';
+
+                                Card.moveToPreviewToHandBlocker = true;
+
+                                $('#noir').css('width', I.W).css('height', I.H).html('<br>Выберите технику.');
+                                var jutsuCount = 0;
+                                for ( var i in condidateCount) {
+                                    if (C[condidateCount[i]].params.type === 'J') {
+                                        jutsuCount++;
+                                    }
+                                }
+
+                                Context.workingUnit = 'card';
+                                Context.clickAction = function(card) {
+                                    if (jutsuCount) {
+                                        if (o.Known[o.Accordance[card.id]].type == 'J') {
+                                            args.selectedCard = card.id;
+                                            Answers.primal.cardEffect.push(args);
+                                            AN.hideNoir({
+                                                condidateCount: condidateCount
+                                            });
+                                            AN.preStack.countDown();
+                                        } else {
+                                            return;
+                                        }
+                                    } else {
+                                        args.selectedCard = false;
+                                        Answers.primal.cardEffect.push(args);
+                                        AN.hideNoir({
+                                            condidateCount: condidateCount
+                                        });
+                                        AN.preStack.countDown();
+                                    }
+                                }
+                            } else {
+                                setTimeout(AN.preStack.countDown, 500)
+                            }
+                        }, time:1, name: 'Questions - card effect concentrate'});
+                    },
+                    "cardEffect": function(result, args, o) {
+                        // console.log('CARDEFFECT'.bold)
+                        if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
+                        var path = Actions.cardPath({
+                            card: args.selectedCard
+                        }, o);
+                        console.log(args, path);
+                        result.adMoveCardToZone.push({
+                            pX: path.player,
+                            card: args.selectedCard,
+                            cause: 'cardEffect',
+                            from: path.zone,
+                            to: 'chackra',
+                            team: null,
+                            cardInArray: path.cardInArray
+                        })
+
+                        var owner = o.Known[o.Accordance[args.selectedCard]].owner;
+                        var otherCard = [];
+                        for (var i in o.S[owner].hand) {
+                            if (o.S[owner].hand[i] !== args.selectedCard) {
+                                otherCard.push(o.S[owner].hand[i]);
+                            }
+                        }
+
+                        console.log('HAND'.red, o.S[owner].hand)
+                        Actions.shuffle({pX:owner, zone:'hand', exept:args.selectedCard},o);
+                        console.log('HAND'.red, o.S[owner].hand)
+
+
+                        if (!('applyUpd' in result)) result.applyUpd = [];
+                        result.applyUpd.push({
+                            forPlayer: (owner == 'pA' ? 'pB' : 'pA'),
+                            cards: otherCard,
+                            unknown : true
+                        })
+                        result.applyUpd.push({
+                            forPlayer: owner,
+                            cards: otherCard,
+                        })
+
+                        var updS = {};
+                        updS[owner] = {'hand':o.S[owner].hand}
+
+                        console.log('updS'.red, updS)
+                        result.applyUpd.push({
+                            S:updS
+                        })
+
+                        if (args.selectedCard) {
+                            if (!('prepareEffect' in result)) result.prepareEffect = [];
+                            result.prepareEffect.push({
+                                pX: owner,
+                                card: args.card,
+                                effectType: 'trigger',
+                                trigger: 'afterMoveCardToZone',
+                                effectKey: 0,
+                                actionArgs: args.actionArgs,
+                                step: 1,
+                                //-----///
+                                selectedCard: args.selectedCard
+                            })
+                        }
+
+
+
+                        // console.log(o.Known[o.Accordance[args.card]].type.bold);
+                        return result;
+                    },
+                    "question1": function(args, o) {
+                        var selectedCard = o.Known[o.Accordance[args.selectedCard]];
+                        var path = Actions.cardPath({
+                            card: args.selectedCard,
+                            path: {}
+                        }, o);
+
+                        AnimationPush({
+                            func: function() {
+                                AN.moveCardToCenter({
+                                    pX: path.player,
+                                    from: path.zone,
+                                    card: args.selectedCard,
+                                    presentation: true,
+                                    outCard : false
+                                }, o)
+                            },
+                            time: 820,
+                            name: 'Questions - card effect card to center'
+                        });
+
+                        var otherCard = [];
+                        for (var i in o.S[path.player].hand) {
+                            if (o.S[path.player].hand[i] !== args.selectedCard) {
+                                otherCard.push(o.S[path.player].hand[i]);
+                            }
+                        }
+                        if (you !== path.player) {
+                            AnimationPush({
+                                func: function() {
+                                    for (var i in otherCard) {
+                                        C[otherCard[i]].flip();
+                                    }
+                                },
+                                time: 1000,
+                                name: 'Questions - card effect flip'
+                            });
+                        }
+
+                        AnimationPush({
+                            func: function() {
+                                for (var i in otherCard) {
+
+                                    var preCardId = otherCard[i];
+                                    C[otherCard[i]].animation({
+                                        Y: (path.player === you ? 2 : -1 ) * I.H ,
+                                        X: I.W / 2,
+                                        additional: {
+                                            after: {
+                                                func : function() {
+                                                    var cardId = preCardId;
+                                                    return function() {
+                                                        console.log(cardId)
+                                                        C[cardId].destroyCard(); 
+                                                    }
+                                                }()
+                                            }
+                                        }
+                                    });
+                                }
+                                setTimeout(function() {
+                                    Card.moveToPreviewToHandBlocker = false;
+                                    AN.preStack.countDown();
+                                }, 1000)
+                            },
+                            time: 1000,
+                            name: 'Questions - card effect move-hide'
+                        });
+                    }
+                }]
+            }
+        }
     },
     "n1322": {
         "type": "N",
@@ -682,9 +1060,72 @@ var CardBase = {
         "number": "n1086",
         "elements": "W",
         "name": "Crow",
-        "effectText": "",
-        "statuses" : ["Puppet"],
-        "effect": {}
+        "effectText": {
+            "effectName": "Деревянный воин",
+            "effects": [{
+                "effect": "Неуникальный.",
+            },{
+                "effect": "Пока этот ниндзя в однойкоманде с ниндзя с боевым атрибтом Манипуляция, этот ниндзя имеет следующий эффект:",
+            },{
+                "effect": "Когда этот ниндзя блокирует, вы может взять 1 карту.",
+            }]
+        },
+        "statuses" : ["Sand","Puppet"],
+        "effect":  {
+            "trigger": {
+                "atJutsu": [{
+                    "func": function(result, args, o) {
+                        console.log("atJutsu".yellow)
+                        console.log(args)
+
+                        var owner = o.Known[o.Accordance[args.card]].owner;
+
+                        if (!('toStack' in result)) result.toStack = {};
+                        if (!('drawCard' in result.toStack)) result.toStack.drawCard = [];
+                        if (!('applyUpd' in result.toStack)) result.toStack.applyUpd = [];
+                        var prepareDrawCard = Actions.prepareDrawCard({
+                            player: owner,
+                            number: 1,
+                            drawCardCause:'cardeffect'
+                        }, o)
+
+                        result.toStack.drawCard.push(prepareDrawCard.drawCard[0]);
+                        result.toStack.applyUpd.push(prepareDrawCard.applyUpd[0]);
+
+                    console.log('result'.red, result)
+                    console.log('prepareDrawCard.drawCard'.red, prepareDrawCard.drawCard)
+                    console.log('result.toStack.drawCard'.red, result.toStack.drawCard)
+                    console.log('prepareDrawCard.drawCard'.red, prepareDrawCard.applyUpd)
+                    console.log('result.toStack.applyUpd'.red, result.toStack.applyUpd)
+                        return result;
+                    },
+                    "conditionSelf": function(args, o) {
+                        var owner = o.Known[o.Accordance[args.card]].owner;
+                        var opp = owner == 'pA' ? 'pB' : 'pA';
+                        var path = Actions.cardPath({
+                            card: args.card,
+                            path: {
+                                players: [owner],
+                                zones: ['block']
+                            }
+                        }, o);
+                        console.log('path'.red, path)
+                        if (!path) {
+                            return false;
+                        }
+                        for (var c in o.S[owner].block.team[path.team]) {
+                            var cardId = o.S[owner].block.team[path.team][c];
+                            var atributes = o.Known[o.Accordance[cardId]].atributes;
+                        console.log('atributes'.red, atributes)
+                            if (atributes && ~atributes.indexOf('Manipulation')) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }]
+            }
+        }
     },
     "n180": {
         "type": "N",
@@ -730,6 +1171,7 @@ var CardBase = {
         "elements": "W",
         "name": "Gaara of the Desert",
         "effectText": "",
+        "statuses":['Sand'],
         "effect": {}
     },
     "n1418": {
@@ -761,6 +1203,7 @@ var CardBase = {
         "elements": "WE",
         "name": "Kankuro",
         "effectText": "",
+        "statuses":['Sand'],
         "atributes":['Manipulation'],
         "effect": {}
     },
@@ -777,6 +1220,7 @@ var CardBase = {
         "elements": "W",
         "name": "Temari",
         "effectText": "",
+        "statuses":['Sand'],
         "effect": {}
     },
     "n1420": {
@@ -823,6 +1267,7 @@ var CardBase = {
         "elements": "W",
         "name": "Gaara of the Desert",
         "effectText": "",
+        "statuses":['Sand'],
         "effect": {}
     },
     "j001": {
