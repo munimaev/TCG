@@ -1,0 +1,313 @@
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="js/jquery.js"></script>
+    <link href="css/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="board">
+
+
+<div class="hexagon X1 Y3">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X1 Y5">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X1 Y7">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+
+<div class="hexagon X2 Y2">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X2 Y4">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X2 Y6">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X2 Y8">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+
+
+<div class="hexagon X3 Y1">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X3 Y3">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X3 Y5">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X3 Y7">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X3 Y9">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+
+
+
+<div class="hexagon X4 Y2">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X4 Y4">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X4 Y6">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X4 Y8">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+
+
+<body>
+<div class="hexagon X5 Y3">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X5 Y5">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+<div class="hexagon X5 Y7">
+    <div class="Hex1"></div>
+    <div class="Hex2"></div>
+    <div class="Hex3"></div>
+</div>
+
+</div>
+<div class="buildings">
+    
+<!-- <div class="road">
+    <div class="roadTop"></div>
+    <div class="roadBottom"></div>
+</div>
+ -->
+</div>
+</body>
+</html>
+
+body {
+  -webkit-transform: perspective(2600px) rotateX(45deg);
+-moz-transform: perspective(2600px) rotateX(45deg);
+-ms-transform: perspective(2600px) rotateX(45deg);
+-o-transform: perspective(2600px) rotateX(45deg);
+transform: perspective(2600px) rotateX(45deg);
+
+    -webkit-transform-style: preserve-3d;
+}
+.board {
+  /*background-color: rgba(125,250,250,0.5);*/
+  height: 866.025403785px;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  position: absolute;
+  left: calc(50% - 400px);
+  /*background-color: rgba(125,250,125,0.5);
+  z-index: 10;*/
+}
+
+
+.hexagon {
+  width: 200px;
+  height: 173.205080757px;
+  position: absolute;
+
+}
+
+.hex1 {
+  margin-right: auto;
+  margin-left: auto;
+  transform: rotate(60deg);
+    background-position: left;
+    background-image: url('../pics/sword12.png');
+  
+}
+.hex2 {
+  margin-top: -86.602540378%;
+  margin-right: auto;
+  margin-left: auto;
+  transform: rotate(-60deg);
+    background-position: left;
+    background-image: url('../pics/sword13.png');
+}
+.hex3 {
+  margin-top: -86.602540378%;
+  margin-right: auto;
+  margin-left: auto;
+  transform: rotate(0deg);
+    background-position: left;
+    background-image: url('../pics/sword11.png');
+}
+.hex1, .hex2, .hex3 {
+  width: 50%;
+  height: 100%;
+  /*background-color: rgba(125,250,125,0.3);*/
+  /*border-top: 1px solid  rgba(125,250,125,0.3);*/
+  -webkit-box-shadow:inset 0 1px 0 0 #1472FF, inset 0 -1px 0 0 #1472FF;
+  box-shadow:inset 0 1px 0 0 #1472FF, inset 0 -1px 0 0 #1472FF;
+    -webkit-transform-style: preserve-3d;
+    background-size: auto  100% ;
+}
+
+
+.hex1:before, 
+.hex2:before, 
+.hex3:before  {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 5%;
+  /*background-color: rgba(125,250,125,1);*/
+    -webkit-transform:rotate3d(1,0,0,-90deg);
+    -webkit-transform-origin: 0% 0%;
+
+  -webkit-box-shadow:inset 0 0 0 1px #1472FF;
+  box-shadow:inset 0 0 0 1px #1472FF;
+}
+
+.hex1:after,
+.hex2:after,
+.hex3:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 10px;
+    -webkit-transform:rotate3d(1,0,0,90deg);
+    -webkit-transform-origin: 0% 100%;
+
+  -webkit-box-shadow:inset 0 0 0 1px #1472FF;
+  box-shadow:inset 0 0 0 1px #1472FF;
+}
+
+.Y1 {
+  top: 0px;
+}
+.Y2 {
+  top: 86.6025403785px;
+}
+.Y3 {
+  top: 173.205080757px;
+}
+.Y4 {
+  top: 259.807621135px;
+}
+.Y5 {
+  top: 346.410161514px;
+}
+.Y6 {
+  top: 433.012701892px;
+}
+.Y7 {
+  top: 519.615242271px;
+}
+.Y8 {
+  top: 606.21778265px;
+}
+.Y9 {
+  top: 692.820323028px;
+}
+
+.X1 {
+  left: 0px;
+}
+.X2 {
+  left: 150px;
+}
+.X3 {
+  left: 300px;
+}
+.X4 {
+  left: 450px;
+}
+.X5 {
+  left: 600px;
+}
+
+
+
+.buildings {
+  height: 866.025403785px;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  position: absolute;
+  z-index: 100;
+  background-color: rgba(125,125,250,0.5);
+  left: calc(50% - 400px);
+    -webkit-transform: translate3d(0,0,11px) ;
+}
+
+/*
+
+
+.road{
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 600px;
+  left:  500px;
+}
+.roadTop {
+  width: 50px;
+  height: 50px;
+  -webkit-box-shadow:inset 0 0 0 2px rgba(240,80,240,0.5);
+  box-shadow:inset 0 0 0 2px rgba(240,80,240,0.5);
+  position: absolute;
+}
+.roadTop:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 50px;
+  height: 50px;
+  -webkit-box-shadow:inset 0 0 0 2px rgba(240,80,240,0.5);
+  box-shadow:inset 0 0 0 2px rgba(240,80,240,0.5);
+    -webkit-transform:rotate3d(1,0,0,90deg);
+    -webkit-transform-origin: 0% 0%;
+}
+.road:hover .roadTop:after,
+.road:hover .roadTop {
+  background-color: red;
+}
