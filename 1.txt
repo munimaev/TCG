@@ -10,11 +10,11 @@
 
 <style type="text/css">
 body {
-  -webkit-transform: perspective(2600px) rotateX(45deg);
--moz-transform: perspective(2600px) rotateX(45deg);
--ms-transform: perspective(2600px) rotateX(45deg);
--o-transform: perspective(2600px) rotateX(45deg);
-transform: perspective(2600px) rotateX(45deg);
+  -webkit-transform: perspective(2600px) rotateX(66deg) rotateZ(66deg);
+-moz-transform: perspective(2600px)  rotateX(66deg) rotateZ(66deg);
+-ms-transform: perspective(2600px)  rotateX(66deg) rotateZ(66deg);
+-o-transform: perspective(2600px)  rotateX(66deg) rotateZ(66deg);
+transform: perspective(2600px)  rotateX(66deg) rotateZ(66deg);
 
     -webkit-transform-style: preserve-3d;
 }
