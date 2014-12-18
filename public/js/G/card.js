@@ -738,9 +738,11 @@ function Card(o) {
                     if (C[id].params.zona === 'hand' && !Card.moveToPreviewToHandBlocker) {
                         G.timers.youHandHover = setTimeout(
                             function() {
-                                AN.moveToHand({
-                                    pX: C[id].params.owner
-                                });
+                                if (C[id]) {
+                                    AN.moveToHand({
+                                        pX: C[id].params.owner
+                                    })
+                                };
                             }, 100
                         ); // end setTimeout
 
@@ -1501,6 +1503,25 @@ function Card(o) {
                 )
 
         )
+        if (known.hasOwnProperty('mental')) {
+            $p = $('<p>', {}); 
+            
+            $p.append(
+                $('<img />', {
+                    'src': 'public/pics/icons/mental.png',
+                    'width' : '1em'
+                })
+            );
+            
+            $p.append(
+                $('<b />', {
+                    'text': ' Ментальная сила: '+ known.mental
+                })
+            );
+
+            $prewContent.append($p);
+
+        }
         if (known.effectText) {
             if (known.effectText.effectName) {
                 $prewContent.append(
@@ -1541,6 +1562,10 @@ function Card(o) {
                 }
             }
         }
+
+        var atributes = '=)';
+       
+
         if (this.params.type == 'N') {
             $prewContent
                 .append(
@@ -1587,14 +1612,14 @@ function Card(o) {
                                     $('<h3 />', {
                                         'class': 'normalPower',
                                         'text': this.params.ah + '/' + this.params.sh
-                                    })
+                                    }).css('color', '#FFF')
                                 )
                             ).append(
                                 $('<td />', {
                                     'colspan': 3
                                 }).append(
                                     $('<h3 />', {
-                                        'text': '-=-'
+                                        'text': atributes
                                     })
                                 )
                             ).append(
@@ -1849,12 +1874,12 @@ function Card(o) {
         LogI['heal'] = 0;
         Log(1, 'heal');
         var args = args || {};
-        self.params.isHealt = true;
+        this.params.isHealt = true;
         if (!args.noAnimation) {
             this.effect({type:'heal'});
             var self = this;
             setTimeout(function() {
-                self.changePower(false);
+                self.changePower(true);
             }, 1000)
         }
         Log(-1, 'heal');
@@ -1865,11 +1890,6 @@ function Card(o) {
         Log(1, 'puff');
         var appearance = !!appearance || false;
         this.effect({type:'puff'});
-        // var self = this;
-        // setTimeout(function() {
-        //     self.changePower(false);
-        //     self.params.ispufft = true;
-        // }, 1000)
         Log(-1, 'puff');
         // return result;
     };
@@ -1878,11 +1898,6 @@ function Card(o) {
         Log(1, 'concentrate');
         var appearance = !!appearance || false;
         this.effect({type:'concentrate'});
-        // var self = this;
-        // setTimeout(function() {
-        //     self.changePower(false);
-        //     self.params.isconcentratet = true;
-        // }, 1000)
         Log(-1, 'concentrate');
         // return result;
     };
@@ -2039,7 +2054,7 @@ function Card(o) {
                             })()
                         }))
                 }
-                else {
+                else if (!activate[i].dontShowIfCant || !activate[i].dontShowIfCant()) {
                     $c.append(
                         $('<div />', {
                             class: 'actionIcon n' + (3 + Number(i)) + ' disable activateEffect' + (Number(i) + 1),
@@ -2211,14 +2226,17 @@ Card.prototype = {
             });
         }
     },
-    changePower: function(injure) {
-        console.log('changePower', this.id)
+    changePower: function(forcedChange) {
+        // console.log('changePower', this.id, this.$power.hasClass('powerInjured'), this.params.isHealt)
         if (this.params.type == 'N') {
             var currentPower = (this.$power.html()).split('/');
             var mod = Actions.getNinjaModPower(this.id, getUniversalObject());
-            if (parseInt(currentPower[0]) != mod.attack 
-                || parseInt(currentPower[1]) != mod.support
-                || injure == this.params.isHealt) {
+            
+            if (parseInt(currentPower[0]) != mod.attack /*если показываемая атака измененеа*/
+                || parseInt(currentPower[1]) != mod.support /*если показываемая поддержка изменена*/
+                || forcedChange
+                || (this.$power.hasClass('powerInjured') == this.params.isHealt)
+                ) { /*принудительная смена*/
                 var newPower = '';
                 newPower += mod.attack + '/' + mod.support;
                 var cardObj = C[this.id];
