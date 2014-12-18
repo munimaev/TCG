@@ -14,238 +14,268 @@ function arraySearch(array, value) {
 	return null
 }
 var Actions = {
-	'Draw Card': function(args, o) {
-		//for (var i in o) 
-		//console.log(i)
-		var S = o.S;
-		var pX = args.player;
-		var draedCards = [];
-		if (S[pX].deck.length) {
-			var id = S[pX].deck.splice(0, 1)[0]
-			S[pX].hand.push(id);
-			return id;
-		};
-		console.log('hand', o.S[pX].hand)
-	},
-	/**
-	 * [description]
-	 * @param  {[type]} args Объект с аргументами
-	 * @param  {[type]} args.phase Значение может быть либо "next" либо название фазы в которую надо перейти.
-	 * @param  {[type]} o	Универсальный объект
-	 * @return {[type]}	  [description]
-	 */
-	'toNextPhase': function(args, o) {
-		var key = -1;
-		for (var i in o.Stadies.order) {
-			if (o.Stadies.order[i] == o.S.phase) {
-				key = i;
-				break;
-			}
-		}
-		var newKey = Number(key) + 1;
-
-
-		if (newKey >= o.Stadies.order.length) {
-			newKey = 0;
-			o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
-			o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-			o.S.counters.playedNinjaActivePlayer = 0;
-			o.S.pA.counters.playedMission = 0;
-			o.S.pB.counters.playedMission = 0;
-		}
-		//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
-		o.S.phase = o.Stadies.order[newKey];
-
-		if (o.S.phase == 'organisation') {
-			var count = 0;
-			for (var i in o.S[o.S.activePlayer].village.team) {
-				for (var j in o.S[o.S.activePlayer].village.team[i]) {
-					count++;
+		'Draw Card': function(args, o) {
+			//for (var i in o) 
+			//console.log(i)
+			var S = o.S;
+			var pX = args.player;
+			var draedCards = [];
+			if (S[pX].deck.length) {
+				var id = S[pX].deck.splice(0, 1)[0]
+				S[pX].hand.push(id);
+				return id;
+			};
+			console.log('hand', o.S[pX].hand)
+		},
+		/**
+		 * [description]
+		 * @param  {[type]} args Объект с аргументами
+		 * @param  {[type]} args.phase Значение может быть либо "next" либо название фазы в которую надо перейти.
+		 * @param  {[type]} o	Универсальный объект
+		 * @return {[type]}	  [description]
+		 */
+		'toNextPhase': function(args, o) {
+			var key = -1;
+			for (var i in o.Stadies.order) {
+				if (o.Stadies.order[i] == o.S.phase) {
+					key = i;
 					break;
 				}
 			}
-			if (count < 2) return Actions.toNextPhase(args, o);			
-		}
+			var newKey = Number(key) + 1;
 
-		if (o.S.phase == 'attack') {
-			var count = 0;
-			for (var i in o.S[o.S.activePlayer].village.team) {
-				count++;
-			}
-			if (!count) return Actions.toNextPhase(args, o);
 
-		}
-		if (o.S.phase == 'block') {
-			var count = 0;
-			for (var i in o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].village.team) {
-				count++;
+			if (newKey >= o.Stadies.order.length) {
+				newKey = 0;
+				o.S[o.S.activePlayer].turnCounter = o.S[o.S.activePlayer].turnCounter + 1;
+				o.S.activePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+				o.S.counters.playedNinjaActivePlayer = 0;
+				o.S.pA.counters.playedMission = 0;
+				o.S.pB.counters.playedMission = 0;
 			}
-			if (!count) return Actions.toNextPhase(args, o);
-			var count = 0;
-			for ( var i in o.S.battlefield) {
-				count++;
-			}
-			if (!count) return Actions.toNextPhase(args, o);
-		}
-		if (o.S.phase == 'jutsu') {
-			var count = 0;
-			for ( var i in o.S.battlefield) {
-				count++;
-			}
-			if (!count) return Actions.toNextPhase(args, o);
-		}
+			//console.log(o.S.phase + ' -> ' + o.Stadies.order[newKey])
+			o.S.phase = o.Stadies.order[newKey];
 
-		if (module) {
-			if (o.S.phase + 'AtStart' in Actions) {
-				return Actions[o.S.phase + 'AtStart'](o);
-			}
-		} else {
-			//updCurrentPhase();
-			AN.changePahseName(Stadies[o.S.phase].rusName, AN.preStack.countDown);
-			if (Can.pressNextBtn({
-				pX: you,
-				S: S,
-				meta: Meta,
-				Stadies: Stadies
-			})) {
-				H.next.removeClass('selectedZone');
-			} else {
-				H.next.addClass('selectedZone');
-			}
-		}
-	},
-	'adMoveCardToZone' : function (args, o) {
-		console.log('adMoveCardToZone'.red)
-		var result = {
-			'moveCardToZone': [args]
-		};
-		result = Actions.addTriggerEffect(result, 'instedMoveCardToZone', args, o); // result change
-		result = Actions.addTriggerEffect(result, 'afterMoveCardToZone', args, o); // result change
-		return result;
-	},
-	'adHealingNinja' : function(args, o) {
-		var result = {
-			'healingNinja': [args]
-		};
-		return result;
-	},
-	'adRemoveCardFromGame' : function(args, o) {
-		var result = {
-			'removeCardFromGame': [args]
-		};
-		return result;
-	},
-	'addConditionalEffect': function(result, trigger, args, o) {},
-	'addTriggerEffect': function(result, trigger, args, o) {
-
-		console.log(('\ntrigger ' + trigger).yellow)
-		var isInsted = trigger.substr(0,6) === 'insted';
-		insted:
-		for (var accCard in o.Accordance) {
-			if (o.Known[o.Accordance[accCard]].effect 
-				&& o.Known[o.Accordance[accCard]].effect.trigger 
-				&& o.Known[o.Accordance[accCard]].effect.trigger[trigger]
-			) {
-				var triggerEffect = o.Known[o.Accordance[accCard]].effect.trigger[trigger];
-				for (var i in triggerEffect) {
-					var conditionSelf = triggerEffect[i].conditionSelf({
-						"card": accCard,
-						"actionArgs": args
-					}, o);
-					var condition = triggerEffect[i].condition(args, o);
-					var ciclingCheck = triggerEffect[i].ciclingCheck({
-						"card": accCard,
-						"actionArgs": args
-					}, o);
-					console.log((accCard + '['+o.Known[o.Accordance[accCard]].number + '] ciclingCheck').yellow, conditionSelf, condition, ciclingCheck)
-					if (conditionSelf && condition && ciclingCheck) {
-						result = triggerEffect[i].resultChange(result, {
-							"card": accCard,
-							"actionArgs" : args
-						}, o)
-						if (isInsted) {
-							break insted;
-						}
+			if (o.S.phase == 'organisation') {
+				var count = 0;
+				for (var i in o.S[o.S.activePlayer].village.team) {
+					for (var j in o.S[o.S.activePlayer].village.team[i]) {
+						count++;
+						break;
 					}
 				}
+				if (count < 2) return Actions.toNextPhase(args, o);
 			}
 
-		}
-		console.log('result'.yellow, result)
-		return result;
-	},
-	'healingNinja' : function (args, o) {
-		if (o.S.statuses[args.card]) {
-			delete o.S.statuses[args.card].injured;
-		}
-		if (!module) {
-			C[args.card].heal();
-		}
-	},
-	'removeCardFromGame' : function (args, o) {
-		var outZone = args.zone || args.from;
-		if (isZoneSimple(outZone)) {
-			var cardInArray = args.cardInArray || o.S[args.pX][outZone].indexOf(args.card);
-			if (cardInArray > -1) {
-				o.S[args.pX][outZone].splice(cardInArray,1)
+			if (o.S.phase == 'attack') {
+				var count = 0;
+				for (var i in o.S[o.S.activePlayer].village.team) {
+					count++;
+				}
+				if (!count) return Actions.toNextPhase(args, o);
+
 			}
-		} else {
-			var cardInArray = args.cardInArray || o.S[args.pX][outZone].team[args.team].indexOf(args.card);
-			if (cardInArray > -1) {
-				o.S[args.pX][outZone].team[args.team].splice(cardInArray,1)
+			if (o.S.phase == 'block') {
+				var count = 0;
+				for (var i in o.S[o.S.activePlayer == 'pA' ? 'pB' : 'pA'].village.team) {
+					count++;
+				}
+				if (!count) return Actions.toNextPhase(args, o);
+				var count = 0;
+				for (var i in o.S.battlefield) {
+					count++;
+				}
+				if (!count) return Actions.toNextPhase(args, o);
 			}
-		}
-		console.log(cardInArray)
-		if (!module && C[args.card]) {
-			C[args.card].puff();
-			// C[args.card].params.zona = 'deleting';
-			// args.outCard = false;
-			// args.afterFunc = function() {
-			// 	setTimeout(function(){
-			// 	C[args.card].animation({
-			// 		duration: 500,
-			// 		additional: {
-			// 			fadeIn:true,
-			// 			after: {
-			// 				func: function() {
-			// 					C[args.card].destroyCard();
-			// 				}
-			// 			}
-			// 		}
-			// 	})
-			// },100)
-			// }
- 		// 	AN.moveCardToCenter(args);
-		}
-	},
-	'preparePutCardinPlay': function(args, o) {
-		return {
-			'adMoveCardToZone': [{
-				pX: args.pX,
-				from: args.from,
-				to: args.to,
-				card: args.card,
-				cause: args.cause,
-				teamCounter: args.teamCounter
-			}],
-			'applyUpd': [{
-				forPlayer: 'pB',
-				cards: [args.card]
-			}, {
-				forPlayer: 'pA',
-				cards: [args.card]
-			}]
-		};
-	},
-	'preparePlayJutsu': function(args, o) {
-		if (args.card) {
+			if (o.S.phase == 'jutsu') {
+				var count = 0;
+				for (var i in o.S.battlefield) {
+					count++;
+				}
+				if (!count) return Actions.toNextPhase(args, o);
+			}
+
+			if (module) {
+				if (o.S.phase + 'AtStart' in Actions) {
+					return Actions[o.S.phase + 'AtStart'](o);
+				}
+			} else {
+				//updCurrentPhase();
+				AN.changePahseName(Stadies[o.S.phase].rusName, AN.preStack.countDown);
+				if (Can.pressNextBtn({
+						pX: you,
+						S: S,
+						meta: Meta,
+						Stadies: Stadies
+					})) {
+					H.next.removeClass('selectedZone');
+				} else {
+					H.next.addClass('selectedZone');
+				}
+			}
+		},
+		'adMoveCardToZone': function(args, o) {
+			console.log('adMoveCardToZone'.red)
+			var result = {
+				'moveCardToZone': [args]
+			};
+			result = Actions.addTriggerEffect(result, 'instedMoveCardToZone', args, o); // result change
+			result = Actions.addTriggerEffect(result, 'afterMoveCardToZone', args, o); // result change
+			result = Actions.addTriggerGrowth(result, args, o); // result change
+			return result;
+		},
+		'addTriggerEffect': function(result, trigger, args, o) {
+
+			console.log(('\ntrigger ' + trigger).yellow)
+			var isInsted = trigger.substr(0, 6) === 'insted';
+			insted:
+				for (var accCard in o.Accordance) {
+					if (o.Known[o.Accordance[accCard]].effect && o.Known[o.Accordance[accCard]].effect.trigger && o.Known[o.Accordance[accCard]].effect.trigger[trigger]) {
+						var triggerEffect = o.Known[o.Accordance[accCard]].effect.trigger[trigger];
+						for (var i in triggerEffect) {
+							var conditionSelf = triggerEffect[i].conditionSelf({
+								"card": accCard,
+								"actionArgs": args
+							}, o);
+							var condition = triggerEffect[i].condition(args, o);
+							var ciclingCheck = triggerEffect[i].ciclingCheck({
+								"card": accCard,
+								"actionArgs": args
+							}, o);
+							console.log((accCard + '[' + o.Known[o.Accordance[accCard]].number + '] ciclingCheck').yellow, conditionSelf, condition, ciclingCheck)
+							if (conditionSelf && condition && ciclingCheck) {
+								result = triggerEffect[i].resultChange(result, {
+									"card": accCard,
+									"actionArgs": args
+								}, o)
+								if (isInsted) {
+									break insted;
+								}
+							}
+						}
+					}
+
+				}
+			console.log('result'.yellow, result)
+			return result;
+		},
+		'addConditionalEffect': function(result, trigger, args, o) {},
+		'healingNinja': function(args, o) {
+			if (o.S.statuses[args.card]) {
+				delete o.S.statuses[args.card].injured;
+			}
+			if (!module) {
+				C[args.card].heal();
+			}
+		},
+		'addTriggerGrowth' : function (result, args, o) {
+			if (args.cause !== 'growth newNinja') {
+				return result;
+			}
+            if (!('adCoin' in result)) result.adCoin = [];
+            result.adCoin.push({
+                cards: [args.card],
+                isPut: true,
+                type : 'growth',
+                count : 1
+            })
+            return result;
+		},
+		'adShuffle': function(args, o) {
+			console.log('adShuffle'.red)
+			var result = {
+				'shuffle': [args]
+			};
+			return result;
+		},
+		'adHealingNinja': function(args, o) {
+			var result = {
+				'healingNinja': [args]
+			};
+			return result;
+		},
+		'adRemoveCardFromGame': function(args, o) {
+			var result = {
+				'removeCardFromGame': [args]
+			};
+			return result;
+		},
+		'adCoin': function(args, o) {
+			var result = {
+				'coin': [args]
+			};
+			return result;
+		},
+		'coin' : function (args, o) {
+			for (var i in args.cards) {
+				if (!o.S.statuses.hasOwnProperty(args.cards[i])) {
+					o.S.statuses[args.cards[i]] = {}
+				}
+				if (!o.S.statuses[args.cards[i]].hasOwnProperty('coins')) {
+					o.S.statuses[args.cards[i]].coins = {}
+				}
+				if (args.isPut) {
+					if (!o.S.statuses[args.cards[i]].coins.hasOwnProperty(args.type)) {
+						o.S.statuses[args.cards[i]].coins[args.type] = 0;
+					}
+					o.S.statuses[args.cards[i]].coins[args.type] += args.count;
+				} 
+				else {
+					if (!o.S.statuses[args.cards[i]].coins.hasOwnProperty(args.type)) {
+						o.S.statuses[args.cards[i]].coins[args.type] = 0;
+					}
+					o.S.statuses[args.cards[i]].coins[args.type] -= args.count;
+					if (o.S.statuses[args.cards[i]].coins[args.type] <= 0 ) {
+						delete o.S.statuses[args.cards[i]].coins[args.type];
+					}
+				};
+			}
+		},
+		'removeCardFromGame': function(args, o) {
+			var outZone = args.zone || args.from;
+			if (isZoneSimple(outZone)) {
+				var cardInArray = args.cardInArray || o.S[args.pX][outZone].indexOf(args.card);
+				if (cardInArray > -1) {
+					o.S[args.pX][outZone].splice(cardInArray, 1)
+				}
+			} else {
+				var cardInArray = args.cardInArray || o.S[args.pX][outZone].team[args.team].indexOf(args.card);
+				if (cardInArray > -1) {
+					o.S[args.pX][outZone].team[args.team].splice(cardInArray, 1)
+				}
+			}
+			console.log(cardInArray)
+			if (!module && C[args.card]) {
+				C[args.card].puff();
+				// C[args.card].params.zona = 'deleting';
+				// args.outCard = false;
+				// args.afterFunc = function() {
+				// 	setTimeout(function(){
+				// 	C[args.card].animation({
+				// 		duration: 500,
+				// 		additional: {
+				// 			fadeIn:true,
+				// 			after: {
+				// 				func: function() {
+				// 					C[args.card].destroyCard();
+				// 				}
+				// 			}
+				// 		}
+				// 	})
+				// },100)
+				// }
+				// 	AN.moveCardToCenter(args);
+			}
+		},
+		'preparePutCardinPlay': function(args, o) {
 			return {
-				'playJutsu': [{
+				'adMoveCardToZone': [{
 					pX: args.pX,
 					from: args.from,
 					to: args.to,
 					card: args.card,
-					cause: 'playJutsu'
+					cause: args.cause,
+					teamCounter: args.teamCounter
 				}],
 				'applyUpd': [{
 					forPlayer: 'pB',
@@ -254,422 +284,471 @@ var Actions = {
 					forPlayer: 'pA',
 					cards: [args.card]
 				}]
+			};
+		},
+		'preparePlayJutsu': function(args, o) {
+			if (args.card) {
+				return {
+					'playJutsu': [{
+						pX: args.pX,
+						from: args.from,
+						to: args.to,
+						card: args.card,
+						cause: 'playJutsu'
+					}],
+					'applyUpd': [{
+						forPlayer: 'pB',
+						cards: [args.card]
+					}, {
+						forPlayer: 'pA',
+						cards: [args.card]
+					}]
+				}
 			}
-		}
-		return {};
+			return {};
 
-	},
-	'prepareCharge': function(args, o) {
-		return {
-			'charge': [{
-				pX: args.pX,
-				from: args.from,
-				to: args.to,
-				card: args.card,
-				cause: args.cause
-			}],
-			'applyUpd': [{
-				forPlayer: 'pB',
-				cards: [args.card]
-			}, {
-				forPlayer: 'pA',
-				cards: [args.card]
-			}]
-		};
-	},
-	'updTable': function(o) {
-		if (!module) {
-			updTable();
-		}
-	},
-	/**
-	 * remove card from team
-	 * @param  {[Object]} o.card
-	 * @param  {[Object]} o.from
-	 * @param  {[Object]} o.pX
-	 * @param  {[Object]} o.S
-	 * @param  {[Object]} o.team
-	 * @param  {[Object]} o.teamCounter
-	 * @param  {[Object]} o.to
-	 */
-	'removeFromTeam': function(args, o) {
-		var key = arraySearch(o.S[args.pX][args.from].team[args.team], args.card);
-		o.S[args.pX][args.from].team[args.team].splice(key, 1);
-		Actions.createTeamFromCard(args, o)
-		if (!module) {
-			updTable();
-		}
-	},
-	'addToTeam': function(args, o) {
-		args.nochange = true;
-		Actions.organisation(args, o);
-	},
-	/**
-	 * [description]
-	 * @param  {[type]} args {
-	 *                      nonchange: default false ,
-	 *                      c1 : {
-	 *                      	position : 'leader' / 'support',
-	 *                      	owner: 'pA' / 'pB',
-	 *                      	zone: 'attack',
-	 *                      	team: 1,
-	 *                      	card : 'c001'
-	 *                      },
-	 *                      c2 : {
-	 *                      	position : 'leader' / 'support',
-	 *                      	owner: 'pA' / 'pB',
-	 *                      	zone: 'attack',
-	 *                      	team: 1,
-	 *                      	card : 'c001'
-	 *                      }
-	 * 					}
-	 * @param  {[type]} o    [description]
-	 * @return {[type]}      [description]
-	 */
-	'organisation': function(args, o) {
-		console.log('nochange', nochange)
-		var nochange = args.nochange || false;
-		var card1pos = args.c1.position;
-		var card2pos = nochange ? 'support' : args.c2.position;
-		var owner = args.c1.owner;
-		var zone = args.c1.zone;
-		var team1 = args.c1.team;
-		var team2 = args.c2.team;
-		var Team1 = o.S[owner][zone].team[team1];
-		var Team2 = o.S[owner][zone].team[team2];
-
-                    // console.log(args.c1.card.bold);
-                    // console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
-		// console.log('organisation'.red)
-		// console.log(owner,zone,team2)
-		// console.log(Team2)
-		// В соотвеввущем массиве команщды удаляеться элемент с номером карты
-		Actions.removeSelfFromTeam(o.S, args.c1);
-
-		// Если карта-назначение лидер, то карта-источник встает на ее место (присоединяется в начало), 
-		// иначе присоединеться в конец
-		if (card2pos == 'leader') Team2.splice(0, 0, args.c1.card);
-		else Team2.push(args.c1.card);
-
-
-		if (!nochange) {
-			Actions.removeSelfFromTeam(o.S, args.c2);
-			if (card1pos == 'leader') Team1.splice(0, 0, args.c2.card);
-			else Team1.push(args.c2.card);
-		} else {
-			if (!Team1.length) {
-				delete o.S[owner][zone].team[team1];
-			}
-		}
-		if (!module) {
-			if (args.pX == you) {
-				Card.prototype.hideActionCircle();
-				G.selectedCard.select(false);
-				G.selectedCard = null;
-			}
-			updTable();
-		}
-                    // console.log(args.c1.card.bold);
-                    // console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
-	},
-	'removeSelfFromTeam': function(S, c2) {
-		console.log('-*- removeSelfFromTeam')
-		var team = S[c2.owner][c2.zone].team[c2.team];
-		for (var i in team) {
-			if (team[i] == c2.card) {
-				team.splice(i, 1);
-				return true;
-			}
-		}
-		console.log(c2)
-		return false;
-	},
-	'moveTeamToAttack': function(o) {
-		try {
-			o.S[o.pX][o.to].team[o.team] = o.S[o.pX][o.from].team[o.team];
-			if (o.to == 'attack') o.S.battlefield[o.team] = null;
-			if (o.to == 'village') delete o.S.battlefield[o.team];
-			delete o.S[o.pX][o.from].team[o.team];
+		},
+		'prepareCharge': function(args, o) {
+			return {
+				'charge': [{
+					pX: args.pX,
+					from: args.from,
+					to: args.to,
+					card: args.card,
+					cause: args.cause
+				}],
+				'applyUpd': [{
+					forPlayer: 'pB',
+					cards: [args.card]
+				}, {
+					forPlayer: 'pA',
+					cards: [args.card]
+				}]
+			};
+		},
+		'updTable': function(o) {
 			if (!module) {
 				updTable();
 			}
-		} catch(e) {
-			console.log('\n- = - ERROR - = -\nmoveTeamToAttack'.bold.red)
-			console.log(o.pX)
-		}
-	},
-	/**
-	 * Функция производит премещение команд во время фазы блока.
-	 * @param  {Object} o [description]
-	 * @param  {Object} o.S снимок игры
-	 * @param  {String} o.attackTeam индификатор атакующей команды
-	 * @param  {String} o.blockTeam индификатор Блокирующей команд. Если не передать этот параметр,
-	 * то команда, которая блокирует o.attackTeam вернеться в деревню без замеры.
-	 * @param  {String} o.pX блокирующий игрок, он же игрок отправвиший действие
-	 * @param  {String} o.from зона из которой коаманда будет отправлена в блок
-	 * @return {undefined}   undefined
-	 */
-	'block': function(o) {
-		if (o.S.battlefield[o.attackTeam] == o.blockTeam) return;
-		// если место блока занято
-		if (o.S.battlefield[o.attackTeam]) {
-			o.S[o.pX].village.team[o.S.battlefield[o.attackTeam]] = o.S[o.pX].block.team[o.S.battlefield[o.attackTeam]];
-			delete o.S[o.pX].block.team[o.S.battlefield[o.attackTeam]];
-			o.S.battlefield[o.attackTeam] = null;
-		}
-		// если место блока свободно
-		// 
-		if (o.blockTeam) {
-			o.S[o.pX].block.team[o.blockTeam] = o.S[o.pX][o.from].team[o.blockTeam];
-			if (o.from == 'block') {
-				for (var i in o.S.battlefield) {
-					if (o.S.battlefield[i] == o.blockTeam) o.S.battlefield[i] = null;
+		},
+		/**
+		 * remove card from team
+		 * @param  {[Object]} o.card
+		 * @param  {[Object]} o.from
+		 * @param  {[Object]} o.pX
+		 * @param  {[Object]} o.S
+		 * @param  {[Object]} o.team
+		 * @param  {[Object]} o.teamCounter
+		 * @param  {[Object]} o.to
+		 */
+		'removeFromTeam': function(args, o) {
+			var key = arraySearch(o.S[args.pX][args.from].team[args.team], args.card);
+			o.S[args.pX][args.from].team[args.team].splice(key, 1);
+			Actions.createTeamFromCard(args, o)
+			if (!module) {
+				updTable();
+			}
+		},
+		'addToTeam': function(args, o) {
+			args.nochange = true;
+			Actions.organisation(args, o);
+		},
+		/**
+		 * [description]
+		 * @param  {[type]} args {
+		 *                      nonchange: default false ,
+		 *                      c1 : {
+		 *                      	position : 'leader' / 'support',
+		 *                      	owner: 'pA' / 'pB',
+		 *                      	zone: 'attack',
+		 *                      	team: 1,
+		 *                      	card : 'c001'
+		 *                      },
+		 *                      c2 : {
+		 *                      	position : 'leader' / 'support',
+		 *                      	owner: 'pA' / 'pB',
+		 *                      	zone: 'attack',
+		 *                      	team: 1,
+		 *                      	card : 'c001'
+		 *                      }
+		 * 					}
+		 * @param  {[type]} o    [description]
+		 * @return {[type]}      [description]
+		 */
+		'organisation': function(args, o) {
+			console.log('nochange', nochange)
+			var nochange = args.nochange || false;
+			var card1pos = args.c1.position;
+			var card2pos = nochange ? 'support' : args.c2.position;
+			var owner = args.c1.owner;
+			var zone = args.c1.zone;
+			var team1 = args.c1.team;
+			var team2 = args.c2.team;
+			var Team1 = o.S[owner][zone].team[team1];
+			var Team2 = o.S[owner][zone].team[team2];
+
+			// console.log(args.c1.card.bold);
+			// console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
+			// console.log('organisation'.red)
+			// console.log(owner,zone,team2)
+			// console.log(Team2)
+			// В соотвеввущем массиве команщды удаляеться элемент с номером карты
+			Actions.removeSelfFromTeam(o.S, args.c1);
+
+			// Если карта-назначение лидер, то карта-источник встает на ее место (присоединяется в начало), 
+			// иначе присоединеться в конец
+			if (card2pos == 'leader') Team2.splice(0, 0, args.c1.card);
+			else Team2.push(args.c1.card);
+
+
+			if (!nochange) {
+				Actions.removeSelfFromTeam(o.S, args.c2);
+				if (card1pos == 'leader') Team1.splice(0, 0, args.c2.card);
+				else Team1.push(args.c2.card);
+			} else {
+				if (!Team1.length) {
+					delete o.S[owner][zone].team[team1];
 				}
-			} else {
-				delete o.S[o.pX][o.from].team[o.blockTeam];
 			}
-			o.S.battlefield[o.attackTeam] = o.blockTeam;
-		}
-		if (!module) {
-			updTable();
-		}
-	},
-	'startAtStart': function(o) {
-		o.S.turnNumber = o.S.turnNumber + 1;
-		o.S.counters.playedNinjaActivePlayer = 0;
-
-		var result = {
-			toStack: [{
-				'clearAtEndOfTurnEffect': [{}]
-			}, {
-				'adEndOfTurn': [{}]
-			}, {
-				'returnToVillaje': [{
-					team: 'all',
-				}]
-			}, {
-				'updTable': [{
-					players: 'all'
-				}]
-			}]
-		}
-
-		var pXs = ['pA', 'pB'];
-
-		for (var pX in pXs) {
-			o.S[pXs[pX]].counters.playedMission = 0;
-			o.S[pXs[pX]].counters.getBattleRewards = [];
-		}
-
-		if (o.S.pA.rewards >= 10 || o.S.pB.rewards >= 10) {
-			var winner = '';
-			if (o.S.pA.rewards >= 10 && o.S.pB.rewards < 10) {
-				winner = 'pA';
-			} else if (o.S.pB.rewards >= 10 && o.S.pA.rewards < 10) {
-				winner = 'pB';
-			} else {
-				winner = o.S.activePlayer;
+			if (!module) {
+				if (args.pX == you) {
+					Card.prototype.hideActionCircle();
+					G.selectedCard.select(false);
+					G.selectedCard = null;
+				}
+				updTable();
 			}
-			var loser = winner == 'pA' ? 'pB' : 'pA';
-
-			return {
-				'winner': [{
-					winner: winner,
-					loser: loser,
-					cause: '10 rewards'
-				}]
-			};
-		}
-		//Активный игрок сменился в фцнкции atstart
-		var oldActivePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-
-		for (var i = o.S[oldActivePlayer].hand.length; i > 6; i--) {
-			result.toStack.push({
-				afterQuestion: [{
-					question: 'discardExcess',
-					pX: oldActivePlayer
-				}]
-			})
-		}
-
-
-		return result;
-		//}
-	},
-	'clearAtEndOfTurnEffect': function(args, o) {
-		for (var i in o.S.statuses) {
-			if ('atEndOfTurn' in o.S.statuses[i]) {
-				delete o.S.statuses[i].atEndOfTurn;
+			// console.log(args.c1.card.bold);
+			// console.log(o.Known[o.Accordance[args.c1.card]].type.bold);
+		},
+		'removeSelfFromTeam': function(S, c2) {
+			console.log('-*- removeSelfFromTeam')
+			var team = S[c2.owner][c2.zone].team[c2.team];
+			for (var i in team) {
+				if (team[i] == c2.card) {
+					team.splice(i, 1);
+					return true;
+				}
 			}
-		}
-		// console.log('STATUS')
-		// console.log(o.S.statuses)
-	},
-	'addPhaseTrigger': function(result, args, o){
-		if (!args.triggerPhase) {
+			console.log(c2)
+			return false;
+		},
+		'moveTeamToAttack': function(o) {
+			try {
+				o.S[o.pX][o.to].team[o.team] = o.S[o.pX][o.from].team[o.team];
+				if (o.to == 'attack') o.S.battlefield[o.team] = null;
+				if (o.to == 'village') delete o.S.battlefield[o.team];
+				delete o.S[o.pX][o.from].team[o.team];
+				if (!module) {
+					updTable();
+				}
+			} catch (e) {
+				console.log('\n- = - ERROR - = -\nmoveTeamToAttack'.bold.red)
+				console.log(o.pX)
+			}
+		},
+		/**
+		 * Функция производит премещение команд во время фазы блока.
+		 * @param  {Object} o [description]
+		 * @param  {Object} o.S снимок игры
+		 * @param  {String} o.attackTeam индификатор атакующей команды
+		 * @param  {String} o.blockTeam индификатор Блокирующей команд. Если не передать этот параметр,
+		 * то команда, которая блокирует o.attackTeam вернеться в деревню без замеры.
+		 * @param  {String} o.pX блокирующий игрок, он же игрок отправвиший действие
+		 * @param  {String} o.from зона из которой коаманда будет отправлена в блок
+		 * @return {undefined}   undefined
+		 */
+		'block': function(o) {
+			if (o.S.battlefield[o.attackTeam] == o.blockTeam) return;
+			// если место блока занято
+			if (o.S.battlefield[o.attackTeam]) {
+				o.S[o.pX].village.team[o.S.battlefield[o.attackTeam]] = o.S[o.pX].block.team[o.S.battlefield[o.attackTeam]];
+				delete o.S[o.pX].block.team[o.S.battlefield[o.attackTeam]];
+				o.S.battlefield[o.attackTeam] = null;
+			}
+			// если место блока свободно
+			// 
+			if (o.blockTeam) {
+				o.S[o.pX].block.team[o.blockTeam] = o.S[o.pX][o.from].team[o.blockTeam];
+				if (o.from == 'block') {
+					for (var i in o.S.battlefield) {
+						if (o.S.battlefield[i] == o.blockTeam) o.S.battlefield[i] = null;
+					}
+				} else {
+					delete o.S[o.pX][o.from].team[o.blockTeam];
+				}
+				o.S.battlefield[o.attackTeam] = o.blockTeam;
+			}
+			if (!module) {
+				updTable();
+			}
+		},
+		'startAtStart': function(o) {
+			o.S.turnNumber = o.S.turnNumber + 1;
+			o.S.counters.playedNinjaActivePlayer = 0;
+
+			var result = {
+				toStack: [{
+					'clearAtEndOfTurnEffect': [{}]
+				}, {
+					'adEndOfTurn': [{}]
+				}, {
+					'returnToVillaje': [{
+						team: 'all',
+					}]
+				}, {
+					'updTable': [{
+						players: 'all'
+					}]
+				}]
+			}
+
+			var pXs = ['pA', 'pB'];
+
+			for (var pX in pXs) {
+				o.S[pXs[pX]].counters.playedMission = 0;
+				o.S[pXs[pX]].counters.getBattleRewards = [];
+			}
+
+			if (o.S.pA.rewards >= 10 || o.S.pB.rewards >= 10) {
+				var winner = '';
+				if (o.S.pA.rewards >= 10 && o.S.pB.rewards < 10) {
+					winner = 'pA';
+				} else if (o.S.pB.rewards >= 10 && o.S.pA.rewards < 10) {
+					winner = 'pB';
+				} else {
+					winner = o.S.activePlayer;
+				}
+				var loser = winner == 'pA' ? 'pB' : 'pA';
+
+				return {
+					'winner': [{
+						winner: winner,
+						loser: loser,
+						cause: '10 rewards'
+					}]
+				};
+			}
+			//Активный игрок сменился в фцнкции atstart
+			var oldActivePlayer = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+
+			for (var i = o.S[oldActivePlayer].hand.length; i > 6; i--) {
+				result.toStack.push({
+					afterQuestion: [{
+						question: 'discardExcess',
+						pX: oldActivePlayer
+					}]
+				})
+			}
+
+
 			return result;
-		}
-		for (var accCard in o.Accordance) {
-			if (o.Known[o.Accordance[accCard]].effect 
-				&& o.Known[o.Accordance[accCard]].effect.trigger 
-				&& o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase]) {
-				var triggerPhase = o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase];
-				for (var i in triggerPhase) {
-					var conditionSelf = triggerPhase[i].conditionSelf({
-						"card": accCard
-					}, o);
-					console.log('conditionSelf'.red, conditionSelf)
-					if (conditionSelf) {
-						triggerPhase[i].func(result, {
+			//}
+		},
+		'clearAtEndOfTurnEffect': function(args, o) {
+			for (var i in o.S.statuses) {
+				if ('atEndOfTurn' in o.S.statuses[i]) {
+					delete o.S.statuses[i].atEndOfTurn;
+				}
+			}
+			// console.log('STATUS')
+			// console.log(o.S.statuses)
+		},
+		'addPhaseTrigger': function(result, args, o) {
+			if (!args.triggerPhase) {
+				return result;
+			}
+			for (var accCard in o.Accordance) {
+				if (o.Known[o.Accordance[accCard]].effect && o.Known[o.Accordance[accCard]].effect.trigger && o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase]) {
+					var triggerPhase = o.Known[o.Accordance[accCard]].effect.trigger[args.triggerPhase];
+					for (var i in triggerPhase) {
+						var conditionSelf = triggerPhase[i].conditionSelf({
 							"card": accCard
-						}, o)
+						}, o);
+						console.log('conditionSelf'.red, conditionSelf)
+						if (conditionSelf) {
+							triggerPhase[i].func(result, {
+								"card": accCard
+							}, o)
+						}
 					}
 				}
-			}
 
-		}
-		return result;
-	},
-	'adJutsu': function(args, o) {
-		var result = {};
-		args.triggerPhase = 'atJutsu';
-		result = Actions.addPhaseTrigger(result, args, o);
-		delete args.triggerPhase;
-		return result;
-	},
-	'adEndOfTurn': function(args, o) {
-		var result = {
-			'toStack': {
-				'removePermanentCounter': [{}]
-			},
-		};
-		args.triggerPhase = 'atEndOfTurn';
-		result = Actions.addPhaseTrigger(result, args, o);
-		delete args.triggerPhase;
-		return result;
-	},
-	'missionAtStart': function(o) {
-		var args = {
-			drawCardCause: 'start turn',
-			number: 1,
-			player: o.S.activePlayer
-		}
-		return Actions.prepareDrawCard(args, o);
-	},
-	/**
-	 * Должен возвращать обект для preStack
-	 * @return {[type]} [description]
-	 */
-	'prepareDrawCard': function(args, o) {
-		if (o.S[o.S.activePlayer].deck.length) {
-			return {
-				'drawCard': [{
-					player: args.player,
-					numberOfCard: args.number,
-					drawCardCause: args.drawCardCause
-				}],
-				'applyUpd': [{
-					forPlayer: args.player,
-					cards: o.S[args.player].deck.slice(0,args.number)
-				}]
+			}
+			return result;
+		},
+		'adJutsu': function(args, o) {
+			var result = {};
+			args.triggerPhase = 'atJutsu';
+			result = Actions.addPhaseTrigger(result, args, o);
+			delete args.triggerPhase;
+			return result;
+		},
+		'adEndOfTurn': function(args, o) {
+			var result = {
+				'toStack': {
+					'removePermanentCounter': [{}]
+				},
 			};
-		} else {
-			return {
-				'winner': [{
-					winner: args.player == 'pA' ? 'pB' : 'pA',
-					loser: args.player,
-					cause: 'empty deck'
+			args.triggerPhase = 'atEndOfTurn';
+			result = Actions.addPhaseTrigger(result, args, o);
+			delete args.triggerPhase;
+			return result;
+		},
+		'missionAtStart': function(o) {
+			var args = {
+				drawCardCause: 'start turn',
+				number: 1,
+				player: o.S.activePlayer
+			}
+			return Actions.prepareDrawCard(args, o);
+		},
+		/**
+		 * Должен возвращать обект для preStack
+		 * @return {[type]} [description]
+		 */
+		'prepareDrawCard': function(args, o) {
+			if (o.S[o.S.activePlayer].deck.length) {
+				return {
+					'drawCard': [{
+						player: args.player,
+						numberOfCard: args.number,
+						drawCardCause: args.drawCardCause
+					}],
+					'applyUpd': [{
+						forPlayer: args.player,
+						cards: o.S[args.player].deck.slice(0, args.number)
+					}]
+				};
+			} else {
+				return {
+					'winner': [{
+						winner: args.player == 'pA' ? 'pB' : 'pA',
+						loser: args.player,
+						cause: 'empty deck'
+					}]
+				}
+			}
+		},
+		'comebackAtStart': function(o) {},
+		'applyToReult': function(o) {
+
+		},
+		'jutsuAtStart': function(o) {
+
+			var result = {
+				toStack: [{
+					'adJutsu': [{}]
 				}]
 			}
-		}
-	},
-	'comebackAtStart': function(o) {},
-	'applyToReult': function(o) {
+			return result;
+			//}
+		},
+		/**
+		 * [description]
+		 * @param  {[type]} args {
+		 *                       attackID : 5 // айдишник атакующей команды
+		 * }
+		 * @param  {[type]} o    обект обладающий свойствами универсального
+		 * @return {[type]}      [description]
+		 */
+		'isMentalBattle': function(args, o) {
+			var result = 0;
+			var funcArgs = {
+				attackID : args.attackID
+			}
+			for (var accCard in o.Accordance) {
+				funcArgs.selfCard = accCard;
+				if (o.Known[o.Accordance[accCard]] 
+					&& o.Known[o.Accordance[accCard]].effect 
+					&& o.Known[o.Accordance[accCard]].effect.performeMentalBattle 
+					&& o.Known[o.Accordance[accCard]].effect.performeMentalBattle.conditionSelf(funcArgs,o)
+				) {
+					//сюда предается айдишник атакующей команды
+					// +1, 0, -1
+					result += o.Known[o.Accordance[accCard]].effect.performeMentalBattle.condition(funcArgs,o);
+				}
 
-	},
-	'jutsuAtStart': function(o) {
+			}
+			return result > 0 ? true : false;
+		},
+		'shutdownAtStart': function(o) {
+			var result = {}; //{'arg':{}, 'act':{}};
+			var toStack = {};
+			var step1 = null,
+				step2 = null;
+			var adWinnerAndLoser = [];
 
-		var result = {
-			toStack: [{
-				'adJutsu': [{}]
-			}]
-		}
-		return result;
-		//}
-	},
-	'shutdownAtStart': function(o) {
-		var result = {}; //{'arg':{}, 'act':{}};
-		var toStack = {};
-		var step1 = null,
-			step2 = null;
-		var adWinnerAndLoser = [];
+			function adWinnerAndLoserPush(pX, zone, team, ad) {
+				adWinnerAndLoser.push({
+					pX: pX,
+					zone: zone,
+					team: team,
+					ad: ad
+				})
+			}
+			var blockResult = {};
+			for (var attackID in o.S.battlefield) {
+				step1 = step2 = null;
 
-		function adWinnerAndLoserPush(pX, zone, team, ad) {
-			adWinnerAndLoser.push({
-				pX: pX,
-				zone: zone,
-				team: team,
-				ad: ad
-			})
-		}
-		var blockResult = {};
-		for (var attackID in o.S.battlefield) {
-			step1 = step2 = null;
-			var attackTeam = o.S[o.S.activePlayer].attack.team[attackID];
-			var blockID = o.S.battlefield[attackID];
-			var blocker = o.blocker = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
-			var attackPower = Actions.getTeamPower(attackTeam, o);
-			// если атакующая команда заюблокирована
-			if (blockID) {
-				var blockTeam = o.S[blocker].block.team[blockID];
-				var blockPower = Actions.getTeamPower(blockTeam, o);
-				//console.log(('attackPower ' + attackPower + ' / blockPower ' + blockPower).red)
-				if (attackPower > blockPower) {
-					if (attackPower - blockPower >= 5) {
+				var isMental = Actions.isMentalBattle({attackID: attackID}, o);
 
-						adWinnerAndLoserPush(blocker, 'block', blockID, 'completeDefeat');
-						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'completeWin');
+				var attackTeam = o.S[o.S.activePlayer].attack.team[attackID];
+				var blockID = o.S.battlefield[attackID];
+				var blocker = o.blocker = o.S.activePlayer == 'pA' ? 'pB' : 'pA';
+				var attackPower = isMental ? Actions.getTeamMentalPower(attackTeam, o) : Actions.getTeamPower(attackTeam, o);
+				// если атакующая команда заюблокирована
+				if (blockID) {
+					var blockTeam = o.S[blocker].block.team[blockID];
+					var blockPower = isMental ? Actions.getTeamMentalPower(blockTeam, o) : Actions.getTeamPower(blockTeam, o);
+
+					console.log('\n '+attackPower+' // ' +blockPower+ '\n')
+					if (attackPower > blockPower) {
+						if (attackPower - blockPower >= 5) {
+
+							adWinnerAndLoserPush(blocker, 'block', blockID, 'completeDefeat');
+							adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'completeWin');
+						} else {
+							adWinnerAndLoserPush(blocker, 'block', blockID, 'normalDefeat');
+							adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'normalWin');
+						}
+					} else if (attackPower < blockPower) {
+						if (blockPower - attackPower >= 5) {
+							adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'completeDefeat');
+							adWinnerAndLoserPush(blocker, 'block', blockID, 'completeWin');
+						} else {
+							adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'normalDefeat');
+							adWinnerAndLoserPush(blocker, 'block', blockID, 'normalWin');
+						}
 					} else {
-						adWinnerAndLoserPush(blocker, 'block', blockID, 'normalDefeat');
-						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'normalWin');
-					}
-				} else if (attackPower < blockPower) {
-					if (blockPower - attackPower >= 5) {
-						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'completeDefeat');
-						adWinnerAndLoserPush(blocker, 'block', blockID, 'completeWin');
-					} else {
-						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'completeDefeat');
-						adWinnerAndLoserPush(blocker, 'block', blockID, 'completeWin');
+						adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'drawBattle');
+						adWinnerAndLoserPush(blocker, 'block', blockID, 'drawBattle');
 					}
 				} else {
-					adWinnerAndLoserPush(o.S.activePlayer, 'attack', attackID, 'drawBattle');
-					adWinnerAndLoserPush(blocker, 'block', blockID, 'drawBattle');
-				}
-			} else {
-				if (!('adWinnerAndLoser' in toStack)) {
-					toStack.adWinnerAndLoser = [];
-				}
-				if (attackPower >= 5) {
-					toStack.adWinnerAndLoser.push({
-						pX: o.S.activePlayer,
-						zone: 'attack',
-						team: attackID,
-						ad: 'completeReward'
-					});
-					o.rewardToPlayer = o.S.activePlayer;
-				} else {
-					toStack.adWinnerAndLoser.push({
-						pX: o.S.activePlayer,
-						zone: 'attack',
-						team: attackID,
-						ad: 'normalReward'
-					});
-					o.rewardToPlayer = o.S.activePlayer;
+					if (!('adWinnerAndLoser' in toStack)) {
+						toStack.adWinnerAndLoser = [];
+					}
+					if (attackPower >= 5) {
+						toStack.adWinnerAndLoser.push({
+							pX: o.S.activePlayer,
+							zone: 'attack',
+							team: attackID,
+							ad: 'completeReward'
+						});
+						o.rewardToPlayer = o.S.activePlayer;
+					} else {
+						toStack.adWinnerAndLoser.push({
+							pX: o.S.activePlayer,
+							zone: 'attack',
+							team: attackID,
+							ad: 'normalReward'
+						});
+						o.rewardToPlayer = o.S.activePlayer;
+					}
 				}
 			}
-		}
 
-		if (!module) {
+			if (!module) {
 			updTable();
 		} else {
 			result.toStack = toStack;
@@ -718,26 +797,26 @@ var Actions = {
 		// var damgeResult1 = {}, damgeResult2 = {};
 		for (var i = 1; i <= team.length - 1; i++) {
 			result.givingDamage.push({
+					pX: o.pX,
+					team: o.team,
+					zone: o.zone,
+					card: team[i],
+					damage: 1,
+					type: 'fire',
+					causeOfDamage: 'completeDefeat'
+				})
+				//damgeResult1 = Actions.giveDamage(team[i],o);
+		}
+		result.givingDamage.push({
 				pX: o.pX,
 				team: o.team,
 				zone: o.zone,
-				card: team[i],
-				damage: 1,
+				card: team[0],
+				damage: 2,
 				type: 'fire',
 				causeOfDamage: 'completeDefeat'
 			})
-			//damgeResult1 = Actions.giveDamage(team[i],o);
-		}
-		result.givingDamage.push({
-			pX: o.pX,
-			team: o.team,
-			zone: o.zone,
-			card: team[0],
-			damage: 2,
-			type: 'fire',
-			causeOfDamage: 'completeDefeat'
-		})
-		//damgeResult2 = Actions.giveDamage(team[0],o);
+			//damgeResult2 = Actions.giveDamage(team[0],o);
 		if (module) {
 			//console.log('completeDefeat')
 			return result;
@@ -786,14 +865,14 @@ var Actions = {
 		if (!team) return;
 		//Actions.giveReward(team[0],o);
 		result.givingReward.push({
-			pX: o.pX,
-			team: o.team,
-			zone: o.zone,
-			card: team[0],
-			rewardsCount: 1,
-			causeOfReward: 'normalReward'
-		})
-		//TODO;
+				pX: o.pX,
+				team: o.team,
+				zone: o.zone,
+				card: team[0],
+				rewardsCount: 1,
+				causeOfReward: 'normalReward'
+			})
+			//TODO;
 		if (module) {
 			return result;
 		}
@@ -914,9 +993,11 @@ var Actions = {
 		if (!module) {
 			AnimationPush({
 				func: function() {
-					C[cardID].injure({noAnimation:true});
+					C[cardID].injure({
+						noAnimation: true
+					});
 					updTable();
-					setTimeout(AN.preStack.countDown, 600+5)
+					setTimeout(AN.preStack.countDown, 600 + 5)
 				},
 				time: 250 + 5,
 				name: 'injureTarget C[' + cardID + '].injure'
@@ -1015,6 +1096,19 @@ var Actions = {
 			result += Actions.getSupportPower(team[i], o);
 		}
 		return result;
+	},
+	'getTeamMentalPower': function(team, o) {
+		var result = 0;
+		if (!team) return result;
+		for (var i = 0; i <= team.length - 1; i++) {
+			result += Actions.getMentalPower(team[i], o);
+		}
+		return result;
+	},
+	'getMentalPower': function(cardID, o) {
+		var mod = Actions.getAllMentalModificator(cardID, o);
+		var def = Actions.getNinjaDefaultMental(cardID, o);
+		return def + mod;
 	},
 	'getLeaderPower': function(cardID, o) {
 		var power = Actions.getNinjaModPower(cardID, o)
@@ -1117,7 +1211,7 @@ var Actions = {
 		for (var ans in table.answers) {
 
 			if (ans == 'primal') {
-				if (loging)console.log('\nPRIMAL'.yellow)
+				if (loging) console.log('\nPRIMAL'.yellow)
 
 				for (var ans2 in table.answers[ans]) {
 					if (loging) console.log(table.answers[ans][ans2])
@@ -1130,8 +1224,7 @@ var Actions = {
 					}
 				}
 
-			}
-			else {
+			} else {
 				for (var args in table.answers[ans]) {
 					var res = Actions[ans](table.answers[ans][args], o);
 					if (loging) console.log('\nRES'.cyan)
@@ -1423,12 +1516,15 @@ var Actions = {
 					result.support += o.S.statuses[card].atEndOfTurn.changePower[i].support;
 				}
 			}
+			if (o.S.statuses[card].hasOwnProperty('coins')) {
+				if (o.S.statuses[card].coins.hasOwnProperty('growth')) {
+					result.attack += o.S.statuses[card].coins.growth;
+					result.support += o.S.statuses[card].coins.growth;
+				}
+			}
 		}
 		for (var accCard in o.Accordance) {
-			if (o.Known[o.Accordance[accCard]]
-				&& o.Known[o.Accordance[accCard]].effect 
-				&& o.Known[o.Accordance[accCard]].effect.static 
-				&& o.Known[o.Accordance[accCard]].effect.static.powerNinja) {
+			if (o.Known[o.Accordance[accCard]] && o.Known[o.Accordance[accCard]].effect && o.Known[o.Accordance[accCard]].effect.static && o.Known[o.Accordance[accCard]].effect.static.powerNinja) {
 				var powerNinja = o.Known[o.Accordance[accCard]].effect.static.powerNinja;
 				for (var i in powerNinja) {
 					var conditionSelf = powerNinja[i].conditionSelf({
@@ -1447,15 +1543,15 @@ var Actions = {
 			}
 
 		}
-		if (o.Known[o.Accordance[card]]
-			&& o.Known[o.Accordance[card]].effect
-			&& o.Known[o.Accordance[card]].effect.static
-			&& o.Known[o.Accordance[card]].effect.static.selfPower
-		) {
+		if (o.Known[o.Accordance[card]] && o.Known[o.Accordance[card]].effect && o.Known[o.Accordance[card]].effect.static && o.Known[o.Accordance[card]].effect.static.selfPower) {
 			var selfPower = o.Known[o.Accordance[card]].effect.static.selfPower;
 			for (var i in selfPower) {
-				if (selfPower[i].condition({self:card},o)) {
-					var powerMod = selfPower[i].getPowerMod({self:card},o);
+				if (selfPower[i].condition({
+						self: card
+					}, o)) {
+					var powerMod = selfPower[i].getPowerMod({
+						self: card
+					}, o);
 					// console.log('powerMod', powerMod)
 					result.attack += powerMod.attack;
 					result.support += powerMod.support;
@@ -1464,17 +1560,65 @@ var Actions = {
 		}
 		return result;
 	},
+	'getAllMentalModificator': function(card, o) {
+		var result = 0;
+		// if (card in o.S.statuses) {
+		// 	if ('atEndOfTurn' in o.S.statuses[card]) {
+		// 		for (var i in o.S.statuses[card].atEndOfTurn['changePower']) {
+		// 			result.attack += o.S.statuses[card].atEndOfTurn.changePower[i].attack;
+		// 			result.support += o.S.statuses[card].atEndOfTurn.changePower[i].support;
+		// 		}
+		// 	}
+		// }
+		// for (var accCard in o.Accordance) {
+		// 	if (o.Known[o.Accordance[accCard]] && o.Known[o.Accordance[accCard]].effect && o.Known[o.Accordance[accCard]].effect.static && o.Known[o.Accordance[accCard]].effect.static.powerNinja) {
+		// 		var powerNinja = o.Known[o.Accordance[accCard]].effect.static.powerNinja;
+		// 		for (var i in powerNinja) {
+		// 			var conditionSelf = powerNinja[i].conditionSelf({
+		// 				"card": card,
+		// 				"self": accCard
+		// 			}, o);
+		// 			var condition = powerNinja[i].condition({
+		// 				"card": card,
+		// 				"self": accCard
+		// 			}, o);
+		// 			if (conditionSelf && condition) {
+		// 				result.attack += powerNinja[i].powerMod.attack;
+		// 				result.support += powerNinja[i].powerMod.support;
+		// 			}
+		// 		}
+		// 	}
+
+		// }
+		// if (o.Known[o.Accordance[card]] && o.Known[o.Accordance[card]].effect && o.Known[o.Accordance[card]].effect.static && o.Known[o.Accordance[card]].effect.static.selfPower) {
+		// 	var selfPower = o.Known[o.Accordance[card]].effect.static.selfPower;
+		// 	for (var i in selfPower) {
+		// 		if (selfPower[i].condition({
+		// 				self: card
+		// 			}, o)) {
+		// 			var powerMod = selfPower[i].getPowerMod({
+		// 				self: card
+		// 			}, o);
+		// 			// console.log('powerMod', powerMod)
+		// 			result.attack += powerMod.attack;
+		// 			result.support += powerMod.support;
+		// 		}
+		// 	}
+		// }
+		return result;
+	},
 	'getNinjaDefaultPower': function(card, o) {
 		return {
 			attack: Actions.getNinjaDefaultAttack(card, o),
 			support: Actions.getNinjaDefaultSupport(card, o)
 		}
 	},
-	'isHealt' : function(card, o) {
-		if (card in o.S.statuses 
-			&& o.S.statuses[card]
-			&& o.S.statuses[card].injured
-		) {
+	'getNinjaDefaultMental': function(card, o) {
+		var cardObj = o.Known[o.Accordance[card]];
+		return cardObj.hasOwnProperty('mental') ? cardObj.mental : 0;
+	},
+	'isHealt': function(card, o) {
+		if (card in o.S.statuses && o.S.statuses[card] && o.S.statuses[card].injured) {
 			return false;
 		}
 		return true;
@@ -1518,6 +1662,7 @@ var Actions = {
 	/**
 	 * [description]
 	 * @param  {[type]} args [description]
+	 * @param  {[type]} args.card
 	 * @param  {[type]} args.path
 	 * @param  {[type]} args.path.player ['pA', 'pB']
 	 * @param  {[type]} args.path.zone ['mission', 'village']
@@ -1542,12 +1687,12 @@ var Actions = {
 				// console.log(zones[zone])
 				// console.log(!isZoneSimple(zones[zone]))
 				if (!isZoneSimple(zones[zone])) {
-						// console.log(o.S[pXs[pX]][zones[zone]].team)
+					// console.log(o.S[pXs[pX]][zones[zone]].team)
 					for (var team in o.S[pXs[pX]][zones[zone]].team) {
 						// console.log(o.S[pXs[pX]][zones[zone]].team[team])
 						for (var cardId in o.S[pXs[pX]][zones[zone]].team[team]) {
-						// console.log(o.S[pXs[pX]][zones[zone]].team[team][cardId])
-						// console.log(args.card)
+							// console.log(o.S[pXs[pX]][zones[zone]].team[team][cardId])
+							// console.log(args.card)
 							if (args.card == o.S[pXs[pX]][zones[zone]].team[team][cardId]) {
 								return {
 									player: pXs[pX],
@@ -1574,22 +1719,22 @@ var Actions = {
 		}
 		return false;
 	},
-	'removePermanentCounter' :  function(args, o) {
+	'removePermanentCounter': function(args, o) {
 		var result = {};
 		for (var mission in o.S[o.S.activePlayer].mission) {
 			var missionId = o.S[o.S.activePlayer].mission[mission];
-			if (o.S.statuses[missionId]
-				&& o.S.statuses[missionId].permanent !== true) 
-			{
+			if (o.S.statuses[missionId] && o.S.statuses[missionId].permanent !== true) {
 				o.S.statuses[missionId].permanent--;
 
 				if (o.S.statuses[missionId].permanent < 1) {
 					if (!('toStack' in result)) result.toStack = [];
 
-					result.toStack.push({'discardMission': [{
-						pX : o.S.activePlayer,
-						card : missionId
-					}]})
+					result.toStack.push({
+						'discardMission': [{
+							pX: o.S.activePlayer,
+							card: missionId
+						}]
+					})
 
 					// if (!('discardMission' in result)) result.discardMission = [];
 					// result.discardMission.push({
@@ -1603,12 +1748,11 @@ var Actions = {
 		if (!module) {
 			updTable();
 			AN.preStack.countDown();
-		}
-		else {
+		} else {
 			return result;
 		}
 	},
-	'discardMission' : function(args, o) {
+	'discardMission': function(args, o) {
 		if (module) {
 			var result = {
 				'toStack': [{
@@ -1633,21 +1777,16 @@ var Actions = {
 		// 	team: null
 		// }, o)
 	},
-	'getPermanentCounter' : function(card, o) {
-		if (o.S.statuses[card]
-			&& 'permanent' in o.S.statuses[card] )
-		{
+	'getPermanentCounter': function(card, o) {
+		if (o.S.statuses[card] && 'permanent' in o.S.statuses[card]) {
 			return o.S.statuses[card].permanent
 		}
-		if (o.Known[o.Accordance[card]].type == 'M'
-			&& o.Known[o.Accordance[card]].effect
-			&& o.Known[o.Accordance[card]].effect.permanent) 
-		{
+		if (o.Known[o.Accordance[card]].type == 'M' && o.Known[o.Accordance[card]].effect && o.Known[o.Accordance[card]].effect.permanent) {
 			return o.Known[o.Accordance[card]].effect.permanent;
 		}
 		return false;
 	},
-	'setCicling' : function (func) {
+	'setCicling': function(func) {
 		var hashes = [];
 		var func = func;
 		return function(args, o) {
@@ -1677,15 +1816,17 @@ var Actions = {
 	 * @param  {[type]} dict [['текст ошибки',function(){return true/false}],...]
 	 * @return {[type]}      [description]
 	 */
-	'canCheckDict':function(dict) {
-        for (var i in dict) {
-            if (dict[i][1]()) continue;
-            return {
-                "cause" : dict[i][0],
-                "result": false
-            }
-        }
-        return {"result": true};
+	'canCheckDict': function(dict) {
+		for (var i in dict) {
+			if (dict[i][1]()) continue;
+			return {
+				"cause": dict[i][0],
+				"result": false
+			}
+		}
+		return {
+			"result": true
+		};
 	}
 };
 
@@ -1693,7 +1834,7 @@ var Actions = {
  * Возврашает обект с приготовленными дейстиями
  * @param  {[type]} args обект с а аргументами
  * @param  {[type]} o стандартный объект {@link getUniversalObject}
- * @example 
+ * @example
  * args {
  *   numberOfCard : 2,
  *   player : 'pA'/'pB'
@@ -1728,9 +1869,9 @@ Actions.DrawXcards = function(args, o) {
 }
 
 /**
- * createTeamFromCard 
+ * createTeamFromCard
  * Используеться в {@link Action.moveCardToZone}, {@link Action.removeFromTeam},
- * @param  {Object} args 
+ * @param  {Object} args
  * { \n
  *    card :'c001', \n
  *    pX : 'pA',\n
@@ -1740,9 +1881,9 @@ Actions.DrawXcards = function(args, o) {
  *    to : 'attack'/'block'/'viilage'\n
  * }
  * @param  {Object} o {@link getUniversalObject}
- * @example 
+ * @example
  */
-Actions.createTeamFromCard =  function(args, o) {
+Actions.createTeamFromCard = function(args, o) {
 	if (!args.teamCounter) {
 		args.teamCounter = ++o.Meta.teamCounter
 	}
@@ -1766,7 +1907,7 @@ Actions.getCardForCondition = function(args, o) {
 		if (!card) return false;
 		var statusCheck = true;
 
-		if (args.statuses && args.statuses.length)  {
+		if (args.statuses && args.statuses.length) {
 			if (card.statuses && card.statuses.length) {
 				var checked = 0;
 				for (var stat in args.statuses) {
@@ -1784,7 +1925,7 @@ Actions.getCardForCondition = function(args, o) {
 			}
 		}
 
-		if (args.atributes && args.atributes.length ) {
+		if (args.atributes && args.atributes.length) {
 			if (card.atributes && card.atributes.length) {
 				var checked = 0;
 				for (var atr in args.atributes) {
@@ -1801,18 +1942,42 @@ Actions.getCardForCondition = function(args, o) {
 				statusCheck == true;
 			}
 		}
+
+		if (args.name && args.name.length) {
+			var checked = 0;
+			if (typeof card.name == 'string'){
+				if (~args.name.indexOf(card.name)) {
+					if (args.greedy) return true;
+					checked++;
+				}
+			}
+			else {
+				for (var atr in args.name) {
+					if (~card.name.indexOf(args.name[atr])) {
+						if (args.greedy) return true;
+						checked++;
+					}
+				}
+			}
+			if (args.name.length == checked) {
+				statusCheck == true;
+			} else {
+				if (!args.greedy) return false;
+			}
+		}
+
 		if (args.injured) {
 			if (o.S.statuses[cardId] && o.S.statuses[cardId].injured) {
 				if (args.greedy) {
 					return true;
 				}
 				statusCheck == true;
-			}
-			else {
+			} else {
 				if (!args.greedy) return false;
 				statusCheck == false;
 			}
 		}
+
 		return statusCheck;
 	}
 
@@ -1846,7 +2011,7 @@ Actions.getCardForCondition = function(args, o) {
 
 /**
  * [description]
- * @param  {Object} args 
+ * @param  {Object} args
  * { \n
  *    card :'c001', \n
  *    pX : 'pA',\n
@@ -1854,7 +2019,9 @@ Actions.getCardForCondition = function(args, o) {
  *    cause : 3,\n
  *    from : 4,\n
  *    to : 'attack'/'block'/'viilage'\n
- *    team : 'attack'/'block'/'viilage'\n
+ *    team : 'attack'/'block'/'viilage'\n,
+ *    injured : default false,
+ *    cardInArray : 1
  * }
  * @param  {Object} o {@link getUniversalObject}
  * @return {[type]}	  [description]
@@ -1862,7 +2029,7 @@ Actions.getCardForCondition = function(args, o) {
 Actions.moveCardToZone = function(args, o) {
 	// console.log('Move Card TO Zone')
 	// console.log(args)
-	
+
 	//Triggers
 
 	var result = {
@@ -1882,10 +2049,21 @@ Actions.moveCardToZone = function(args, o) {
 	if (!isZoneSimple(args.from)) {
 
 		result.updTable[0] = {};
+		var oldTeam, oldPos;
+		forBreaker:
+		for (var oTeam in o.S[args.pX][args.from].team) {
+			for (var oPos in o.S[args.pX][args.from].team[oTeam]) {
+				if (o.S[args.pX][args.from].team[oTeam][oPos] == args.card) {
+					o.S[args.pX][args.from].team[oTeam].splice(oPos, 1);
+					oldTeam = oTeam;
+					oldPos = oPos;
+					break forBreaker;
+				}
+			}
+		}
 
 		if (isZoneSimple(args.to)) {
 			// console.log('h->s')
-			o.S[args.pX][args.from].team[args.team].splice(args.cardInArray, 1);
 			if (args.options && args.options.moveTo && args.options.moveTo == 'top') {
 				o.S[args.pX][args.to].splice(0, 0, args.card)
 			} else {
@@ -1903,16 +2081,22 @@ Actions.moveCardToZone = function(args, o) {
 					name: 'moveCardToZone'
 				});
 			}
-		} else if (!isZoneSimple(args.from)) {
+		} else if (!isZoneSimple(args.to)) {
 			// console.log('h->h')
 			Actions.organisation({
-				nochange : true,
+				nochange: true,
 				c1: {
 					position: args.cardInArray == 0 ? 'leader' : 'support',
 					owner: args.pX,
 					zone: args.from,
-					team: Actions.cardPath({card:args.card, path:{players:[args.pX], zones:[args.from]}},o).team,
-					card : args.card
+					team: Actions.cardPath({
+						card: args.card,
+						path: {
+							players: [args.pX],
+							zones: [args.from]
+						}
+					}, o).team,
+					card: args.card
 				},
 				c2: {
 					position: 'support',
@@ -1920,10 +2104,10 @@ Actions.moveCardToZone = function(args, o) {
 					zone: args.to,
 					team: args.team,
 				}
-			} ,o);
+			}, o);
 
 		}
-		if (!o.S[args.pX][args.from].team[args.team].length) {
+		if (!o.S[args.pX][args.from].team[oldTeam].length && args.cause !== 'growth oldNinja') {
 			delete o.S[args.pX][args.from].team[args.team];
 			for (var i in o.S.battlefield) {
 				if (i == args.team || o.S.battlefield[i] == args.team) {
@@ -1939,7 +2123,7 @@ Actions.moveCardToZone = function(args, o) {
 		} else {
 			var ind = arraySearch(o.S[args.pX][args.from], args.card);
 		}
-		 // console.log('IND', ind)
+		// console.log('IND', ind)
 		if (ind !== null) {
 			if (args.from == 'stack') {
 				for (var i in o.S.stack) {
@@ -1953,7 +2137,7 @@ Actions.moveCardToZone = function(args, o) {
 			}
 
 			if (isZoneSimple(args.to)) {
-				 // console.log('s->s')
+				// console.log('s->s')
 				if (args.to == 'stack') {
 					o.S.stack.push({
 						card: args.card,
@@ -1982,12 +2166,19 @@ Actions.moveCardToZone = function(args, o) {
 				}
 				// console.log("\n\n\nSTACK")
 				// console.log(o.S.stack)
-			} 
-			else if (!isZoneSimple(args.to)) {
-				 // console.log('s->h')
+			} else if (!isZoneSimple(args.to)) {
+				// console.log('s->h')
 
 				result.updTable[0] = {};
-				Actions.createTeamFromCard(args, o);
+				if (!args.team) {
+					Actions.createTeamFromCard(args, o);
+				} 
+				else {
+					o.S[args.pX][args.to].team[args.team].splice(args.cardInArray, 0 , args.card);
+				}
+				if (args.injured) {
+					injureTarget(args.card, o)
+				}
 				if (!module) {
 					C[args.card].params.zona = args.to;
 					AnimationPush({
@@ -2003,7 +2194,7 @@ Actions.moveCardToZone = function(args, o) {
 		}
 	}
 	// if (module) result = Actions.addTriggerEffect(result, 'moveCardToZone', args, o);
-	
+
 	if (!result.updTable.length) delete result.updTable;
 	return result;
 }
@@ -2018,7 +2209,7 @@ Actions.shuffle = function(args, o) {
 	// console.log('exept'.red, exept)
 	for (var i in o.S[args.pX][args.zone]) {
 		var card = o.S[args.pX][args.zone][i];
-	// console.log('indexOf'.red, ~exept.indexOf(card))
+		// console.log('indexOf'.red, ~exept.indexOf(card))
 		if (!~exept.indexOf(card)) {
 			accK.push(card);
 			accV.push(o.Accordance[card]);
@@ -2032,7 +2223,7 @@ Actions.shuffle = function(args, o) {
 		return Math.random() - 0.5
 	})
 	for (var i in accK) {
-		o.Accordance[accK[i]] = accV[i]; 
+		o.Accordance[accK[i]] = accV[i];
 	}
 	// console.log(accV, accK)
 }
