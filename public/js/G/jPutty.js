@@ -291,7 +291,7 @@ function fillScroll(o){
     for (var i in G) {
         var thisFaceUp = faceUp;
         if (o.args.faceUp && ~o.args.faceUp.indexOf(G[i])) thisFaceUp = true;
-        params = Known[Accordance[G[i]]];
+        params = Known[Accordance[G[i]]] || {};
         var preparams = {'id':G[i],'X':0,'Y':0,'H':I.card.W,'W':I.card.W, faceUp:thisFaceUp, zindex:600};
         for (var i2 in preparams) {
             params[i2] = preparams[i2];
