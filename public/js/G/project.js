@@ -1688,7 +1688,7 @@ function createteam(o, o2) {
             return function() {
                 C[id].setZIndex(200);
             }
-        })()
+        })();
         C[o[i]].animation({
             X: posLeft + o2.X,
             Y: posTop + o2.Y,
