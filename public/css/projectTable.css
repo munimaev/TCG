@@ -74,6 +74,24 @@ body {
 .actionIcon.activateEffect1.disable {
     background-image: url('../pics/numberdisable1.png');   
 }
+.actionIcon.activateEffect2 {
+    background-image: url('../pics/number2.png');   
+}
+.actionIcon.activateEffect2.disable {
+    background-image: url('../pics/numberdisable2.png');   
+}
+.actionIcon.activateEffect3 {
+    background-image: url('../pics/number3.png');   
+}
+.actionIcon.activateEffect3.disable {
+    background-image: url('../pics/numberdisable3.png');   
+}
+.actionIcon.activateEffect4 {
+    background-image: url('../pics/number4.png');   
+}
+.actionIcon.activateEffect4.disable {
+    background-image: url('../pics/numberdisable4.png');   
+}
 .actionClose {
     position: absolute;
     width: 20%;
@@ -118,6 +136,16 @@ body {
     background: linear-gradient(135deg, #4bb8f0 1%,#3a8bc2 45%,#26558b 95%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4bb8f0', endColorstr='#26558b',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
+background: #feffff; /* Old browsers */
+background: -moz-linear-gradient(top,  #feffff 0%, #ddf1f9 35%, #a0d8ef 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feffff), color-stop(35%,#ddf1f9), color-stop(100%,#a0d8ef)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #feffff 0%,#ddf1f9 35%,#a0d8ef 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#a0d8ef',GradientType=0 ); /* IE6-9 */
+
+
     border-radius: 9px;
     padding: 10px;
     border: 2px solid #dfd495;
@@ -129,7 +157,7 @@ body {
 .cardPrewievWrap h6 ,
 .cardPrewievWrap p {
     line-height: 1em;
-    color: #FFF;
+    color: #000;
     padding: 0 0 0.1em;
     margin: 0px;
 }
