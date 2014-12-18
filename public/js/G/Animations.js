@@ -1156,10 +1156,12 @@ var AN = {
 			// console.log('---!--- prepareEffect')
 			// console.log(args);
 			var question = 'question' + (args.step || '');
-				if (args.effectType == 'trigger')
-				Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey][question](args, getUniversalObject());
-				if (args.effectType == 'activate')
-				Known[Accordance[args.card]].effect.activate[args.effectKey][question](args, getUniversalObject());
+				if (args.effectType == 'trigger') {
+					Known[Accordance[args.card]].effect.trigger[args.trigger][args.effectKey][question](args, getUniversalObject());
+				}
+				if (args.effectType == 'activate') {
+					Known[Accordance[args.card]].effect.activate[args.effectKey][question](args, getUniversalObject());
+				}
 		},
 		'adEndOfTurn' : function() {
 			AN.preStack.countDown();
@@ -1196,6 +1198,19 @@ var AN = {
 		},
 		'adRemoveCardFromGame' : function(args) {
 			AN.preStack.countDown();
+		},
+		'adShuffle' : function(args) {
+			AN.preStack.countDown();
+		},
+		'shuffle' : function(args) {
+			AN.preStack.countDown();
+		},
+		'adCoin' : function (args) {
+			AN.preStack.countDown();
+		},
+		'coin' : function (args) {
+			Actions.coin(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,1000)
 		},
 		'removeCardFromGame' : function(args) {
 			Actions.removeCardFromGame(args, getUniversalObject());
