@@ -243,22 +243,24 @@ var Can = {
             return true;
         }
         else {
-            // console.log(  
-            //  o.S.phase == 'mission' 
-            //  , arraySearch(o.S[args.pX].hand, args.card) !== null
-            //  , o.Known[o.Accordance[args.card]]
-            //  , '\n(' 
-            //  , o.Known[o.Accordance[args.card]].type == 'M' 
-            //  , '&&'
-            //  , o.S[args.pX].counters.playedMission == 0
-            //  , '||'
-            //  , o.Known[o.Accordance[args.card]].type == 'N'
-            //  , '&&'
-            //  ,  o.S.counters.playedNinjaActivePlayer == 0 
-            //  , ')\n'
-            //  , o.Known[o.Accordance[args.card]].owner == args.pX 
-            //  , o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec
-            //  )
+            if (module) {
+            console.log(  
+                 o.S.phase == 'mission' 
+                 , arraySearch(o.S[args.pX].hand, args.card) !== null
+                 , o.Known[o.Accordance[args.card]]
+                 , '\n(' 
+                 , o.Known[o.Accordance[args.card]].type == 'M' 
+                 , '&&'
+                 , o.S[args.pX].counters.playedMission == 0
+                 , '||'
+                 , o.Known[o.Accordance[args.card]].type == 'N'
+                 , '&&'
+                 ,  o.S.counters.playedNinjaActivePlayer == 0 
+                 , ')\n'
+                 , o.Known[o.Accordance[args.card]].owner == args.pX 
+                 , o.S[args.pX].turnCounter >=  o.Known[o.Accordance[args.card]].ec
+                 )
+            }
         }
     },
     playJutsu : function(args, o) {
