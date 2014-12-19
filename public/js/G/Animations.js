@@ -783,7 +783,7 @@ var AN = {
 
 			$( '#noir' ).css( 'width', I.W ).css( 'height', I.H ).html( 'Выберите исполльзующнго для техники.' );
 			
-			condidateCount = Can.areAvailableTargets(args, o);
+			condidateCount = Can.areAvailableUsers(args, o);
 			for (var i in condidateCount) {
 				C[condidateCount[i]].setZIndex(1202);
 			}
