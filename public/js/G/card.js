@@ -1456,124 +1456,15 @@ function Card(o) {
         $('#prewiev').append($prew);
         var known = Known[Accordance[this.id]];
         var $prewContent = $('<div />');
-        $prewContent
-            .append(
-                $('<table />', {
-                    'border': 0,
-                    'cellpadding': 0,
-                    'cellspacing': 0,
-                    'cols': 3,
-                    'width': '100%'
-                }).append(
-                    $('<tbody />', {
-                        'valign': 'top'
-                    }).append(
-                        $('<tr />', {}).append(
-                            $('<td />', {
-                                'colspan': 8
-                            }).append(
-                                $('<h3 />', {
-                                    'text': this.id + ' ' + this.params.name
-                                })
-                            )
-                        ).append(
-                            $('<td />', {
-                                'width': '2em'
-                            }).append(
-                                $('<img />', {
-                                    'src': 'public/pics/H' + hc + '.png',
-                                    'width': '2em',
-                                    'height': '2em',
-                                    'margin-top': '-5px'
-                                })
-                            )
-                        ).append(
-                            $('<td />', {
-                                'width': '2em'
-                            }).append(
-                                $('<img />', {
-                                    'src': 'public/pics/T' + ec + '.png',
-                                    'width': '2em',
-                                    'height': '2em',
-                                    'margin-top': '-5px'
-                                })
-                            )
-                        )
-                    )
-                )
 
-        )
-        if (known.hasOwnProperty('mental')) {
-            $p = $('<p>', {}); 
-            
-            $p.append(
-                $('<img />', {
-                    'src': 'public/pics/icons/mental.png',
-                    'width' : '1em'
-                })
-            );
-            
-            $p.append(
-                $('<b />', {
-                    'text': ' Ментальная сила: '+ known.mental
-                })
-            );
-
-            $prewContent.append($p);
-
-        }
-        if (known.effectText) {
-            if (known.effectText.effectName) {
-                $prewContent.append(
-                    $('<p>', {
-                        'text': known.effectText.effectName
-                    })
-                );
-            } else {
-                $prewContent.append(
-                    $('<p>', {
-                        'text': ' '
-                    })
-                );
-            }
-            if (known.effectText.effects) {
-                for (var i in known.effectText.effects) {
-                    if (known.effectText.effects[i].when) {
-                        $p = $('<p>', {}); 
-                        $p.append('<b>'+ known.effectText.effects[i].when + '</b></br>')
-                        $p.append('<b><i>' + known.effectText.effects[i].cost + '</i></b>')
-                        $p.append(known.effectText.effects[i].effect)
-                        $prewContent.append($p);
-                    }
-                    else {
-                        var effect = '';
-                        if (known.effectText.effects[i].effect) {
-                            effect = known.effectText.effects[i].effect;
-                        }
-                        if (known.effectText.effects[i].valid) {
-                            effect = "Дйствительный: " + effect;
-                        }
-                        $prewContent.append(
-                            $('<p>', {
-                                'text': effect
-                            })
-                        );
-                    }
-                }
-            }
-        }
-
-        var atributes = '=)';
-       
-
-        if (this.params.type == 'N') {
+        if (this.params.type == 'N' || this.params.type == 'M') {
             $prewContent
                 .append(
                     $('<table />', {
                         'border': 0,
                         'cellpadding': 0,
                         'cellspacing': 0,
-                        'cols': 9,
+                        'cols': 3,
                         'width': '100%'
                     }).append(
                         $('<tbody />', {
@@ -1581,61 +1472,226 @@ function Card(o) {
                         }).append(
                             $('<tr />', {}).append(
                                 $('<td />', {
-                                    'colspan': 3
-                                }).append(
-                                    $('<h6 />', {
-                                        'text': 'Здоровый'
-                                    })
-                                )
-                            ).append(
-                                $('<td />', {
-                                    'colspan': 3
-                                }).append(
-                                    $('<h6/>', {
-                                        'text': 'Атрибут'
-                                    })
-                                )
-                            ).append(
-                                $('<td />', {
-                                    'colspan': 3
-                                }).append(
-                                    $('<h6 />', {
-                                        'text': 'Раненный'
-                                    })
-                                )
-                            ).css('text-align', 'center')
-                        ).append(
-                            $('<tr />', {}).append(
-                                $('<td />', {
-                                    'colspan': 3
+                                    'colspan': 8
                                 }).append(
                                     $('<h3 />', {
-                                        'class': 'normalPower',
-                                        'text': this.params.ah + '/' + this.params.sh
-                                    }).css('color', '#FFF')
-                                )
-                            ).append(
-                                $('<td />', {
-                                    'colspan': 3
-                                }).append(
-                                    $('<h3 />', {
-                                        'text': atributes
+                                        'text': this.id + ' ' + this.params.name
                                     })
                                 )
                             ).append(
                                 $('<td />', {
-                                    'colspan': 3
+                                    'width': '2em'
                                 }).append(
-                                    $('<h3 />', {
-                                        'class': 'power powerInjured',
-                                        'text': this.params.ai + '/' + this.params.si
+                                    $('<img />', {
+                                        'src': 'public/pics/H' + hc + '.png',
+                                        'width': '2em',
+                                        'height': '2em',
+                                        'margin-top': '-5px'
                                     })
                                 )
-                            ).css('text-align', 'center')
+                            ).append(
+                                $('<td />', {
+                                    'width': '2em'
+                                }).append(
+                                    $('<img />', {
+                                        'src': 'public/pics/T' + ec + '.png',
+                                        'width': '2em',
+                                        'height': '2em',
+                                        'margin-top': '-5px'
+                                    })
+                                )
+                            )
                         )
                     )
 
             )
+            if (known.hasOwnProperty('mental')) {
+                $p = $('<p>', {}); 
+                
+                $p.append(
+                    $('<img />', {
+                        'src': 'public/pics/icons/mental.png',
+                        'width' : '1em'
+                    })
+                );
+                
+                $p.append(
+                    $('<b />', {
+                        'text': ' Ментальная сила: '+ known.mental
+                    })
+                );
+
+                $prewContent.append($p);
+
+            }
+            if (known.effectText) {
+                if (known.effectText.effectName) {
+                    $prewContent.append(
+                        $('<p>', {
+                            'text': known.effectText.effectName
+                        })
+                    );
+                } else {
+                    $prewContent.append(
+                        $('<p>', {
+                            'text': ' '
+                        })
+                    );
+                }
+                if (known.effectText.effects) {
+                    for (var i in known.effectText.effects) {
+                        if (known.effectText.effects[i].when) {
+                            $p = $('<p>', {}); 
+                            $p.append('<b>'+ known.effectText.effects[i].when + '</b></br>')
+                            $p.append('<b><i>' + known.effectText.effects[i].cost + '</i></b>')
+                            $p.append(known.effectText.effects[i].effect)
+                            $prewContent.append($p);
+                        }
+                        else {
+                            var effect = '';
+                            if (known.effectText.effects[i].effect) {
+                                effect = known.effectText.effects[i].effect;
+                            }
+                            if (known.effectText.effects[i].valid) {
+                                effect = "Дйствительный: " + effect;
+                            }
+                            $prewContent.append(
+                                $('<p>', {
+                                    'text': effect
+                                })
+                            );
+                        }
+                    }
+                }
+            }
+
+            var atributes = '=)';
+           
+
+            if (this.params.type == 'N') {
+                $prewContent
+                    .append(
+                        $('<table />', {
+                            'border': 0,
+                            'cellpadding': 0,
+                            'cellspacing': 0,
+                            'cols': 9,
+                            'width': '100%'
+                        }).append(
+                            $('<tbody />', {
+                                'valign': 'top'
+                            }).append(
+                                $('<tr />', {}).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h6 />', {
+                                            'text': 'Здоровый'
+                                        })
+                                    )
+                                ).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h6/>', {
+                                            'text': 'Атрибут'
+                                        })
+                                    )
+                                ).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h6 />', {
+                                            'text': 'Раненный'
+                                        })
+                                    )
+                                ).css('text-align', 'center')
+                            ).append(
+                                $('<tr />', {}).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h3 />', {
+                                            'class': 'normalPower',
+                                            'text': this.params.ah + '/' + this.params.sh
+                                        }).css('color', '#FFF')
+                                    )
+                                ).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h3 />', {
+                                            'text': atributes
+                                        })
+                                    )
+                                ).append(
+                                    $('<td />', {
+                                        'colspan': 3
+                                    }).append(
+                                        $('<h3 />', {
+                                            'class': 'power powerInjured',
+                                            'text': this.params.ai + '/' + this.params.si
+                                        })
+                                    )
+                                ).css('text-align', 'center')
+                            )
+                        )
+
+                )
+            }
+        }
+
+        if (this.params.type == 'J') {
+            $jHeader = $('<h3/>',{text:this.params.name});
+            var jCard = Known[Accordance[this.id]];
+            for (var i in jCard.cost) {
+                for (var j in jCard.cost[i]) {
+                    var elPic = 'void';
+                    switch (jCard.cost[i][j]) {
+                        case 'L':
+                            elPic = 'lightning';
+                            break;
+                        case 'F':
+                            elPic = 'fire';
+                            break;
+                        case 'W':
+                            elPic = 'wind';
+                            break;
+                        case 'E':
+                            elPic = 'earth';
+                            break;
+                        case 'A':
+                            elPic = 'water';
+                            break;
+                    }
+                    $prewContent.append($('<img />', {src:'public/pics/'+elPic+'.png', height: '1.5em', width:'auto'}).css({'float':'right'}))
+                }
+                $jHeader.append($('<hr/>'));
+            }
+            $prewContent.append($jHeader);
+
+            if (jCard.hasOwnProperty('effectText')) {
+                if (jCard.effectText.hasOwnProperty('requirement')) {
+                    $jReq = $('<p />')
+                    $jReq.append($('<b />',{'text':'Условие: '}))
+                    $jReq.append(jCard.effectText.requirement);
+                    $prewContent.append($jReq);
+                }
+                if (jCard.effectText.hasOwnProperty('target')) {
+                    $jTrg = $('<p />')
+                    $jTrg.append($('<b />',{'text':'Цель: '}))
+                    $jTrg.append(jCard.effectText.target);
+                    $prewContent.append($jTrg);
+                }
+                if (jCard.effectText.hasOwnProperty('effect')) {
+                    $jEff = $('<p />')
+                    $jEff.append($('<b />',{'text':'Эффект: '}))
+                    $jEff.append(jCard.effectText.effect);
+                    $prewContent.append($jEff);
+                }
+            }
+
+
         }
         $prew.append($prewContent);
         if ($prewContent.height() > H - 20) {
