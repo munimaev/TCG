@@ -278,7 +278,9 @@ var Can = {
         			break;
         		}
         	}
-        	if (!Can.areAvailableUsers(args, o).length) return false; 
+        	if (!Can.areAvailableUsers(args, o).length) {
+                return false; 
+            }
         	delete args.targetKey;
             return true;
         }
@@ -294,20 +296,24 @@ var Can = {
         var jutsu = o.Known[o.Accordance[args.card]];
         var target = args.targetKey ? jutsu.target[args.targetKey] : jutsu.target[0];
 
-        var player = target.player == 'you' ? args.pX : (args.pX == 'pA' ? 'pB' : 'pa');
-        if (target.zone == 'battle') {
-            var role = player == o.S.activePlayer ? 'attack' : 'block';
+        var player = target.player == 'you' ? args.pX : (args.pX == 'pA' ? 'pB' : 'pA');
+        
+        role = typeof target.zone == 'string' ? [target.zone] : target.zone;
+        for (var i in role) {
+            if (role[i] == 'battle') {
+                role[i] = player == o.S.activePlayer ? 'attack' : 'block';
+            }
         }
-        else {
-            role = target.zone;
-        }
+                    
 
         var result = [];
-        for (var i in o.S[player][role].team) {
-            for (var c in o.S[player][role].team[i]) {
-                var ninja = o.S[player][role].team[i][c];
-                if ( target.func(o.Known[o.Accordance[ninja]], o)) {
-                    result.push(ninja);
+        for (var r in role) {
+            for (var i in o.S[player][role[r]].team) {
+                for (var c in o.S[player][role[r]].team[i]) {
+                    var ninja = o.S[player][role[r]].team[i][c];
+                    if ( target.func(o.Known[o.Accordance[ninja]],ninja, o)) {
+                        result.push(ninja);
+                    }
                 }
             }
         }
@@ -320,7 +326,7 @@ var Can = {
 		for (var i in o.S[args.pX][role].team) {
 			for (var c in o.S[args.pX][role].team[i]) {
 				var ninja = o.S[args.pX][role].team[i][c];
-				if ( o.Known[o.Accordance[args.card]].requirement(o.Known[o.Accordance[ninja]], o)) {
+				if ( o.Known[o.Accordance[args.card]].requirement(o.Known[o.Accordance[ninja]],ninja, o)) {
 					result.push(ninja);
 				}
 			}
