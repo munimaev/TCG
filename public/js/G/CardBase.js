@@ -1286,7 +1286,13 @@ var CardBase = {
                                 players: [o.Known[o.Accordance[args.self]].owner],
                                 zones: ['village', 'attack', 'block']
                             }
-                        }, o);
+                        }, o) && Actions.getCardForCondition({
+                            path: {
+                                players: [o.Known[o.Accordance[args.self]].owner],
+                                zones: ['village', 'attack', 'block']
+                            },
+                            atributes: ['Manipulation'],
+                        }, o).length;
                     },
                     "getPowerMod": function(args, o) {
                         var result = {
@@ -1426,6 +1432,7 @@ var CardBase = {
         "name": "Gaara of the Desert",
         "effectText": "",
         "statuses": ['Sand'],
+        "atributes": ['Sand'],
         "effect": {}
     },
     "n1418": {
@@ -1522,6 +1529,7 @@ var CardBase = {
         "name": "Gaara of the Desert",
         "effectText": "",
         "statuses": ['Sand'],
+        "atributes": ['Sand'],
         "effect": {}
     },
     "j001": {
@@ -1769,7 +1777,7 @@ var CardBase = {
         "elements": "W",
         "name": "Secret White Move: Chikamatsu's Ten Puppets",
         "cost": [
-            ['1']
+            ['W','X']
         ],
         "costText": [
             ['1']
@@ -1815,7 +1823,7 @@ var CardBase = {
         "elements": "W",
         "name": "Substitution by puppet",
         "cost": [
-            ['1']
+            ['W','F']
         ],
         "costText": [
             ['1']
@@ -1861,7 +1869,7 @@ var CardBase = {
         "elements": "W",
         "name": "Wind Scythe jutsu",
         "cost": [
-            ['1']
+            ['W','W']
         ],
         "costText": [
             ['1']
@@ -1953,20 +1961,29 @@ var CardBase = {
         "elements": "W",
         "name": "Sand burai",
         "cost": [
-            ['1']
+            ['W','W']
         ],
         "costText": [
-            ['1']
+            ['W','W']
         ],
-        "effectText": "",
-        "requirement": function(card, o) {
-            return true;
+		"effectText": {
+			"requirement" : "Боевой атрибут песок.",
+			"target" : "1 ренный ниндзя.",
+			"effect" : "Переместите цель в сброс."
+		},
+        "requirement": function(card,cardID, o) {
+        	if (card.atributes && ~card.atributes.indexOf('Sand')) {
+        		return true;
+        	}
         },
         "target": [{
-            player: 'you',
+            player: 'opp',
             zone: 'battle',
-            func: function() {
-                return true;
+            func: function(card,cardID, o) {
+                if (!Actions.isHealt(cardID, o)) {
+                	return true;
+                }
+                return false;
             }
         }],
         "effect": {
@@ -1974,13 +1991,27 @@ var CardBase = {
                 "resolve": [{
                     func: function(result, args, o) {
                         if (!('toStack' in result)) result.toStack = {};
-                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
-                        result.toStack.increaseNinjaPower.push({
-                            card: args.target[0],
-                            attack: 5,
-                            support: 2,
-                        });
-                        return result;
+	                    if (!('adMoveCardToZone' in result)) result.toStack.adMoveCardToZone = [];
+                        for (var i in args.target) {
+                            var opp = o.Known[o.Accordance[args.target[i]]].owner;
+                            var path = Actions.cardPath({
+                                card: args.target[i],
+                                path: {
+                                    players: [opp],
+                                    zones: ['attack', 'block', 'village']
+                                }
+                            },o )
+                            result.toStack.adMoveCardToZone.push({
+                                pX: opp,
+                                card: args.target[i],
+                                cause: 'cardEffect',
+                                from: path.zone,
+                                to: 'discard',
+                                team: null
+                            })
+                        }
+	                    return result;
+
                     }
                 }]
             }
