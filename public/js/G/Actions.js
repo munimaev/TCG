@@ -1920,7 +1920,7 @@ Actions.getCardForCondition = function(args, o) {
 				if (!args.greedy) return false;
 				statusCheck == false;
 			}
-			if (args.statuses.length == checked) {
+			if (!args.hasOwnProperty('statuses') || args.statuses.length == checked) {
 				statusCheck == true;
 			}
 		}
@@ -1938,7 +1938,7 @@ Actions.getCardForCondition = function(args, o) {
 				if (!args.greedy) return false;
 				statusCheck == false;
 			}
-			if (args.statuses.length == checked) {
+			if (args.atributes.length == checked) {
 				statusCheck == true;
 			}
 		}
@@ -2231,6 +2231,14 @@ Actions.randomSort = function(args, o) {
 	o.S[args.pX][args.zone].sort(function() {
 		return Math.random() - 0.5
 	})
+}
+Actions.getJutsuCost = function(cardID, o) {
+
+	var card = o.Known[o.Accordance[cardID]];
+	if (card.type != 'J') {
+		return null;
+	}
+	return card.cost;
 }
 if (module) {
 	module.exports = Actions;
