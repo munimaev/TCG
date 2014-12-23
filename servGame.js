@@ -928,14 +928,20 @@ function pressNextBtn(d) {
 }
 
 function LoadStack(table) {
-	for (var j in table.Snapshot.stack) {
+	// table.meta.loadStack = true;
+	var len = table.Snapshot.stack.length;
+	// var jutsuObj = table.Snapshot.stack[ len - 1 ];
+	// table.stack.splice(0, 0, {
+	// 	resolveJutsuInStack: [jutsuObj]
+	// });
+	for (var j = table.Snapshot.stack.length - 1; j >= 0; j--) {
 		var jutsuObj = table.Snapshot.stack[j];
 		table.stack.splice(0, 0, {
 			resolveJutsuInStack: [jutsuObj]
 		});
 	}
-	console.log("\n\ntable.stack")
-	console.log(table.stack)
+	// console.log("\n\ntable.stack")
+	// console.log(table.stack)
 }
 
 function addToTeam(d) {
