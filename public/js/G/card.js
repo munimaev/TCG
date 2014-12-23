@@ -1418,8 +1418,10 @@ function Card(o) {
     };
 
     this.showPrewiev = function() {
-        if (this.params.prewiev || !this.params.faceUp)
+        if (this.params.prewiev || !this.params.faceUp){
+            console.log(this.params.prewiev, !this.params.faceUp)
             return true;
+        }
         var offset = this.$id.offset();
         var X = offset.top - (this.params.H * 4 / 92);
         var Y = (offset.left + this.params.H + (this.params.H / 20));
@@ -1455,9 +1457,26 @@ function Card(o) {
         }
         $('#prewiev').append($prew);
         var known = Known[Accordance[this.id]];
-        var $prewContent = $('<div />');
+        var $prewContent = this.prewievContent();
+        $prew.append($prewContent);
+        if ($prewContent.height() > H - 20 ) {
+            var r = $prewContent.height() - H + 20
+            $prew.css('height', H + r);
+            if (this.params.zona == 'hand') {
+                $prew.css('top', topPrew - r);
+            }
+        }
+        this.params.prewiev = true;
+    };
 
+    this.prewievContent = function() {
+
+        var $prewContent = $('<div />');
+        var known = Known[Accordance[this.id]];
         if (this.params.type == 'N' || this.params.type == 'M') {
+            var hc = Known[Accordance[this.id]].hc;
+            var ec = Known[Accordance[this.id]].ec;
+            var name = typeof known.name == "string" ? known.name : known.name[0];
             $prewContent
                 .append(
                     $('<table />', {
@@ -1475,7 +1494,7 @@ function Card(o) {
                                     'colspan': 8
                                 }).append(
                                     $('<h3 />', {
-                                        'text': this.id + ' ' + this.params.name
+                                        'text': this.id + ' ' + name
                                     })
                                 )
                             ).append(
@@ -1689,17 +1708,24 @@ function Card(o) {
                     $jEff.append(jCard.effectText.effect);
                     $prewContent.append($jEff);
                 }
+                if (jCard.effectText.hasOwnProperty('expert')) {
+                    for (var i in jCard.effectText.expert) {
+                        $jExp = $('<p />')
+                        if (jCard.effectText.expert[i].hasOwnProperty('requirement')) {
+                            $jExp.append($('<b />',{'text':'Эксперт '+jCard.effectText.expert[i].requirement+': '}))
+                        } 
+                        else {
+
+                        }
+                        $jExp.append(jCard.effectText.expert[i].effect);
+                        $prewContent.append($jExp);
+                    }
+                }
             }
-
-
         }
-        $prew.append($prewContent);
-        if ($prewContent.height() > H - 20) {
-            var r = $prewContent.height() - H + 20
-            $prew.css('height', H + r).css('top', topPrew - r)
-        }
-        this.params.prewiev = true;
-    };
+        return $prewContent;
+
+    }
 
     this.setZIndex = function(ind) {
         var ind = ind || this.params.zindex || 0;
