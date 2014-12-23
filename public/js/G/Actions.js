@@ -987,6 +987,12 @@ var Actions = {
 			}
 		}
 	},
+	'adInjureTarget' : function(args) {
+		var result = {
+			'injureTarget': [args.card]
+		};
+		return result;
+	},
 	'injureTarget': function(cardID, o) {
 		if (!(cardID in o.S.statuses)) o.S.statuses[cardID] = {};
 		o.S.statuses[cardID].injured = true;
@@ -1417,6 +1423,11 @@ var Actions = {
 	'resolveJutsuInStack': function(args, o) {
 		// console.log('ARGS', args)
 		var result = {};
+		if (!Can.resolveJutsuInStack({
+			jutsu : args.card
+		},o)) {
+			return result;
+		}
 		var jutsu = o.Known[o.Accordance[args.card]];
 		if (!module) {
 			AnimationPush({
@@ -2240,6 +2251,8 @@ Actions.getJutsuCost = function(cardID, o) {
 	}
 	return card.cost;
 }
+
 if (module) {
+	var Can = require(__dirname+'/Can.js');
 	module.exports = Actions;
 }
