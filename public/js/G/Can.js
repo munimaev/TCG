@@ -296,23 +296,58 @@ var Can = {
         var jutsu = o.Known[o.Accordance[args.card]];
         var target = args.targetKey ? jutsu.target[args.targetKey] : jutsu.target[0];
 
-        var player = target.player == 'you' ? args.pX : (args.pX == 'pA' ? 'pB' : 'pA');
-        
-        role = typeof target.zone == 'string' ? [target.zone] : target.zone;
-        for (var i in role) {
-            if (role[i] == 'battle') {
-                role[i] = player == o.S.activePlayer ? 'attack' : 'block';
+        var result = [];
+
+        if (target.hasOwnProperty('alias')) {
+            switch (target.alias) {
+                case 'jutsuInStack':
+                    for (var i in o.S.stack) {
+                        result.push(o.S.stack[i].card);
+                    }
+                    result = result.concat()
+                    break;
+                case 'everyNinjaBattlingAgainstTheUser':
+                    var users = Actions.areAvailableUsers(args, o);
+                    var attacker = o.S.activePlayer;
+                    var blocker = attacker == 'pA' ? 'pB' : 'pA';
+
+
+                    for (var i in users) {
+                        var user = Actions.cardPath({
+                            card: args.card,
+                            players: [args.pX],
+                            zones : ['attack', 'block']
+                        }, o)
+                        for (var j in o.S.battlefield) {
+                            var opp = user.player == 'pA' ? 'pB' : 'pA';{
+                            var zone = user.zone == 'attack' ? 'block' : 'attack';
+                            if (j == user.team && o.S.battlefield[j]) {
+                                result = result.concat(o.S[opp][zone].team[o.S.battlefield[j]])
+                            }
+                            else if (o.S.battlefield[j] == user.team) {
+                                result = result.concat(o.S[opp][zone].team[j])
+                            }
+                        }
+                    }
+                    break;
+                }
             }
         }
-                    
-
-        var result = [];
-        for (var r in role) {
-            for (var i in o.S[player][role[r]].team) {
-                for (var c in o.S[player][role[r]].team[i]) {
-                    var ninja = o.S[player][role[r]].team[i][c];
-                    if ( target.func(o.Known[o.Accordance[ninja]],ninja, o)) {
-                        result.push(ninja);
+        else {
+            var player = target.player == 'you' ? args.pX : (args.pX == 'pA' ? 'pB' : 'pA');
+            role = typeof target.zone == 'string' ? [target.zone] : target.zone;
+            for (var i in role) {
+                if (role[i] == 'battle') {
+                    role[i] = player == o.S.activePlayer ? 'attack' : 'block';
+                }
+            }
+            for (var r in role) {
+                for (var i in o.S[player][role[r]].team) {
+                    for (var c in o.S[player][role[r]].team[i]) {
+                        var ninja = o.S[player][role[r]].team[i][c];
+                        if ( target.func(o.Known[o.Accordance[ninja]],ninja, o)) {
+                            result.push(ninja);
+                        }
                     }
                 }
             }
@@ -369,8 +404,8 @@ var Can = {
        			var itIs = false;
        			nextCardInChackra:
        			for (var j = chackraDefault.length - 1; j >= 0; j--) { // перебираем карты в чакре
-       				// console.log(cost[i] , chackraDefault[j])
-       				if (cost[i] == '1') {
+       				console.log(cost[i] , chackraDefault[j])
+       				if (cost[i] == '1' || cost[i] == 'X') {
        					itIs = true;
        					chackraDefault.splice(j,0)
        					continue nextElementInCost;
@@ -414,6 +449,24 @@ var Can = {
              , o.Known[o.Accordance[o.card]].owner == o.pX)
         return false;
     },
+    /**
+     * Проерка может ли эффект техники быть рассмотрена в стеке. Для этого карт техники должна еще находиться в стеке. Использующий должен быть на поле боя и отвечать требованиеям техники. Цель так жедоллна отвечать требованиям.
+     * @param  {[type]} args Обхект с аргументами
+     *                       args.jutsu индификатор техники эффект кторой рассматривается
+     * @param  {[type]} o    [description]
+     * @return {[type]}      [description]
+     */
+    resolveJutsuInStack : function(args,o) {
+        var result = true;
+        var inStack = false;
+        for (var i in o.S.stack) {
+            if (o.S.stack[i].card == args.jutsu) {
+                inStack = true;
+                break;
+            }
+        }
+        return inStack;
+    }
 }
 if (module) {
     Actions = require(__dirname+'/Actions.js');
