@@ -1,5 +1,6 @@
 if (module) {
-    var Can = require('./Can.js');;
+    var Can = require('./Can.js');
+    var Actions = require('./Actions.js');
 }
 var CardBase = {
     "n1092": {
@@ -1780,11 +1781,17 @@ var CardBase = {
             ['W','X']
         ],
         "costText": [
-            ['1']
+            ['W','X']
         ],
-        "effectText": "",
+        "effectText": {
+            "requirement" : "Боевой атрибут 'Манипуляция' и цена вывода 4 или более.",
+            "target" : "Каждый ниндзя сражающийся против используюшего.",
+            "effect" : "Покажите Х врхних карт вашей колоды. Цель получает 1 попреждение за каждую карту ниндзя показанную таким образом. Затем верните эти карты в колоду и перемешайте ее.",
+        },
         "requirement": function(card, o) {
-            return true;
+            if (card.atributes && ~card.atributes.indexOf('Manipulation')) {
+                return true;
+            }
         },
         "target": [{
             player: 'you',
@@ -1872,30 +1879,65 @@ var CardBase = {
             ['W','W']
         ],
         "costText": [
-            ['1']
+            ['W','W']
         ],
-        "effectText": "",
+        "effectText": {
+            "target" : "1 сыгранная техника.",
+            "effect" : "Отмените цель и переместите ее в чакру владельца.",
+            "expert": [{
+                "requirement" : "Темари",
+                "effect" : "Раньте ниндзя используюшего цель.",
+
+            }]
+        },
         "requirement": function(card, o) {
             return true;
         },
         "target": [{
-            player: 'you',
-            zone: 'battle',
-            func: function() {
-                return true;
-            }
+            "alias" : "everyNinjaBattlingAgainstTheUser"
         }],
         "effect": {
             "trigger": {
                 "resolve": [{
                     func: function(result, args, o) {
                         if (!('toStack' in result)) result.toStack = {};
-                        if (!('increaseNinjaPower' in result.toStack)) result.toStack.increaseNinjaPower = [];
-                        result.toStack.increaseNinjaPower.push({
-                            card: args.target[0],
-                            attack: 5,
-                            support: 2,
-                        });
+                        if (!('adMoveCardToZone' in result)) result.toStack.adMoveCardToZone = [];
+
+                        var users = [];
+                        for (var i in args.target) {
+                            for (var j in o.S.stack) {
+                                if (o.S.stack[j].card == args.target[i]) {
+                                    users = users.concat(o.S.stack[j].user);
+                                }
+                            }
+                            var card = o.Known[o.Accordance[args.target[i]]];
+                            result.toStack.adMoveCardToZone.push({
+                                pX: card.owner,
+                                card: args.target[i],
+                                cause: 'cardEffect',
+                                from: 'stack',
+                                to: 'chackra',
+                                team: null
+                            })
+                        }
+                        var hasExpert = false;
+                        for (var i in args.user) {
+                            var name = o.Known[o.Accordance[args.user[i]]].name;
+                            var names = typeof name == "string" ? [name] : name;
+                            if (~names.indexOf('Gaara of the Desert')) {
+                                hasExpert = true;
+                                break;
+                            }
+                        }
+                        if (hasExpert && users.length) {
+                            if (!('adInjureTarget' in result)) result.toStack.adInjureTarget = [];
+                            for (var i in users)
+                            result.toStack.adInjureTarget.push({
+                                card: users[i],
+                                cause: 'cardEffect'
+                            })
+                        }
+
                         return result;
                     }
                 }]
