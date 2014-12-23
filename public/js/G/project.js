@@ -1648,6 +1648,7 @@ function createteam(o, o2) {
         C[o[0]].params.team = o2.team;
         C[o[0]].params.teamPosition = 'leader';
         C[o[0]].changePower();
+        C[o[0]].params.faceUp = true;
 
     }
 
@@ -1710,6 +1711,7 @@ function createteam(o, o2) {
         C[o[i]].params.teamPosition = 'support';
         C[o[i]].removeTeamPower(o2.player);
         C[o[i]].changePower();
+        C[o[i]].params.faceUp = true;
     }
     if (o[0]) {
         C[o[0]].addTeamPower(o2.player);
