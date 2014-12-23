@@ -536,6 +536,7 @@ var AN = {
 				if (playingJutsu[i][j].card != null) {
 					classCircle += ' payd';
 				}
+				console.log(playingJutsu[i][j])
 				barConteiner.append($('<div />', {
 					'class' : classCircle
 				})
@@ -904,10 +905,12 @@ var AN = {
 							for (var k in chackra) {
 								if (Meta.playingJutsu[i][j].card == null
 									&& (Meta.playingJutsu[i][j].element == chackra[k]
-										|| Meta.playingJutsu[i][j].element == '1' )) 
+										|| Meta.playingJutsu[i][j].element == '1'
+										|| Meta.playingJutsu[i][j].element == 'X' )) 
 								{
 									card.select(true);
 									isPaid  = true;
+									вот где-то тут надо добавить добавление выбранной карты в цену техники в виде массива для оплаты значения X
 									Meta.playingJutsu[i][j].card = card.id;
 									continue toNextElementInCost;
 								}
@@ -1211,6 +1214,13 @@ var AN = {
 		'coin' : function (args) {
 			Actions.coin(args, getUniversalObject());
 			setTimeout(AN.preStack.countDown,1000)
+		},
+		'adInjureTarget' : function(args) {
+			AN.preStack.countDown();
+		},
+		'injureTarget' : function(args) {
+			Actions.injureTarget(args, getUniversalObject());
+			setTimeout(AN.preStack.countDown,500)
 		},
 		'removeCardFromGame' : function(args) {
 			Actions.removeCardFromGame(args, getUniversalObject());
