@@ -85,6 +85,17 @@ app.get('/lobby', function(req, res){
 	}
 });
 
+app.get('/decks', function(req, res){
+  if (req.session.login) {
+    req.session.id == req.cookies['connect.sid'];
+    res.render('index.ejs', { myLayout: 'decks', session : req.session })
+  }
+  else {
+    res.writeHead(303, {'Location': '/login'});
+    res.end();
+  }
+});
+
 app.use('/public', express.static(__dirname + '/public'));
 
 // var usersData = {};
