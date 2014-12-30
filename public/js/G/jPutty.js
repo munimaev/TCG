@@ -22,28 +22,6 @@ var G = {
     selectedCard: null,
     transferInitiative : false
 }
-var D = { // as Dictionary
-    names : {
-        deck: {
-            rus : 'Колода'
-        },
-        chackra : {
-            rus : 'Чакра'
-        },
-        discard : {
-            rus : 'Сброс'
-
-        }
-    },
-    colors : {
-        L : { light : 'EB77EF' , dark : '990699'},
-        F : { light : 'ED7676' , dark : '990608'},
-        W : { light : '3F789B' , dark : '055194'},
-        E : { light : 'E7ED76' , dark : '9B9B06'},
-        A : { light : '7BF7EF' , dark : '069E9E'},
-        V : { light : 'B5B5B5' , dark : '666666'}
-    }
-}
 
 $( document ).ready(function() {
 
