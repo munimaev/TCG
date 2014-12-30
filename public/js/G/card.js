@@ -33,6 +33,7 @@ function Card(o) {
      * @param {[type]} upd Необязательныей аргумент, в содержаться пармаетры которые необходимо одновить.
      */
     this.setAllParams = function(upd) {
+        var S = S || false;
         var upd = upd || null;
         this.params = {
             action: false,
@@ -78,7 +79,7 @@ function Card(o) {
             hc: ('hc' in o) ? o.hc : 0,
             ec: ('ec' in o) ? o.ec : 0,
         };
-        if (S.statuses[this.id]) {
+        if (S && S.statuses[this.id]) {
             var statuses = S.statuses[this.id];
             if (statuses.injured) this.params.isHealt = false;
         }
@@ -191,392 +192,6 @@ function Card(o) {
         o._this.$mouse.css('-webkit-transform', 'translate3d(0,0,' + (o._this.params.zindex) + 'px )');
         o._this.$mouse.css('-moz-transform', 'translate3d(0,0,' + (o._this.params.zindex) + 'px )');
     };
-    this.fillAsFaceUp = function(link) {
-        //console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
-        if (this.params.type == "N") this.fillAsFaceUpNinja(link)
-        if (this.params.type == "J") this.fillAsFaceUpJutsu(link)
-        if (this.params.type == "M") this.fillAsFaceUpMission(link)
-    };
-
-    this.fillAsFaceUpNinja = function(link) {
-        var mouseControle = this.params.status == 'card' ? 'mouseControle full' : 'mouseControle';
-        var currentPower = Actions.getNinjaModPower(this.id);
-
-        link
-            .append($('<div />', {
-                'class': 'cbg'
-            }))
-            .append($('<div />', {
-                    'class': 'outShell'
-                })
-                .css('width', '92%')
-                .css('height', '92%')
-                .css('top', '4%')
-                .css('left', '4%')
-                .append(
-                    $('<div />', {
-                        'class': 'romb'
-                    }) // end create 'romb'
-                    .append($('<div />', {
-                            'class': 'corner ceb top '
-                        })
-                        .css('background', this.getBG('corner top')))
-                    .append($('<div />', {
-                            'class': 'side ceb top left '
-                        })
-                        .css('background', this.getBG('side top left')))
-                    .append($('<div />', {
-                            'class': 'side ceb top right '
-                        })
-                        .css('background', this.getBG('side top right')))
-                    .append($('<div />', {
-                            'class': 'corner ceb left '
-                        })
-                        .css('background', this.getBG('corner left')))
-                    .append(
-                        $('<div />', {
-                            'class': 'center ceb'
-                        })
-                        .append(
-                            $('<div />', {
-                                'class': 'image'
-                            })
-                            .css('background-image', 'url(public/pics/' + this.params.img + '.jpg)')
-                        )
-                    ) // end append 'center'
-                    .append($('<div />', {
-                            'class': 'corner ceb right '
-                        })
-                        .css('background', this.getBG('corner right')))
-                    .append($('<div />', {
-                            'class': 'side ceb bottom left '
-                        })
-                        .css('background', this.getBG('side bottom left')))
-                    .append($('<div />', {
-                            'class': 'side ceb bottom right '
-                        })
-                        .css('background', this.getBG('side bottom right')))
-                    .append($('<div />', {
-                            'class': 'corner ceb bottom '
-                        })
-                        .css('background', this.getBG('corner bottom')))
-                ) // end append 'romb'
-                .append(
-                    $('<div />', {
-                        'class': 'icon atribut'
-                    })
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'powerCurrent power ' + (this.params.isHealt ? '' : 'powerInjured'),
-                        'text': currentPower.attack + '/' + currentPower.support
-                    }) // end create 'power'
-                    .css('fontSize', this.params.W / 4 + 'px')
-                    .css('lineHeight', this.params.W / 4 + 'px')
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'injuredPower power',
-                        'text': this.params.ai + '/' + this.params.si
-                    }) // end create 'power'
-                    .css('fontSize', this.params.W / 4 + 'px')
-                    .css('lineHeight', this.params.W / 4 + 'px')
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('right', '11%')
-                    .css('top', '0%')
-                    .css('width', '20%')
-                    .css('height', '20%')
-                    .append(
-                        $('<div />', {
-                            'class': 'blur'
-                        })
-                    )
-                    .append(
-                        $('<div />', {
-                            'class': 'fire'
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('right', '0%')
-                    .css('top', '11%')
-                    .css('width', '20%')
-                    .css('height', '20%')
-                    .append(
-                        $('<div />', {
-                            'class': 'blur'
-                        })
-                    )
-                    .append(
-                        $('<div />', {
-                            'class': 'void'
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('left', '8%')
-                    .css('top', '-3%')
-                    .css('width', '25%')
-                    .css('height', '25%')
-                    .append(
-                        $('<div />', {
-                            'class': 'handcost' + this.params.hc
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('left', '-3%')
-                    .css('top', '9%')
-                    .css('width', '25%')
-                    .css('height', '25%')
-                    .append(
-                        $('<div />', {
-                            'class': 'turncost' + this.params.ec
-                        })
-                    )
-                )
-        )
-            .append($('<div />', {
-                'class': 'mouseControle'
-            }));
-
-    };
-    this.fillAsFaceUpJutsu = function(link) {
-        link
-            .append($('<div />', {
-                'class': 'cbg'
-            }))
-            .append($('<div />', {
-                    'class': 'outShell'
-                })
-                .css('width', '92%')
-                .css('height', '92%')
-                .css('top', '4%')
-                .css('left', '4%')
-                .append(
-                    $('<div />', {
-                        'class': 'limon'
-                    }) // end create 'limon'
-                    .css('background', this.getBG('side bottom right'))
-                    .append(
-                        $('<div />', {
-                            'class': 'limon_image'
-                        })
-                        .css('background-image', 'url(public/pics/' + this.params.img + '.jpg)')
-                    )
-                ) // end append 'limon'
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('right', '11%')
-                    .css('bottom', '0%')
-                    .css('width', '20%')
-                    .css('height', '20%')
-                    .append(
-                        $('<div />', {
-                            'class': 'blur'
-                        })
-                    )
-                    .append(
-                        $('<div />', {
-                            'class': 'fire'
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('right', '0%')
-                    .css('bottom', '11%')
-                    .css('width', '20%')
-                    .css('height', '20%')
-                    .append(
-                        $('<div />', {
-                            'class': 'blur'
-                        })
-                    )
-                    .append(
-                        $('<div />', {
-                            'class': 'void'
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('left', '8%')
-                    .css('top', '-3%')
-                    .css('width', '25%')
-                    .css('height', '25%')
-                    .append(
-                        $('<div />', {
-                            'class': 'handcost' + this.params.hc
-                        })
-                    )
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'icon cardIcon'
-                    })
-                    .css('left', '-3%')
-                    .css('top', '9%')
-                    .css('width', '25%')
-                    .css('height', '25%')
-                    .append(
-                        $('<div />', {
-                            'class': 'turncost' + this.params.ec
-                        })
-                    )
-                )
-        )
-            .append($('<div />', {
-                'class': 'mouseControle'
-            }));
-
-    };
-    this.fillAsFaceUpMission = function(link) {
-        link
-            .append($('<div />', {
-                'class': 'cbg'
-            }))
-
-        var outShell = $('<div />', {
-                'class': 'outShell'
-            })
-            .css('width', '92%')
-            .css('height', '92%')
-            .css('top', '4%')
-            .css('left', '4%')
-
-        outShell
-            .append(
-                $('<div />', {
-                    'class': 'rectangle'
-                }) // end create 'rectangle'
-                .css('background', this.getBG('side bottom right'))
-                .append(
-                    $('<div />', {
-                        'class': 'rectangle_image'
-                    })
-                    .css('background-image', 'url(public/pics/' + this.params.img + '.jpg)')
-                )
-        ) // end append 'rectangle'
-        .append(
-            $('<div />', {
-                'class': 'icon cardIcon'
-            })
-            .css('right', '18%')
-            .css('top', '0%')
-            .css('width', '20%')
-            .css('height', '20%')
-            .append(
-                $('<div />', {
-                    'class': 'blur'
-                })
-            )
-            .append(
-                $('<div />', {
-                    'class': 'fire'
-                })
-            )
-        )
-            .append(
-                $('<div />', {
-                    'class': 'icon cardIcon'
-                })
-                .css('right', '0%')
-                .css('top', '0%')
-                .css('width', '20%')
-                .css('height', '20%')
-                .append(
-                    $('<div />', {
-                        'class': 'blur'
-                    })
-                )
-                .append(
-                    $('<div />', {
-                        'class': 'void'
-                    })
-                )
-        )
-            .append(
-                $('<div />', {
-                    'class': 'icon cardIcon'
-                })
-                .css('left', '18%')
-                .css('top', '-3%')
-                .css('width', '25%')
-                .css('height', '25%')
-                .append(
-                    $('<div />', {
-                        'class': 'whiteTextblackBorder handcost' + this.params.hc,
-                        'text': this.params.hc
-                    })
-                )
-        )
-            .append(
-                $('<div />', {
-                    'class': 'icon cardIcon'
-                })
-                .css('left', '-3%')
-                .css('top', '-3%')
-                .css('width', '25%')
-                .css('height', '25%')
-                .append(
-                    $('<div />', {
-                        'class': 'whiteTextblackBorder turncost' + this.params.ec,
-                        'text': this.params.ec
-                    })
-                )
-        )
-
-        var permanentValue = Known[Accordance[this.id]].effect.permanent;
-        if (permanentValue) {
-            if (permanentValue !== true) {
-
-                if (S.statuses[this.id] && S.statuses[this.id].permanent) {
-                    permanentValue = S.statuses[this.id].permanent;
-                }
-
-                outShell
-                    .append(
-                        $('<div />', {
-                            'class': 'icon cardIconPermanent'
-                        })
-                        .css('left', '37.5%')
-                        .css('top', '77%')
-                        .append(
-                            $('<div />', {
-                                'class': 'permanent whiteTextblackBorder',
-                                'text': permanentValue
-                            })
-                        )
-                )
-            }
-        }
-        link
-            .append(outShell)
-            .append($('<div />', {
-                'class': 'mouseControle'
-            }));
-
-    };
 
     this.getBG = function(str) {
         var elements = this.params.elements || Known[Accordance[this.id]].elements;
@@ -674,29 +289,6 @@ function Card(o) {
         this.$icons = $('.icon', this.$id);
         this.$mouse = $('.mouseControle', this.$id);
         this.$cbg = $('.cbg', this.$id);
-    };
-
-    this.create = function(id) {
-        var $card = $('<div /> ', {
-                'class': 'card',
-                'id': id
-            }) // end create 'card'
-            .css('top', this.params.position.Y)
-            .css('left', this.params.position.X)
-            .css('width', this.params.W)
-            .css('height', this.params.W)
-            .css('font-size', this.params.W / 8 + 'px')
-            .css('line-height', this.params.W / 4 + 'px')
-        if (this.params.faceUp) {
-            var cbg = this.glossary.colors.card.bg[this.params.type];
-            cbg.a = this.params.status === 'card' ? 1 : 0;
-            cbg.a = 0;
-            $card.css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
-            this.fillAsFaceUp($card);
-        } else {
-            this.fillAsFaceDown($card);
-        }
-        $('#main').append($card);
     };
 
     this.create(this.id);
@@ -1479,49 +1071,50 @@ function Card(o) {
             var name = typeof known.name == "string" ? known.name : known.name[0];
             $prewContent
                 .append(
-                    $('<table />', {
-                        'border': 0,
-                        'cellpadding': 0,
-                        'cellspacing': 0,
-                        'cols': 3,
-                        'width': '100%'
-                    }).append(
-                        $('<tbody />', {
-                            'valign': 'top'
-                        }).append(
-                            $('<tr />', {}).append(
-                                $('<td />', {
-                                    'colspan': 8
-                                }).append(
-                                    $('<h3 />', {
-                                        'text': this.id + ' ' + name
-                                    })
-                                )
-                            ).append(
-                                $('<td />', {
-                                    'width': '2em'
-                                }).append(
-                                    $('<img />', {
-                                        'src': 'public/pics/H' + hc + '.png',
-                                        'width': '2em',
-                                        'height': '2em',
-                                        'margin-top': '-5px'
-                                    })
-                                )
-                            ).append(
-                                $('<td />', {
-                                    'width': '2em'
-                                }).append(
-                                    $('<img />', {
-                                        'src': 'public/pics/T' + ec + '.png',
-                                        'width': '2em',
-                                        'height': '2em',
-                                        'margin-top': '-5px'
-                                    })
-                                )
-                            )
-                        )
-                    )
+                    this.prewievContentHeader({name:this.id+' '+name, ec:ec, hc:hc})
+                    // $('<table />', {
+                    //     'border': 0,
+                    //     'cellpadding': 0,
+                    //     'cellspacing': 0,
+                    //     'cols': 3,
+                    //     'width': '100%'
+                    // }).append(
+                    //     $('<tbody />', {
+                    //         'valign': 'top'
+                    //     }).append(
+                    //         $('<tr />', {}).append(
+                    //             $('<td />', {
+                    //                 'colspan': 8
+                    //             }).append(
+                    //                 $('<h3 />', {
+                    //                     'text': this.id + ' ' + name
+                    //                 })
+                    //             )
+                    //         ).append(
+                    //             $('<td />', {
+                    //                 'width': '2em'
+                    //             }).append(
+                    //                 $('<img />', {
+                    //                     'src': 'public/pics/H' + hc + '.png',
+                    //                     'width': '2em',
+                    //                     'height': '2em',
+                    //                     'margin-top': '-5px'
+                    //                 })
+                    //             )
+                    //         ).append(
+                    //             $('<td />', {
+                    //                 'width': '2em'
+                    //             }).append(
+                    //                 $('<img />', {
+                    //                     'src': 'public/pics/T' + ec + '.png',
+                    //                     'width': '2em',
+                    //                     'height': '2em',
+                    //                     'margin-top': '-5px'
+                    //                 })
+                    //             )
+                    //         )
+                    //     )
+                    // )
 
             )
             if (known.hasOwnProperty('mental')) {
@@ -2358,6 +1951,56 @@ Card.prototype = {
             }
         }
     },
+    prewievContentHeader : function(args){
+        var args = args || {};
+        var name = args.name ||  this.id + ' ' + name;
+        var hc = args.hasOwnProperty('hc') ? args.hc : hc;
+        var ec = args.hasOwnProperty('ec') ? args.ec : ec;
+        console.log(args,hc,ec)
+        return $('<table />', {
+            'border': 0,
+            'cellpadding': 0,
+            'cellspacing': 0,
+            'cols': 3,
+            'width': '100%'
+        }).append(
+            $('<tbody />', {
+                'valign': 'top'
+            }).append(
+                $('<tr />', {}).append(
+                    $('<td />', {
+                        'colspan': 8
+                    }).append(
+                        $('<h3 />', {
+                            'text': name//this.id + ' ' + name
+                        })
+                    )
+                ).append(
+                    $('<td />', {
+                        'width': '2em'
+                    }).append(
+                        $('<img />', {
+                            'src': 'public/pics/H' + hc + '.png',
+                            'width': '2em',
+                            'height': '2em',
+                            'margin-top': '-5px'
+                        })
+                    )
+                ).append(
+                    $('<td />', {
+                        'width': '2em'
+                    }).append(
+                        $('<img />', {
+                            'src': 'public/pics/T' + ec + '.png',
+                            'width': '2em',
+                            'height': '2em',
+                            'margin-top': '-5px'
+                        })
+                    )
+                )
+            )
+        )
+    },
     /**
      * Анимационный эффект возникающий над полем
      * @param  {[type]} o [description]
@@ -2548,7 +2191,6 @@ Card.prototype = {
                 .css('opacity', 1)
                 .css('background-image', "url('public/pics/puff.png')")
                 .css('background-size', "480% 105%")
-                console.log('msg')
             H.animate.append(sprite);
             setTimeout(function(){
                 _this.destroyCard();
@@ -2611,5 +2253,548 @@ Card.prototype = {
                 }, 60)
             }, 60)
         };
-    } // end effect
+    }, // end effect
+    
+
+
+    create : function(id, args) {
+        var args = args || {};
+        var $card = $('<div /> ', {
+                'class': 'card',
+                'id': id
+            }) // end create 'card'
+            .css('top', this.params.position.Y)
+            .css('left', this.params.position.X)
+            .css('width', this.params.W)
+            .css('height', this.params.W)
+            .css('font-size', this.params.W / 8 + 'px')
+            .css('line-height', this.params.W / 4 + 'px')
+        if ((this.params && this.params.faceUp) || args.faceUp) {
+            var cbg = this.glossary.colors.card.bg[this.params.type];
+            cbg.a = this.params.status === 'card' ? 1 : 0;
+            cbg.a = 0;
+            $card.css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
+            this.fillAsFaceUp($card, args);
+        } else {
+            this.fillAsFaceDown($card, args);
+        }
+        $('#main').append($card);
+    },
+
+    fillAsFaceUp : function(link, args) {
+        //console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
+        var args = args || {};
+        var typeCard = args.type || this.params.type;
+        if (typeCard == "N") this.fillAsFaceUpNinja(link, args)
+        if (typeCard == "J") this.fillAsFaceUpJutsu(link, args)
+        if (typeCard == "M") this.fillAsFaceUpMission(link, args)
+    },
+
+    fillAsFaceUpNinja : function(link, args) {
+        var args = args || {};
+        var mouseControle = args.hasOwnProperty('mouseControle') ? args.mouseControle : (this.params.status == 'card' ? 'mouseControle full' : 'mouseControle');
+        var currentPower = args.hasOwnProperty('currentPower') ? args.currentPower : Actions.getNinjaModPower(this.id);
+        var img = args.img || this.params.img;
+        var isHealt = args.isHealt || this.params.isHealt;
+        var W = args.W || this.params.W;
+
+        var ai = args.hasOwnProperty('ai') ? args.ai : this.params.ai;
+        var si = args.hasOwnProperty('si') ? args.si : this.params.si;
+        var hc = args.hasOwnProperty('hc') ? args.hc : this.params.hc;
+        var ec = args.hasOwnProperty('ec') ? args.ec : this.params.ec;
+
+        link
+            .append($('<div />', {
+                'class': 'cbg'
+            }));
+
+        var $outShell = $('<div />', {
+                    'class': 'outShell'
+                })
+                .css('width', '92%')
+                .css('height', '92%')
+                .css('top', '4%')
+                .css('left', '4%')
+
+
+
+        var $romb = $('<div />', {
+                'class': 'romb'
+            }) // end create 'romb'
+            .append($('<div />', {
+                    'class': 'corner ceb top '
+                })
+                .css('background', this.getBG('corner top', args)))
+            .append($('<div />', {
+                    'class': 'side ceb top left '
+                })
+                .css('background', this.getBG('side top left', args)))
+            .append($('<div />', {
+                    'class': 'side ceb top right '
+                })
+                .css('background', this.getBG('side top right', args)))
+            .append($('<div />', {
+                    'class': 'corner ceb left '
+                })
+                .css('background', this.getBG('corner left', args)))
+            .append(
+                $('<div />', {
+                    'class': 'center ceb'
+                })
+                .append(
+                    $('<div />', {
+                        'class': 'image'
+                    })
+                    .css('background-image', 'url(public/pics/' + img + '.jpg)')
+                )
+            ) // end append 'center'
+            .append($('<div />', {
+                    'class': 'corner ceb right '
+                })
+                .css('background', this.getBG('corner right', args)))
+            .append($('<div />', {
+                    'class': 'side ceb bottom left '
+                })
+                .css('background', this.getBG('side bottom left', args)))
+            .append($('<div />', {
+                    'class': 'side ceb bottom right '
+                })
+                .css('background', this.getBG('side bottom right', args)))
+            .append($('<div />', {
+                    'class': 'corner ceb bottom '
+                })
+                .css('background', this.getBG('corner bottom', args)))
+
+        ;
+
+        link
+            .append($outShell
+
+                .append( $romb
+                ) // end append 'romb'
+
+        
+                .append(
+                    $('<div />', {
+                        'class': 'icon atribut'
+                    })
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'powerCurrent power ' + (isHealt ? '' : 'powerInjured'),
+                        'text': currentPower.attack + '/' + currentPower.support
+                    }) // end create 'power'
+                    .css('fontSize', W / 4 + 'px')
+                    .css('lineHeight', W / 4 + 'px')
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'injuredPower power',
+                        'text': ai + '/' + si
+                    }) // end create 'power'
+                    .css('fontSize', W / 4 + 'px')
+                    .css('lineHeight', W / 4 + 'px')
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('right', '11%')
+                    .css('top', '0%')
+                    .css('width', '20%')
+                    .css('height', '20%')
+                    .append(
+                        $('<div />', {
+                            'class': 'blur'
+                        })
+                    )
+                    .append(
+                        $('<div />', {
+                            'class': 'fire'
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('right', '0%')
+                    .css('top', '11%')
+                    .css('width', '20%')
+                    .css('height', '20%')
+                    .append(
+                        $('<div />', {
+                            'class': 'blur'
+                        })
+                    )
+                    .append(
+                        $('<div />', {
+                            'class': 'void'
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('left', '8%')
+                    .css('top', '-3%')
+                    .css('width', '25%')
+                    .css('height', '25%')
+                    .append(
+                        $('<div />', {
+                            'class': 'handcost' + hc
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('left', '-3%')
+                    .css('top', '9%')
+                    .css('width', '25%')
+                    .css('height', '25%')
+                    .append(
+                        $('<div />', {
+                            'class': 'turncost' + ec
+                        })
+                    )
+                )
+        )
+            .append($('<div />', {
+                'class': 'mouseControle'
+            }));
+
+    },
+
+
+    fillAsFaceUpJutsu : function(link, args) {
+                var img = args.img || this.params.img;
+        var hc = args.hasOwnProperty('hc') ? args.hc : this.params.hc;
+        var ec = args.hasOwnProperty('ec') ? args.ec : this.params.ec;
+
+
+        link
+            .append($('<div />', {
+                'class': 'cbg'
+            }))
+            .append($('<div />', {
+                    'class': 'outShell'
+                })
+                .css('width', '92%')
+                .css('height', '92%')
+                .css('top', '4%')
+                .css('left', '4%')
+                .append(
+                    $('<div />', {
+                        'class': 'limon'
+                    }) // end create 'limon'
+                    .css('background', this.getBG('side bottom right', args))
+                    .append(
+                        $('<div />', {
+                            'class': 'limon_image'
+                        })
+                        .css('background-image', 'url(public/pics/' + img + '.jpg)')
+                    )
+                ) // end append 'limon'
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('right', '11%')
+                    .css('bottom', '0%')
+                    .css('width', '20%')
+                    .css('height', '20%')
+                    .append(
+                        $('<div />', {
+                            'class': 'blur'
+                        })
+                    )
+                    .append(
+                        $('<div />', {
+                            'class': 'fire'
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('right', '0%')
+                    .css('bottom', '11%')
+                    .css('width', '20%')
+                    .css('height', '20%')
+                    .append(
+                        $('<div />', {
+                            'class': 'blur'
+                        })
+                    )
+                    .append(
+                        $('<div />', {
+                            'class': 'void'
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('left', '8%')
+                    .css('top', '-3%')
+                    .css('width', '25%')
+                    .css('height', '25%')
+                    .append(
+                        $('<div />', {
+                            'class': 'handcost' + hc
+                        })
+                    )
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'icon cardIcon'
+                    })
+                    .css('left', '-3%')
+                    .css('top', '9%')
+                    .css('width', '25%')
+                    .css('height', '25%')
+                    .append(
+                        $('<div />', {
+                            'class': 'turncost' + ec
+                        })
+                    )
+                )
+        )
+            .append($('<div />', {
+                'class': 'mouseControle'
+            }));
+
+    },
+
+
+    fillAsFaceUpMission : function(link, args) {
+                var img = args.img || this.params.img;
+        var hc = args.hasOwnProperty('hc') ? args.hc : this.params.hc;
+        var ec = args.hasOwnProperty('ec') ? args.ec : this.params.ec;
+
+        var permanentValue = args.hasOwnProperty('permanent') ? args.permanent : Known[Accordance[this.id]].effect.permanent;
+
+        link
+            .append($('<div />', {
+                'class': 'cbg'
+            }))
+
+        var outShell = $('<div />', {
+                'class': 'outShell'
+            })
+            .css('width', '92%')
+            .css('height', '92%')
+            .css('top', '4%')
+            .css('left', '4%')
+
+        outShell
+            .append(
+                $('<div />', {
+                    'class': 'rectangle'
+                }) // end create 'rectangle'
+                .css('background', this.getBG('side bottom right', args))
+                .append(
+                    $('<div />', {
+                        'class': 'rectangle_image'
+                    })
+                    .css('background-image', 'url(public/pics/' + img + '.jpg)')
+                )
+        ) // end append 'rectangle'
+        .append(
+            $('<div />', {
+                'class': 'icon cardIcon'
+            })
+            .css('right', '18%')
+            .css('top', '0%')
+            .css('width', '20%')
+            .css('height', '20%')
+            .append(
+                $('<div />', {
+                    'class': 'blur'
+                })
+            )
+            .append(
+                $('<div />', {
+                    'class': 'fire'
+                })
+            )
+        )
+            .append(
+                $('<div />', {
+                    'class': 'icon cardIcon'
+                })
+                .css('right', '0%')
+                .css('top', '0%')
+                .css('width', '20%')
+                .css('height', '20%')
+                .append(
+                    $('<div />', {
+                        'class': 'blur'
+                    })
+                )
+                .append(
+                    $('<div />', {
+                        'class': 'void'
+                    })
+                )
+        )
+            .append(
+                $('<div />', {
+                    'class': 'icon cardIcon'
+                })
+                .css('left', '18%')
+                .css('top', '-3%')
+                .css('width', '25%')
+                .css('height', '25%')
+                .append(
+                    $('<div />', {
+                        'class': 'whiteTextblackBorder handcost' + hc,
+                        'text': hc
+                    })
+                )
+        )
+            .append(
+                $('<div />', {
+                    'class': 'icon cardIcon'
+                })
+                .css('left', '-3%')
+                .css('top', '-3%')
+                .css('width', '25%')
+                .css('height', '25%')
+                .append(
+                    $('<div />', {
+                        'class': 'whiteTextblackBorder turncost' + ec,
+                        'text': ec
+                    })
+                )
+        )
+
+        if (permanentValue) {
+            if (permanentValue !== true) {
+
+
+                if (!args.hasOwnProperty('permanent') && S.statuses[this.id] && S.statuses[this.id].permanent) {
+                    permanentValue = S.statuses[this.id].permanent;
+                }
+
+                outShell
+                    .append(
+                        $('<div />', {
+                            'class': 'icon cardIconPermanent'
+                        })
+                        .css('left', '37.5%')
+                        .css('top', '77%')
+                        .append(
+                            $('<div />', {
+                                'class': 'permanent whiteTextblackBorder',
+                                'text': permanentValue
+                            })
+                        )
+                )
+            }
+        }
+        link
+            .append(outShell)
+            .append($('<div />', {
+                'class': 'mouseControle'
+            }));
+
+    },
+
+
+    getBG : function(str, args) {
+        var args = args || {};
+        var elements = args.elements || this.params.elements || Known[Accordance[this.id]].elements;
+        switch (str) {
+            case 'corner top':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
+                } else {
+                    return '#' + D.colors[elements[1]].dark;
+                }
+                break;
+            case 'side top left':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
+                } else {
+                    return '#' + D.colors[elements[0]].light
+                        //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[elements[0]].light+'), color-stop(100%,#'+D.colors[elements[1]].light+'))';
+                }
+                break;
+            case 'side top right':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
+                } else {
+                    return '-webkit-linear-gradient(left, #' + D.colors[elements[0]].light + ' 0%,#' + D.colors[elements[1]].light + ' 100%)'
+                        //TODO //+ ';background:-moz-linear-gradient(left, #'+D.colors[elements[0]].light+' 0%,#'+D.colors[elements[1]].light+' 100%)';
+                }
+                break;
+            case 'corner left':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
+                } else {
+                    return '#' + D.colors[elements[0]].dark;
+                }
+                break;
+            case 'corner right':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
+                } else {
+                    return '#' + D.colors[elements[0]].dark;
+                }
+                break;
+            case 'side bottom left':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
+                } else {
+                    return '#' + D.colors[elements[1]].light;
+                    //return '-webkit-gradient(linear, left top, left bottom, color-stop(0%,#'+D.colors[elements[1]].light+'), color-stop(100%,#'+D.colors[elements[0]].light+'))';
+                }
+                break;
+            case 'side bottom right':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].light;
+                } else {
+                    return '-webkit-linear-gradient(left, #' + D.colors[elements[0]].light + ' 0%,#' + D.colors[elements[1]].light + ' 100%)'
+                        //TODO  //  + 'background:-moz-linear-gradient(left, #'+D.colors[elements[0]].light+' 0%,#'+D.colors[elements[1]].light+' 100%);';
+                }
+                break;
+            case 'corner bottom':
+                if (elements.length == 1) {
+                    return '#' + D.colors[elements].dark;
+                } else {
+                    return '#' + D.colors[elements[1]].dark;
+                }
+                break;
+
+        }
+    }
+}
+
+var D = { // as Dictionary
+    names : {
+        deck: {
+            rus : 'Колода'
+        },
+        chackra : {
+            rus : 'Чакра'
+        },
+        discard : {
+            rus : 'Сброс'
+
+        }
+    },
+    colors : {
+        L : { light : 'EB77EF' , dark : '990699'},
+        F : { light : 'ED7676' , dark : '990608'},
+        W : { light : '3F789B' , dark : '055194'},
+        E : { light : 'E7ED76' , dark : '9B9B06'},
+        A : { light : '7BF7EF' , dark : '069E9E'},
+        V : { light : 'B5B5B5' , dark : '666666'}
+    }
 }
