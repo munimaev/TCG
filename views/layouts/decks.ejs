@@ -1,0 +1,450 @@
+<style>
+#pool h3 {
+  padding: 0px;
+  margin: 0px;
+} 
+#deck {
+}
+#deck .card,
+#pool .card {
+  position: relative;
+  height: 110px;
+  width: 110px;
+} 
+#deck .cardWraper,
+#pool .cardWraper {
+  margin: 5px;
+  width: 110px;
+  height: 132px;
+  position: relative;
+  display: inline-block;
+} 
+
+</style>
+<link href="/public/css/project.css" rel="stylesheet">
+<link href="/public/css/projectTable.css" rel="stylesheet">
+<h1>Decks</h1>
+<div class="row">
+  <div class="col-md-12">
+      <h3>Search</h3>
+      <form id="search">
+
+<div class="row">
+  <div class="col-md-3">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Type</label>
+          <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="type" sValue="N">Nin</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="type" sValue="J">Jut</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="type" sValue="M">Mis</button>
+            </div>
+          </div>
+        </div>
+  </div>
+  <div class="col-md-3">
+        <div class="form-group">
+          <label for="exampleInputEmail1">ELement</label>
+          <div class="btn-group btn-group-justified" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="L">L</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="F">F</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="W">W</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="E">E</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="A">A</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default sButton btn-primary" sType="element" sValue="V">V</button>
+            </div>
+          </div>
+        </div>
+  </div>
+  <div class="col-md-3">
+        <div class="form-group">
+          <label for="sText">Text</label>
+          <input type="email" class="form-control sButton" id="sText" placeholder="Text" sType="text">
+        </div>
+  </div>
+  <div class="col-md-1">
+              <label for="exampleInputEmail1">Entrance</label>
+              <select class="form-control sButton" sType="entrance">
+                <option>Any</option>
+                <option>0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+              </select>
+  </div>
+  <div class="col-md-1">
+              <label for="exampleInputEmail1">Hand</label>
+              <select class="form-control sButton" sType="handcost">
+                <option>Any</option>
+                <option>0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+              </select>
+  </div>
+  <div class="col-md-1">
+              <label for="exampleInputEmail1">Chackra</label>
+              <select class="form-control sButton" sType="chackra">
+                <option>Any</option>
+                <option>0</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+              </select>
+
+  </div>
+
+      </form>
+  </div>
+</div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+      <h3>Pool</h3>
+      <div id="pool"></div>
+  </div>
+  <div class="col-md-8">
+      <h3> <div class="input-group">
+      <input type="text" class="form-control" placeholder="New D">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Save</button>
+      </span>
+    </div></h3>
+   
+      <div id="deck"></div>
+  </div>
+</div>
+<script>
+var module = false;
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/public/js/G/cardBase.js"></script>
+<script src="/public/js/G/card.js"></script>
+<script src="/public/js/G/Actions.js"></script>
+<script src="/public/js/jquery.js"></script>
+<script>
+var curentDeck = {};
+
+var $search = $('#search');
+$search.bind( "click keyup", function(e) { 
+  var button = $(e.target);
+  // console.log(e)
+  if(e.type == 'click') {
+    if (button.hasClass('sButton')) {
+
+      var sType = button.attr('sType');
+      var args = {};
+
+      if (sType == 'type' || sType == 'element') {
+        var sValue = button.attr('sValue');
+        if (button.hasClass('btn-primary')) {
+          button.removeClass('btn-primary');        
+          args[sValue] = false;
+        }
+        else {
+          button.addClass('btn-primary');
+          args[sValue] = true;
+        }
+        updateSearch(args)
+      }
+      if (sType == 'entrance' || sType == 'handcost' || sType == 'chackra') {     
+        args[sType] = button.val();
+        updateSearch(args)
+      }
+    }
+  }
+  if (e.type == 'keyup' && button.hasClass('sButton') && button.attr('sType') === 'text') {  
+        updateSearch({'text':button.val()})
+  }
+});
+
+
+var $pool = $('#pool');
+$pool.bind( "click", function(e) { 
+  var button = $(e.target);
+  if(e.type == 'click') {
+    if (button.hasClass('sButtonPlus')) {
+      updateDeck('plus',button.attr('sValue'));
+    }
+    if (button.hasClass('sButtonMinus')) {
+      updateDeck('minus',button.attr('sValue'));
+    }
+  }
+});
+
+
+var $deck = $('#deck');
+$deck.bind( "click", function(e) { 
+  var button = $(e.target);
+  // console.log(e)
+  console.log('msg')
+  if(e.type == 'click') {
+    if (button.hasClass('sButtonPlus')) {
+      updateDeck('plus',button.attr('sValue'));
+    }
+    if (button.hasClass('sButtonMinus')) {
+      updateDeck('minus',button.attr('sValue'));
+    }
+  }
+});
+
+var updateDeck = (function(){
+  var deck = {
+    N : {},
+    J : {},
+    M : {},
+  }
+  for (var i = 0; i<=9; i++) {
+    deck.N[i+''] = {};
+  }
+  var row = function(link) {
+      for (var c in link) {
+        for (var k = 1; k<=link[c]; k++) {
+          $div = creaeCard(c);
+          $deck.append($div);
+        }
+      }
+  }
+
+  return function (act, id) {
+    console.log(act,id)
+    var link;
+    if (CardBase[id].type == 'N') {
+      link = deck.N[CardBase[id].ec];
+    }
+    else {
+      link = deck[CardBase[id].type]
+    }
+
+    if (act === 'plus') {
+      if (link.hasOwnProperty(id)) {
+        if (link[id] < 3) {
+          link[id]++;
+        }
+      }
+      else {
+        link[id] = 1;
+      }
+    }
+
+    if (act === 'minus') {
+      if (link.hasOwnProperty(id)) {
+        link[id]--;
+        if (link[id] == 0) {
+          delete link[id];
+        }
+      }
+    }
+
+
+    $deck.empty();
+    var count = 0;
+    for (var n in deck.N) {
+      for (var i in deck.N[n]) {
+        $deck.append('<div></div>');
+        break;
+      }
+      row(deck.N[n]);
+    }
+      for (var i in deck.J) {
+        $deck.append('<div></div>');
+        break;
+      }
+    row(deck.J);
+
+      for (var i in deck.M) {
+        $deck.append('<div></div>');
+        break;
+      }
+    row(deck.M);
+
+       
+
+  }
+})()
+
+var updateSearch = (function(){
+  var current = {
+    type : ['J','N','M'],
+    element : ['L','F','W','A','E','V'],
+    text : '',
+    handcost : 'Any',
+    entrance : 'Any',
+    chackra : 'Any'
+  };
+  return function(args) {
+    var isChange = false;
+    for (var i in args) {
+      if (i === 'J' || i === 'N' || i === 'M'){
+        var ind = current.type.indexOf(i);
+        if (args[i] && !~ind) {
+          current.type.push(i);
+          isChange = true;
+        }
+        if (!args[i] && ~ind) {
+          current.type.splice(ind, 1);
+          isChange = true;
+        }
+      }
+
+      if (i === 'L' || i === 'F' || i === 'W' || i === 'A' || i === 'E' || i === 'V') {
+        var ind = current.element.indexOf(i);
+        if (args[i] && !~ind) {
+          current.element.push(i);
+          isChange = true;
+        }
+        if (!args[i] && ~ind) {
+          current.element.splice(ind, 1);
+          isChange = true;
+        }
+      }
+
+      if (i === 'entrance' || i === 'handcost' || i === 'chackra') {     
+        if (current[i] !== args[i]) {
+          isChange = true;
+          current[i] = args[i];
+        }
+      }
+
+      if (i === 'text') {     
+        if (current[i] !== args[i]) {
+          isChange = true;
+          current[i] = args[i];
+        }
+      }
+
+    }
+    var arg = {};
+    for (var i in current) {
+      arg[i] = current[i];
+    }
+
+
+    if (isChange) {
+      args.command == 'new'
+    }
+    updatePool(arg)
+  }
+})();
+
+var updatePool = (function() {
+  var shown = 0;
+  return function(args) {
+    var command = args.command || 'add';
+    var type    = args.type    || ['J','N','M'];
+    var element = args.element || ['L','F','W','A','E','V'];
+    var text    = args.text    || '';
+    var handcost = args.handcost || 'Any';
+    var entrance = args.entrance || 'Any';
+    var chackra  = args.chackra || 'Any';
+
+    $pool.empty();
+    if (command == 'empty') {
+      shown = 0;
+      return;
+    }
+    var count = 0;
+    var newShown = shown + 12;
+    for (var i in CardBase) {
+
+      var isPrint = false;
+      if (type.length != 0) {
+        if (!~type.indexOf(CardBase[i].type)) {
+          continue;
+        }
+      }
+      if (element.length != 0) {
+        for (var k in CardBase[i].elements) {
+          // console.log(CardBase[i].elements[k], element, ~element.indexOf(CardBase[i].elements[k]))
+          if (~element.indexOf(CardBase[i].elements[k])) {
+            isPrint = true;
+          }
+        }
+      }
+
+      if (isPrint) {
+
+        $div =  creaeCard(i);
+        $pool.append($div);
+        count++;
+      }
+      if (count >= newShown) break;
+    }
+  }
+})()
+
+function creaeCard(i) {
+
+        var $div = $('<div />',{class:'cardWraper'});
+        var $card = $('<div />',{class:'card'});
+
+         $div.append($card);
+        // $card.append(Card.prototype.prewievContentHeader({name:CardBase[i].name,ec:CardBase[i].ec,hc:CardBase[i].hc,headerSize:4}));
+
+
+        var cardParams = {
+          type : CardBase[i].type,
+          faceUp: true,
+          currentPower: {attack: 0, support: 0},
+          mouseControle: 'mouseControle full',
+          elements : CardBase[i].elements,
+          img : CardBase[i].img,
+          isHealt : true,
+          W : 100,
+          ai : CardBase[i].ai,
+          si : CardBase[i].si,
+          hc : CardBase[i].hc,
+          ec : CardBase[i].ec,
+        }
+
+        cardParams.permanent = 0;
+        if (CardBase[i].effect.permanent) {
+          cardParams.permanent = CardBase[i].effect.permanent;
+        }
+
+        Card.prototype.fillAsFaceUp($card, cardParams)
+
+        var $p = $('<div />',{'class':'text-center'});
+        $p.append(
+          $('<button />',{class:'btn btn-default btn-xs sButtonPlus', sValue:i})
+          .append($('<span />',{class:'sButtonPlus glyphicon glyphicon-plus', sValue:i})))
+        $p.append(
+          $('<button />',{class:'btn btn-default btn-xs sButtonMinus', sValue:i})
+          .append($('<span />',{class:'sButtonMinus glyphicon glyphicon-minus',sValue:i})))
+        $div.append($p)
+        return $div;
+}
+</script>
