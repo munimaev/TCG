@@ -556,3 +556,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
         1px 0px 0px #FFF,  -1px -0px 0px #FFF, 0px 1px 0px #FFF,  0px -1px 0px #FFF;
     color: #8f0222;
 }
+
+.effectHealCircle {
+    -webkit-box-shadow: 0 0 10px 0 #1CFFFF, inset 0 0 100px 0 #1CFFFF;
+    box-shadow: 0 0 10px 0 #1CFFFF, inset 0 0 100px 0 #1CFFFF;   
+}
