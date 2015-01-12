@@ -13,7 +13,6 @@ var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
-var fs = require('fs');
 var colors = require('colors');
 
 //console.log(Stadies)
