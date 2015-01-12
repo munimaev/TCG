@@ -7,7 +7,7 @@
 }
 #deck .card,
 #pool .card {
-  position: relative;
+  position: absolute;
   height: 110px;
   width: 110px;
 } 
@@ -18,12 +18,19 @@
   height: 132px;
   position: relative;
   display: inline-block;
+  vertical-align: top;
 } 
+
+.cardWraper .text-center {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+}
 
 </style>
 <link href="/public/css/project.css" rel="stylesheet">
 <link href="/public/css/projectTable.css" rel="stylesheet">
-<h1>Decks</h1>
+<h1>Constructor</h1>
 <div class="row">
   <div class="col-md-12">
       <h3>Search</h3>
@@ -80,7 +87,7 @@
   <div class="col-md-1">
               <label for="exampleInputEmail1">Entrance</label>
               <select class="form-control sButton" sType="entrance">
-                <option>Any</option>
+                <option>-</option>
                 <option>0</option>
                 <option>1</option>
                 <option>2</option>
@@ -96,7 +103,7 @@
   <div class="col-md-1">
               <label for="exampleInputEmail1">Hand</label>
               <select class="form-control sButton" sType="handcost">
-                <option>Any</option>
+                <option>-</option>
                 <option>0</option>
                 <option>1</option>
                 <option>2</option>
@@ -112,7 +119,7 @@
   <div class="col-md-1">
               <label for="exampleInputEmail1">Chackra</label>
               <select class="form-control sButton" sType="chackra">
-                <option>Any</option>
+                <option>-</option>
                 <option>0</option>
                 <option>1</option>
                 <option>2</option>
@@ -134,16 +141,31 @@
 <div class="row">
   <div class="col-md-4">
       <h3>Pool</h3>
+  </div>
+  <div class="col-md-2">
+      <h3>Deck</h3>
+  </div>
+  <div class="col-md-6"><h3>
+    <div class="input-group">
+      <input type="text" class="form-control" value="New Deck" id="deckName">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="ajaxDeck('save')"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></button>
+        <button class="btn btn-default" type="button" onclick="ajaxDeck('delete')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul id="deckskList" class="dropdown-menu dropdown-menu-right" role="menu">
+        </ul>
+      </span>
+    </div></h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
       <div id="pool"></div>
   </div>
   <div class="col-md-8">
-      <h3> <div class="input-group">
-      <input type="text" class="form-control" placeholder="New D">
-      <span class="input-group-btn">
-        <button class="btn btn-default" type="button">Save</button>
-      </span>
-    </div></h3>
-   
       <div id="deck"></div>
   </div>
 </div>
@@ -156,12 +178,14 @@ var module = false;
 <script src="/public/js/G/Actions.js"></script>
 <script src="/public/js/jquery.js"></script>
 <script>
+
+
+
 var curentDeck = {};
 
 var $search = $('#search');
 $search.bind( "click keyup", function(e) { 
   var button = $(e.target);
-  // console.log(e)
   if(e.type == 'click') {
     if (button.hasClass('sButton')) {
 
@@ -209,8 +233,6 @@ $pool.bind( "click", function(e) {
 var $deck = $('#deck');
 $deck.bind( "click", function(e) { 
   var button = $(e.target);
-  // console.log(e)
-  console.log('msg')
   if(e.type == 'click') {
     if (button.hasClass('sButtonPlus')) {
       updateDeck('plus',button.attr('sValue'));
@@ -222,51 +244,79 @@ $deck.bind( "click", function(e) {
 });
 
 var updateDeck = (function(){
-  var deck = {
-    N : {},
-    J : {},
-    M : {},
+  var deck;
+
+  var clearDeck = function() {
+    deck = {
+      N : {},
+      J : {},
+      M : {},
+    }
+    for (var i = 0; i<=9; i++) {
+      deck.N['cost'+i+''] = {};
+    }
   }
-  for (var i = 0; i<=9; i++) {
-    deck.N[i+''] = {};
-  }
+  clearDeck();
+
   var row = function(link) {
       for (var c in link) {
         for (var k = 1; k<=link[c]; k++) {
-          $div = creaeCard(c);
+          $div = createCard(c);
           $deck.append($div);
         }
       }
   }
 
-  return function (act, id) {
-    console.log(act,id)
-    var link;
-    if (CardBase[id].type == 'N') {
-      link = deck.N[CardBase[id].ec];
-    }
-    else {
-      link = deck[CardBase[id].type]
-    }
-
-    if (act === 'plus') {
-      if (link.hasOwnProperty(id)) {
-        if (link[id] < 3) {
-          link[id]++;
-        }
+  var mainFunc = function (act, id) {
+    if (act === 'plus' || act === 'minus') {
+      var link;
+      if (CardBase[id].type == 'N') {
+        link = deck.N['cost'+CardBase[id].ec];
       }
       else {
-        link[id] = 1;
+        link = deck[CardBase[id].type]
+      }
+
+      if (act === 'plus') {
+        if (link.hasOwnProperty(id)) {
+          if (link[id] < 3) {
+            link[id]++;
+          }
+        }
+        else {
+          link[id] = 1;
+        }
+      }
+
+      if (act === 'minus') {
+        if (link.hasOwnProperty(id)) {
+          link[id]--;
+          if (link[id] == 0) {
+            delete link[id];
+          }
+        }
       }
     }
 
-    if (act === 'minus') {
-      if (link.hasOwnProperty(id)) {
-        link[id]--;
-        if (link[id] == 0) {
-          delete link[id];
+    if (act === 'select') {
+      clearDeck();
+      for (var i in id) {
+        if (i === 'N') {
+          for (var j in id.N) {
+            for (var k in id.N[j])
+            deck.N[j][k] = id.N[j][k];
+          }
+        }
+        else {
+          for (var j in id[i]) {
+            deck[i][j] = id[i][j];
+          } 
         }
       }
+    }
+
+    if (act === 'delete') {
+      clearDeck();
     }
 
 
@@ -279,21 +329,26 @@ var updateDeck = (function(){
       }
       row(deck.N[n]);
     }
-      for (var i in deck.J) {
-        $deck.append('<div></div>');
-        break;
-      }
+    for (var i in deck.J) {
+      $deck.append('<div></div>');
+      break;
+    }
     row(deck.J);
 
-      for (var i in deck.M) {
-        $deck.append('<div></div>');
-        break;
-      }
+    for (var i in deck.M) {
+      $deck.append('<div></div>');
+      break;
+    }
     row(deck.M);
 
-       
 
   }
+
+  mainFunc.getDeck = function() {
+    return deck;
+  }
+
+  return mainFunc;
 })()
 
 var updateSearch = (function(){
@@ -301,9 +356,9 @@ var updateSearch = (function(){
     type : ['J','N','M'],
     element : ['L','F','W','A','E','V'],
     text : '',
-    handcost : 'Any',
-    entrance : 'Any',
-    chackra : 'Any'
+    handcost : '-',
+    entrance : '-',
+    chackra : '-'
   };
   return function(args) {
     var isChange = false;
@@ -363,13 +418,15 @@ var updateSearch = (function(){
 var updatePool = (function() {
   var shown = 0;
   return function(args) {
+
     var command = args.command || 'add';
     var type    = args.type    || ['J','N','M'];
     var element = args.element || ['L','F','W','A','E','V'];
     var text    = args.text    || '';
-    var handcost = args.handcost || 'Any';
-    var entrance = args.entrance || 'Any';
-    var chackra  = args.chackra || 'Any';
+    var handcost = args.handcost || '-';
+    var entrance = args.entrance || '-';
+    var chackra  = args.chackra || '-';
+    var shown    = args.shown || 0;
 
     $pool.empty();
     if (command == 'empty') {
@@ -378,8 +435,13 @@ var updatePool = (function() {
     }
     var count = 0;
     var newShown = shown + 12;
+    var existMoreCheck = false;
+    var existMore = false;
     for (var i in CardBase) {
-
+      if (existMoreCheck) {
+        existMore = true;
+        break;
+      }
       var isPrint = false;
       if (type.length != 0) {
         if (!~type.indexOf(CardBase[i].type)) {
@@ -388,29 +450,81 @@ var updatePool = (function() {
       }
       if (element.length != 0) {
         for (var k in CardBase[i].elements) {
-          // console.log(CardBase[i].elements[k], element, ~element.indexOf(CardBase[i].elements[k]))
           if (~element.indexOf(CardBase[i].elements[k])) {
             isPrint = true;
           }
         }
       }
 
+      if (text.length != 0) {
+        if (!~CardBase[i].name.indexOf(text)) {
+          continue;
+        }
+      }
+
+      if (entrance !== '-' && (CardBase[i].type == 'N' || CardBase[i].type == 'M' || CardBase[i].type == 'C')){
+        if (CardBase[i].ec+'' !== entrance ) {
+          continue;
+        }
+      }
+      if (handcost !== '-' && (CardBase[i].type == 'N' || CardBase[i].type == 'M' || CardBase[i].type == 'C')){
+        if (CardBase[i].hc+'' !=handcost) {
+          continue;
+        }
+      }
+      if (chackra !== '-' && CardBase[i].type == 'J'){
+        var exist = false;
+        existBreak:
+        for (var j in CardBase[i].cost) {
+            if (CardBase[i].cost[j].length + '' ==  chackra) {
+              exist = true;
+              break existBreak;
+            }
+        }
+        if (!exist) {
+          continue;
+        }
+      }
+
       if (isPrint) {
 
-        $div =  creaeCard(i);
+        $div =  createCard(i);
         $pool.append($div);
         count++;
       }
-      if (count >= newShown) break;
+      if (count >= newShown) {
+        existMoreCheck = true;
+      }
+    }
+    if (existMore) {
+      var $pp = $('<p />');
+      var $bp = $('<button />', {
+        'class': 'btn btn-default btn-lg btn-block',
+        'text': 'More',
+        'click': function() {
+          updatePool({
+            command : command,
+            type : type,
+            element : element,
+            text : text,
+            handcost : handcost,
+            entrance : entrance,
+            chackra : chackra,
+            shown : newShown
+          })
+        }
+      });
+      $pp.append($bp);
+      $pool.append($pp);
     }
   }
 })()
 
-function creaeCard(i) {
+function createCard(i) {
 
         var $div = $('<div />',{class:'cardWraper'});
         var $card = $('<div />',{class:'card'});
-
+        var $prew = $('')
          $div.append($card);
         // $card.append(Card.prototype.prewievContentHeader({name:CardBase[i].name,ec:CardBase[i].ec,hc:CardBase[i].hc,headerSize:4}));
 
@@ -446,5 +560,68 @@ function creaeCard(i) {
           .append($('<span />',{class:'sButtonMinus glyphicon glyphicon-minus',sValue:i})))
         $div.append($p)
         return $div;
+}
+
+
+var updateDecks = (function () {
+  var $deckName = $('#deckName');
+  var $deckskList = $('#deckskList');
+  var decks = <%- JSON.stringify(decks) %> ;
+  var selectDeck = function(name, deck) {
+    $deckName.val(decodeURIComponent(name));
+    updateDeck('select',deck)
+  }
+  return function(act, data) {
+    if (act == 'add') {
+      decks[data.name] = data.deck;
+    }
+    if (act == 'delete') {
+      delete decks[encodeURIComponent(data.name)];
+      updateDeck('delete', null);
+    }
+    $deckskList.empty();
+    for (var i in decks) {
+      var $a = $('<a />', {
+        'href': '#',
+        'text':  decodeURIComponent(i),
+        'click': function() {
+          var deckName = i;
+          var deckDeck = decks[i];
+          return function() {
+              selectDeck(deckName, deckDeck)
+          }
+        }()
+      });
+      var $li = $('<li />');
+      $li.append($a);
+      $deckskList.append($li);
+    }
+  }
+})()
+updateDecks();
+
+function ajaxDeck(act) {
+  var deckToSave = updateDeck.getDeck();
+  var $deckName = $('#deckName');
+  var data = {
+      name: $deckName.val(),
+      'deck': deckToSave,
+      act : act
+    };
+  if (act === 'save') {
+    updateDecks('add', data);
+  }
+  if (act === 'delete') {
+    updateDecks('delete', data);
+  }
+  $.ajax({
+    type: "POST",
+    url: '/ajaxDeck',
+    data: data,
+    success: function() {
+      alert('success')
+    },
+    dataType: 'json'
+  });
 }
 </script>
