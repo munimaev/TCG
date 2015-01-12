@@ -1072,50 +1072,6 @@ function Card(o) {
             $prewContent
                 .append(
                     this.prewievContentHeader({name:this.id+' '+name, ec:ec, hc:hc})
-                    // $('<table />', {
-                    //     'border': 0,
-                    //     'cellpadding': 0,
-                    //     'cellspacing': 0,
-                    //     'cols': 3,
-                    //     'width': '100%'
-                    // }).append(
-                    //     $('<tbody />', {
-                    //         'valign': 'top'
-                    //     }).append(
-                    //         $('<tr />', {}).append(
-                    //             $('<td />', {
-                    //                 'colspan': 8
-                    //             }).append(
-                    //                 $('<h3 />', {
-                    //                     'text': this.id + ' ' + name
-                    //                 })
-                    //             )
-                    //         ).append(
-                    //             $('<td />', {
-                    //                 'width': '2em'
-                    //             }).append(
-                    //                 $('<img />', {
-                    //                     'src': 'public/pics/H' + hc + '.png',
-                    //                     'width': '2em',
-                    //                     'height': '2em',
-                    //                     'margin-top': '-5px'
-                    //                 })
-                    //             )
-                    //         ).append(
-                    //             $('<td />', {
-                    //                 'width': '2em'
-                    //             }).append(
-                    //                 $('<img />', {
-                    //                     'src': 'public/pics/T' + ec + '.png',
-                    //                     'width': '2em',
-                    //                     'height': '2em',
-                    //                     'margin-top': '-5px'
-                    //                 })
-                    //             )
-                    //         )
-                    //     )
-                    // )
-
             )
             if (known.hasOwnProperty('mental')) {
                 $p = $('<p>', {}); 
