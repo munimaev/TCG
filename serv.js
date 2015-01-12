@@ -1,9 +1,17 @@
 var app = require('express')();
 var express  = require('express');
+
+var bodyParser = require('body-parser');
+var multer = require('multer'); 
+  app.use(bodyParser.json()); // for parsing application/json
+  app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+  app.use(multer()); // for parsing multipart/form-data
+
 var engine   = require('ejs-locals');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var SG = require('./servGame');
+var fs = require('fs');
 var window = null;
 
 // Установка рендера - http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express/
@@ -87,11 +95,54 @@ app.get('/lobby', function(req, res){
 
 app.get('/decks', function(req, res){
   if (req.session.login) {
+
+
+    var loginFileName = encodeURIComponent(req.session.login);
+    var outputFilename = __dirname + '/data/decks_'+loginFileName+'.json';
+
+    var decks = {};
+    if (fs.existsSync(outputFilename)) {
+      decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+    }
+
     req.session.id == req.cookies['connect.sid'];
-    res.render('index.ejs', { myLayout: 'decks', session : req.session })
+    res.render('index.ejs', { myLayout: 'decks', session : req.session, decks : decks })
   }
   else {
     res.writeHead(303, {'Location': '/login'});
+    res.end();
+  }
+});
+
+app.post('/ajaxDeck', function(req, res) {
+  console.log('\nreq.session.login\n' + req.session.login)
+  if (req.session.login) {
+    var loginFileName = encodeURIComponent(req.session.login);
+    var outputFilename = __dirname + '/data/decks_'+loginFileName+'.json';
+    var nameFileName = encodeURIComponent(req.param('name'));
+
+    var decks = {};
+    if (fs.existsSync(outputFilename)) {
+      decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+    }
+    var deck = req.param('deck');
+
+    var act = req.param('act')
+    if (act === 'save') {
+      decks[nameFileName] = deck;
+    }
+    if (act === 'delete' && decks.hasOwnProperty(nameFileName)) {
+      console.log(outputFilename);
+      delete decks[nameFileName];
+    }
+    fs.writeFile(outputFilename, JSON.stringify(decks, null, 4), function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("DEck " + nameFileName + " " + act  +" to " + outputFilename);
+      }
+    });
+  } else {
     res.end();
   }
 });
