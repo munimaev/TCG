@@ -44,6 +44,17 @@
     border: 1px solid #CCC;
 
 }
+
+.cbg.limon {
+    background: rgb(246,230,180); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(246,230,180,1) 0%, rgba(237,144,23,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(246,230,180,1)), color-stop(100%,rgba(237,144,23,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, rgba(246,230,180,1) 0%,rgba(237,144,23,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, rgba(246,230,180,1) 0%,rgba(237,144,23,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, rgba(246,230,180,1) 0%,rgba(237,144,23,1) 100%); /* IE10+ */
+background: linear-gradient(to bottom, rgba(246,230,180,1) 0%,rgba(237,144,23,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6e6b4', endColorstr='#ed9017',GradientType=0 ); 
+}
 .cbg.cbgD {
     width:100%;
     height: 100%;
@@ -96,21 +107,27 @@
 .limon {
     width: 98%;
     height: 98%;
-    -webkit-border-radius: 77% 13%;
-    border-radius: 77% 13%;
+    /*-webkit-border-radius: 77% 13%;
+    border-radius: 77% 13%;*/
+    -webkit-border-radius: 5%;
+    border-radius: 5%;
     margin: 1%;
     border: 1px solid rgba(0,0,0,0.35);
+
+
 
 }
 .limon_image {
     width: 94%;
     height: 94%;
-    -webkit-border-radius: 80% 13%;
-    border-radius: 80% 13%;
+    /*-webkit-border-radius: 80% 13%;*/
+    /*border-radius: 80% 13%;*/
+    -webkit-border-radius: 5%;
+    border-radius: 5%;
     margin: 3%;
     -webkit-box-shadow:0px 0px 0px 1px rgba(0,0,0,0.35);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.35);
-    background-size: 120% auto;
+    background-size: 135% auto;
     background-position: 50% 20%;
 
 }
@@ -439,6 +456,38 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
     background-size: 100% 100%;
     text-align: center;
 }
+.card .icon .elementL,
+.card .icon .elementF,
+.card .icon .elementW,
+.card .icon .elementE,
+.card .icon .elementA,
+.card .icon .elementV,
+.card .icon .element1,
+.card .icon .element2,
+.card .icon .element3,
+.card .icon .element4,
+.card .icon .element5,
+.card .icon .elementX
+.card .icon .costL,
+.card .icon .costF,
+.card .icon .costW,
+.card .icon .costE,
+.card .icon .costA,
+.card .icon .costV,
+.card .icon .cost1,
+.card .icon .cost2,
+.card .icon .cost3,
+.card .icon .cost4,
+.card .icon .cost5,
+.card .icon .costX {
+    width: 100%;
+    height: 100%;
+    margin: 0%;
+    background-size: 90% 90%;
+    background-position: center;
+    background-repeat: no-repeat;
+    text-align: center;
+}
 .card .icon .handcost1 { background-image: url('../pics/H1.png'); }
 .card .icon .handcost0 { background-image: url('../pics/H0.png'); }
 .card .icon .turncost0 { background-image: url('../pics/T0.png'); }
@@ -449,6 +498,26 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#069e9e', end
 .card .icon .turncost5 { background-image: url('../pics/T5.png'); }
 .card .icon .turncost6 { background-image: url('../pics/T6.png'); }
 .card .icon .turncost7 { background-image: url('../pics/T7.png'); }
+
+.card .icon .elementL { background-image: url('/public/pics/lightning.png'); }
+.card .icon .elementF { background-image: url('/public/pics/fire.png'); }
+.card .icon .elementW { background-image: url('/public/pics/wind.png'); }
+.card .icon .elementE { background-image: url('/public/pics/earth.png'); }
+.card .icon .elementA { background-image: url('/public/pics/water.png'); }
+.card .icon .elementV { background-image: url('/public/pics/void.png'); }
+
+.card .icon .costL { background-image: url('/public/pics/cost/L.png'); }
+.card .icon .costF { background-image: url('/public/pics/cost/F.png'); }
+.card .icon .costW { background-image: url('/public/pics/cost/W.png'); }
+.card .icon .costE { background-image: url('/public/pics/cost/E.png'); }
+.card .icon .costA { background-image: url('/public/pics/cost/A.png'); }
+.card .icon .costV { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .cost1 { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .cost2 { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .cost3 { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .cost4 { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .cost5 { background-image: url('/public/pics/cost/X.png'); }
+.card .icon .costX { background-image: url('/public/pics/cost/X.png'); }
 
 .card .icon .permanent { background-image: url('../pics/permanent.png'); }
 
