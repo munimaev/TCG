@@ -19,12 +19,47 @@
   position: relative;
   display: inline-block;
   vertical-align: top;
+  z-index: 50;
 } 
+#deck .cardWraper:hover,
+#pool .cardWraper:hover {
+  z-index: 100;
+}
 
 .cardWraper .text-center {
   position: absolute;
   bottom: 0px;
   width: 100%;
+}
+
+#pool .cardPrewievWrap,
+#deck .cardPrewievWrap {
+  display: none;
+  min-height: 100px;
+}
+#pool .cardWraper:hover .cardPrewievWrap,
+#deck .cardWraper:hover .cardPrewievWrap {
+  display: block;
+}
+#pool .cardPrewievWrap {
+  left:115px;
+}
+#deck .cardPrewievWrap {
+  right:115px;
+}
+
+#pool .cardWraper .cardPrewievWrap h3,
+#deck .cardWraper .cardPrewievWrap h3 {
+  font-size: 1.3em;
+  line-height: 1.3em;
+}
+#pool .cardWraper .cardPrewievWrap hr,
+#deck .cardWraper .cardPrewievWrap hr {
+  margin: 5px;
+}
+#pool .icon ,
+#deck .icon {
+  line-height: 25px;
 }
 
 </style>
@@ -524,10 +559,12 @@ function createCard(i) {
 
         var $div = $('<div />',{class:'cardWraper'});
         var $card = $('<div />',{class:'card'});
-        var $prew = $('')
-         $div.append($card);
+        var $prew = $('<div />', {class:'cardPrewievWrap'})
+        $div.append($card);
         // $card.append(Card.prototype.prewievContentHeader({name:CardBase[i].name,ec:CardBase[i].ec,hc:CardBase[i].hc,headerSize:4}));
 
+
+        $prew.append( Card.prototype.prewievContent( {known:CardBase[i]} ) );
 
         var cardParams = {
           type : CardBase[i].type,
@@ -542,6 +579,7 @@ function createCard(i) {
           si : CardBase[i].si,
           hc : CardBase[i].hc,
           ec : CardBase[i].ec,
+          cost : CardBase[i].cost,
         }
 
         cardParams.permanent = 0;
@@ -558,7 +596,8 @@ function createCard(i) {
         $p.append(
           $('<button />',{class:'btn btn-default btn-xs sButtonMinus', sValue:i})
           .append($('<span />',{class:'sButtonMinus glyphicon glyphicon-minus',sValue:i})))
-        $div.append($p)
+        $div.append($p);
+        $div.append($prew);
         return $div;
 }
 
