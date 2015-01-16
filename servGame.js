@@ -14,6 +14,7 @@ var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
 var colors = require('colors');
+var fs = require('fs');
 
 //console.log(Stadies)
 
@@ -112,7 +113,8 @@ function lobby_create(req) {
 	Tables[getNewObjectId(Tables)] = {
 		'pA': ses.login,
 		'sesA': req.ses,
-		'sokA': this.id
+		'sokA': this.id,
+		'deckpA': req.myDeck
 	};
 	getTables();
 }
@@ -133,19 +135,23 @@ function lobby_join(req) {
 				StartedGames[id].pA = Tables[req.toTable].pA
 				StartedGames[id].loginA = Tables[req.toTable].pA
 				StartedGames[id].sesA = Tables[req.toTable].sesA
+				StartedGames[id].deckpA = Tables[req.toTable].deckpA
 				SesssionTable[Tables[req.toTable].sesA] = id;
 				StartedGames[id].loginB = ses.login;
 				StartedGames[id].pB = ses.login;
 				StartedGames[id].sesB = req.ses;
+				StartedGames[id].deckpB = req.myDeck;
 				SesssionTable[req.ses] = id;
 			} else {
 				StartedGames[id].loginB = Tables[req.toTable].pA
 				StartedGames[id].pB = Tables[req.toTable].pA
 				StartedGames[id].sesB = Tables[req.toTable].sesA
+				StartedGames[id].deckpB = Tables[req.toTable].deckpA
 				SesssionTable[Tables[req.toTable].sesA] = id;
 				StartedGames[id].loginA = ses.login;
 				StartedGames[id].pA = ses.login;
 				StartedGames[id].sesA = req.ses;
+				StartedGames[id].deckpA = req.myDeck;
 				SesssionTable[req.ses] = id;
 			}
 			this.emit('startGame', {
@@ -335,7 +341,7 @@ function bothIsJoin(d) {
 			Known: {}
 		};
 		table.Accordance = getStartAccordiance(table);
-		table.Known = getStartCards();
+		table.Known = getStartCards(table);
 		getStartAccordanceKnown(table, 'pA');
 		getStartAccordanceKnown(table, 'pB');
 		table.meta = getStartMeta(table);
@@ -438,16 +444,50 @@ function getStartSnapshot(table) {
 	var deckpA = [];
 	var deckpB = [];
 
-
+	console.log('TABLE'.bold)
+	console.log(table)
 
 	var pXs = {
 		'pA': 'c0',
 		'pB': 'c1'
 	};
+
+		table.Decks = {pA:[],pB:[]};
+	for (var  pX in pXs) {
+
+
+		var loginFileName = encodeURIComponent(table[pX]);
+		var outputFilename = __dirname + '/data/decks_' + loginFileName + '.json';
+
+		var decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+		var deck  =  decks[encodeURIComponent(table['deck'+pX])];
+
+		for (var i in deck) {
+			if (i === 'N') {
+				for (var k in deck[i]) {
+					for (var j in deck[i][k]) {
+						table.Decks[pX].push({
+							'count': deck[i][k][j],
+							'number': j
+						})
+					}
+				}
+			}
+			else {
+				for ( var k in deck[i]) {
+					table.Decks[pX].push({'count':deck[i][k],'number':k})
+				}
+			}
+		}
+
+	}
+
+	
+
 	for (var pX in pXs) {
 		var count = 1;
-		for (var i in Decks[pX]) {
-			for (var j = 1; j <= Decks[pX][i].count; j++) {
+		for (var i in table.Decks[pX]) {
+			for (var j = 1; j <= table.Decks[pX][i].count; j++) {
 				var number = pXs[pX] + (count < 10 ? '0' + count : '' + count);
 				result[pX].deck.push(number)
 				count++;
@@ -629,7 +669,7 @@ var Decks = {
 	}, ]
 };
 
-function getStartCards() {
+function getStartCards(table) {
 	var result = {};
 
 	
@@ -676,18 +716,19 @@ function getStartCards() {
 		}
 	}
 
+	console.log('CARD'.bold)
 
 	for (var pX in pXs) {
 		var oboidennie = [];
 		var count = 1;
-		for (var i in Decks[pX]) {
+		for (var i in table.Decks[pX]) {
 
-			for (var j = 1; j <= Decks[pX][i].count; j++) {
+			for (var j = 1; j <= table.Decks[pX][i].count; j++) {
 				var number = pXs[pX] + (count < 10 ? '0' + count : '' + count);
 				result[number] = {};
 
-				for (var prop in Known[Decks[pX][i].number]) {
-					result[number][prop] = Known[Decks[pX][i].number][prop];
+				for (var prop in Known[table.Decks[pX][i].number]) {
+					result[number][prop] = Known[table.Decks[pX][i].number][prop];
 				}
 
 				result[number].owner = pX;
@@ -737,12 +778,15 @@ function getStartAccordiance(S) {
 		return obj.Accordance;
 	}
 
+
+	console.log('ACC'.bold)
+
 	for (var pX in pXs) {
 		var keys = [];
 		var values = [];
 		var count = 1;
-		for (var i in Decks[pX]) {
-			for (var j = 1; j <= Decks[pX][i].count; j++) {
+		for (var i in S.Decks[pX]) {
+			for (var j = 1; j <= S.Decks[pX][i].count; j++) {
 				keys.push(count < 10 ? '0' + count : '' + count)
 				values.push(count < 10 ? '0' + count : '' + count)
 				count++;
