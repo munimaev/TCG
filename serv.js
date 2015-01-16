@@ -69,9 +69,14 @@ app.get('/serv', function(req, res){
 var logicLogin = require('./logic/login');
 app.get('/login', function(req, res){
 	if (req.query.login && req.query.password) {
-		logicLogin.processPost(req, res) // производим вход
+    if (req.query.password2) {
+      logicLogin.registerPost(req, res);
+    }
+    else {
+  		logicLogin.processPost(req, res); // производим вход
+    }
 	} else {
-  		res.render('index.ejs', { myLayout: 'login' }) 
+  		res.render('index.ejs', { myLayout: 'login', session: req.session }) 
 	}
 });
 
@@ -84,7 +89,17 @@ app.get('/logout', function(req, res){
 app.get('/lobby', function(req, res){
 	if (req.session.login) {
 		req.session.id == req.cookies['connect.sid'];
-		res.render('index.ejs', { myLayout: 'lobby', session : req.session })
+
+
+    var loginFileName = encodeURIComponent(req.session.login);
+    var outputFilename = __dirname + '/data/decks_'+loginFileName+'.json';
+
+    var decks = {};
+    if (fs.existsSync(outputFilename)) {
+      decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+    }
+    
+		res.render('index.ejs', { myLayout: 'lobby', session : req.session, decks : decks })
 		//console.log('req',req)
 	}
 	else {
