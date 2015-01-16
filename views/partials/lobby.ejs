@@ -1,5 +1,12 @@
 <h1>Лобби</h1>
 <div class="row">
+  <select class="form-control" id="selectedDeck">
+    <% for (var i in decks) { %>
+      <option><%=decodeURIComponent(i)%></option>
+    <% } %>
+  </select>
+</div>
+<div class="row">
 	<table class="table" id="tables">
 	  <!-- <tr>
 	    <th width="30%">#</th>
@@ -114,7 +121,8 @@
 				          "type" : "button",
 				          "class": "btn btn-primary btn-sm",
 				          "click":  function() {
-                     socket.emit('lobby:create', {'ses':ses});
+                     var myDeck = $('#selectedDeck').val();
+                     socket.emit('lobby:create', {'ses':ses, 'myDeck':myDeck });
                    }
 				        })
               )
@@ -143,7 +151,9 @@
 
       function sitBtnClick(id,pX) {
         result = function() {
-                    socket.emit('lobby:join', {'ses':ses, 'toTable':id});
+        var myDeck = $('#selectedDeck').val()
+        alert(myDeck)
+                    socket.emit('lobby:join', {'ses':ses, 'toTable':id, 'myDeck':myDeck});
                  }
         if (Tables[id][pX] == login) result = function() {};
         if (pX=='pB' && Tables[id]['pA'] == login) result = function() {
