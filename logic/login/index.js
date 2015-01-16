@@ -1,3 +1,5 @@
+
+var fs = require('fs');
 //---
 function create(request, response) {
   var nw = false;
@@ -36,8 +38,14 @@ function processPost(request, response) {
   //console.log('processing POST request: ', request.query.login, request.query.password, request.query.remember);
   var nextLocation = '/login' ;
 
-  if ((request.query.login==='Thor')&&(request.query.password==='111') ||
-    (request.query.login==='Odin')&&(request.query.password==='111')) {
+  var outputFilename = __dirname + '/../../data/users.json';
+  var users = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+
+  if (!users.hasOwnProperty(request.query.login)) {
+
+    request.session.notification = {type:'alert', role:'danger', text:'Неверный логин'};    
+  }
+  else if(users[request.query.login].password === request.query.password) {
     request.session.login = request.query.login;    
 
     if ( typeof(request.session.redirectedFrom) === 'string') {
@@ -51,6 +59,7 @@ function processPost(request, response) {
     delete request.session.enteredWrongPassword;
   }
   else {
+    request.session.notification = {type:'alert', role:'danger', text:'Неверный пароль'};  
     request.session.enteredWrongPassword = true;
     nextLocation = '/login';
   }
@@ -59,6 +68,46 @@ function processPost(request, response) {
   response.end();
 }
 
+
+/**
+ * Processes POST request with registration.
+ * @param request
+ * @param response
+ */
+function registerPost(request, response) {
+  //console.log('processing POST request: ', request.query.login, request.query.password, request.query.remember);
+  var nextLocation = '/login' ;
+  for (var i in request.query) {
+    console.log(i + ' = ' + request.query[i])
+  }
+  var outputFilename = __dirname + '/../../data/users.json';
+  var users = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+
+  if (users.hasOwnProperty(request.query.login)) {
+    request.session.notification = {type:'alert', role:'danger', text:'Логин занят'};    
+  }
+  else if (request.query.password !== request.query.password2) {
+    request.session.notification = {type:'alert', role:'danger', text:'Пароли не совпадают.'};   
+  }
+  else {
+    users[request.query.login] = {'password':request.query.password};
+    request.session.notification = {type:'alert', role:'success', text:'Успех.'};  
+
+    fs.writeFile(outputFilename, JSON.stringify(users, null, 2), function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("New user " + request.query.login);
+      }
+    });
+
+  }
+
+  response.writeHead(303, {'Location': nextLocation});
+  response.end();
+}
+
 //---
 exports.create = create ;
+exports.registerPost = registerPost;
 exports.processPost = processPost ;
