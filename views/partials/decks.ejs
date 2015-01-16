@@ -116,7 +116,7 @@
   <div class="col-md-3">
         <div class="form-group">
           <label for="sText">Text</label>
-          <input type="email" class="form-control sButton" id="sText" placeholder="Text" sType="text">
+          <input type="text" class="form-control sButton" id="sText" placeholder="Text" sType="text">
         </div>
   </div>
   <div class="col-md-1">
@@ -492,7 +492,7 @@ var updatePool = (function() {
       }
 
       if (text.length != 0) {
-        if (!~CardBase[i].name.indexOf(text)) {
+        if (!~CardBase[i].name.indexOf(text) && !~CardBase[i].number.indexOf(text)) {
           continue;
         }
       }
