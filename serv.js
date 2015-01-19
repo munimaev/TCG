@@ -40,16 +40,17 @@ app.get('/game', function(req, res){
 	if (req.session.login) {
     console.log('============== /game');
     var ok = false;
-    for (var i in SG.StartedGames) {
-        console.log(i + ' : ' + SG.StartedGames[i].loginA + ' / ' + SG.StartedGames[i].loginB + ' | ' + req.session.login)
-      if (SG.StartedGames[i].loginA == req.session.login 
-        || SG.StartedGames[i].loginB == req.session.login
+    var StartedGames = SG.getStartedGames();
+
+    for (var i in StartedGames) {
+        console.log(i + ' : ' + StartedGames[i].loginA + ' / ' + StartedGames[i].loginB + ' | ' + req.session.login)
+      if (StartedGames[i].loginA == req.session.login 
+        || StartedGames[i].loginB == req.session.login
       ) {
         ok = true;
       }
     }
     if (ok) {
-      console.log('load template')
       req.session.id == req.cookies['connect.sid'];
       res.render('game.ejs', { myLayout: 'game', session : req.session })
     } else {
