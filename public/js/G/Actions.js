@@ -1,3 +1,9 @@
+
+/**
+ * Проверяет яляеться ли переданная зона name простой, т.е. такая зона где карты лежэат по одной и никогда не объединются в команды.
+ * @param  {String}  name Название зоны
+ * @return {Boolean}      true если зона простая
+ */
 function isZoneSimple(name) {
 	if (name == 'deck' || name == 'discard' || name == 'chackra' || name == 'hand' || name == 'stack' || name == 'mission') {
 		return true;
@@ -355,23 +361,20 @@ var Actions = {
 		},
 		/**
 		 * [description]
-		 * @param  {[type]} args {
-		 *                      nonchange: default false ,
-		 *                      c1 : {
-		 *                      	position : 'leader' / 'support',
-		 *                      	owner: 'pA' / 'pB',
-		 *                      	zone: 'attack',
-		 *                      	team: 1,
-		 *                      	card : 'c001'
-		 *                      },
-		 *                      c2 : {
-		 *                      	position : 'leader' / 'support',
-		 *                      	owner: 'pA' / 'pB',
-		 *                      	zone: 'attack',
-		 *                      	team: 1,
-		 *                      	card : 'c001'
-		 *                      }
-		 * 					}
+		 * @param  {Object} args 
+		 * @param  {Boolean} args.nonchange: default false ,
+		 * @param  {Object} args.c1 
+		 * @params {String} args.c1.position : 'leader' / 'support',
+		 * @params {String} args.c1.owner: 'pA' / 'pB',
+		 * @params {String} args.c1.zone: 'attack',
+		 * @params {String} args.c1.team: 1,
+		 * @params {String} args.c1.card : 'c001'
+		 * @param  {[type]} args.c2 
+		 * @param  {[type]} args.c2.position : 'leader' / 'support',
+		 * @param  {[type]} args.c2.owner: 'pA' / 'pB',
+		 * @param  {[type]} args.c2.zone: 'attack',
+		 * @param  {[type]} args.c2.team: 1,
+		 * @param  {[type]} args.c2.card : 'c001'
 		 * @param  {[type]} o    [description]
 		 * @return {[type]}      [description]
 		 */
@@ -1812,20 +1815,8 @@ var Actions = {
 	},
 	/**
 	 * [description]
-	 * @param  {[type]} args {
-	 *                       statuses : ['Puppet'],
-	 *                       path : {
-	 *                       	players : ['pA', 'pB'],
-	 *                       	zones : ['attack', 'block']
-	 *                       },
-	 * }
-	 * @param  {[type]} o    [description]
-	 * @return {[type]}      [description]
-	 */
-	/**
-	 * [description]
 	 * @param  {[type]} dict [['текст ошибки',function(){return true/false}],...]
-	 * @return {[type]}      [description]
+	 * @return {Object}      Возвраащает {"result:true"} или {"cause": dict[i][0],"result": false}.
 	 */
 	'canCheckDict': function(dict) {
 		for (var i in dict) {
