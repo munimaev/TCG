@@ -119,7 +119,6 @@ function Card(o) {
             }
         }
     };
-    //console.log(this.params.H)
     if (('H' in o) && ('W' in o)) {
         this.params.H = o.H;
         this.params.W = o.W;
@@ -134,7 +133,6 @@ function Card(o) {
         this.params.H = rand;
         this.params.W = rand;
     };
-    //console.log(o.H)
 
 
     /**
@@ -615,7 +613,6 @@ function Card(o) {
             o.ym = moveIncline.ym;
             o.degm = moveIncline.degm;
             o.trace = moveIncline.trace;
-            //console.log(moveIncline);
 
 
             if (o.additional && o.additional.curveMoving) {
@@ -634,14 +631,10 @@ function Card(o) {
 
         var done = function() {};
 
-        // console.log(!o.isInclining, o.isMoving, !o.additional.incline);
 
         if ((!o.isInclining && o.isMoving && !o.additional.incline) || o.additional.after) {
             done = function() {
-                // if (o._this.id == 'c001')console.log('after',o);
-                // console.log(o._this.params.incline);
                 if (!o.isInclining && o.isMoving && !o.additional.incline) {
-                    // console.log(o._this.id, 'after')
                     o._this.animation({
                         x: 0,
                         y: 0,
@@ -650,7 +643,6 @@ function Card(o) {
                         duration: Math.round(o.duration / 2)
                     });
                 }
-                // console.log(o);
                 if (o.additional.after) {
                     if (o.additional.after.func) {
                         o.additional.after.func();
@@ -670,7 +662,6 @@ function Card(o) {
     };
 
     this.animationStep = function(o) {
-        //console.log('animationStep');
         var oldXi, oldYi, oldZi, oldDegi;
         var oldX = oldXi = o._this.params.incline.x;
         var oldY = oldYi = o._this.params.incline.y;
@@ -727,10 +718,7 @@ function Card(o) {
             }
         }
 
-        //console.log(o)
-
         return function(now, fx) {
-            //if (o._this.id == 'c005')console.log(o);
 
             if (trace == null && newNow == 0) {
                 newNow = 1;
@@ -755,7 +743,6 @@ function Card(o) {
                 $(this).
                 css('-webkit-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)').
                 css('-moz-transform', 'rotate3d(' + nowX + ',' + nowY + ',' + nowZ + ',' + nowDeg + 'deg)');
-                //console.log(fx.prop, fx.start, now, fx.end)
                 o._this.params.incline = {x: nowX, y: nowY, z: nowZ, deg: nowDeg};
             }
 
@@ -766,7 +753,6 @@ function Card(o) {
                 var nowW = oldW - (oldW - newW) * multipler;
                 $(this).css('height', nowH + 'px')
                     .css('width', nowW + 'px');
-                //('.power' , this).css('fontSize', nowH/4 + 'px').css('lineHeight', nowH/4 + 'px')
                 o._this.instPower(nowH, o);
                 o._this.instTeamPower(nowH, o);
                 o._this.upSideAndCorner(nowH, o);
@@ -824,9 +810,6 @@ function Card(o) {
             }
 
             if (o.additional.curveMoving) {
-
-                //console.log(o.additional.curveMoving);
-
                 var multiplerX = o.additional.curveMoving === 'X' ? multipler * multipler : multipler;
                 var multiplerY = o.additional.curveMoving === 'Y' ? multipler * multipler : multipler;
 
@@ -845,12 +828,10 @@ function Card(o) {
 
     this.moveIncline = function(o) {
 
-        //console.log(o)
         var deltaX = this.params.position.X > o.X ? this.params.position.X - o.X : o.X - this.params.position.X;
         var deltaY = this.params.position.Y > o.Y ? this.params.position.Y - o.Y : o.Y - this.params.position.Y;
         var trace = deltaY > deltaX ? 'top' : 'left';
 
-        //console.log(this.params.position)
         var yi = this.params.incline.x;
         if (o.Y !== this.params.position.Y) {
             yi = o.Y > this.params.position.Y ? -1 : 1;
@@ -869,7 +850,7 @@ function Card(o) {
     };
 
     this.transformToCard = function() {
-        console.log(this.$id.css('background-color', 'black'));
+        this.$id.css('background-color', 'black')
     };
 
     this.changeZone = function(zona) {
@@ -935,7 +916,6 @@ function Card(o) {
             }
         }
         if (this.params.zona === 'stack' && onOrOff) {
-            console.log('to showUserAndTarget ', this.id, onOrOff)
             this.showUserAndTarget(this.id, onOrOff);
         }
     };
@@ -1011,7 +991,6 @@ function Card(o) {
 
     this.showPrewiev = function() {
         if (this.params.prewiev || !this.params.faceUp){
-            console.log(this.params.prewiev, !this.params.faceUp)
             return true;
         }
         var offset = this.$id.offset();
@@ -1029,10 +1008,8 @@ function Card(o) {
             .css('width', W + 'px')
             .css('font-size', I.card.W / 8 + 'px');
 
-        //console.log( I.H,I.card.H ,H , this.params.H )
         var topPrew = X - H - this.params.H / 20;
         if (topPrew + H > I.H - I.card.W) topPrew = I.H - I.card.W - H - this.params.H / 20;
-        //console.log(topPrew,I.H - I.card.W )
         if (this.params.zona == 'hand') {
             $prew
                 .css('top', topPrew + 'px')
@@ -1108,20 +1085,6 @@ function Card(o) {
             additional : {
                 after: {
                     func: afterFunc
-                    // (function() {
-                    //     return function() {
-                    //         console.log(1, _this)
-                    //         var _this = this;
-                    //         _this.$id.empty();
-                    //         _this.fillAsFaceUp(_this.$id);
-                    //         _this.updateLinks();
-                    //         _this.updateMouse();
-                    //         _this.animation({
-                    //             y: 1,
-                    //             deg: 0
-                    //         });
-                    //     }
-                    // })()
                 }
             }
         });
@@ -1130,7 +1093,6 @@ function Card(o) {
 
     this.flipDown = function() {
         if (!this.params.faceUp){
-            console.log(this.params.faceUp)
             return false;
         }
         var card = C[this.id];
@@ -1405,7 +1367,6 @@ function Card(o) {
             var id = this.id;
             obj.c2 = this.getMainParams();
             obj.c1 = G.selectedCard.getMainParams();
-            console.log(this.id, G.selectedCard.id)
             if (Can.orgAddToTeam(obj, getUniversalObject())) {
                 $c.append(
                     $('<div />', {
@@ -1442,15 +1403,10 @@ function Card(o) {
             var id = this.id;
             var activate = Known[Accordance[this.id]].effect.activate;
             for (var i in activate) {
-                // console.log(';;')
-                // console.log(activate[i].can({card: this.id},
-                //     getUniversalObject()
-                // ).result)
                 var canResult = activate[i].can({
                         card: this.id
                     },
                     getUniversalObject())
-                // console.log(canResult)
 
                 if (canResult.result) {
                     $c.append(
@@ -1621,7 +1577,6 @@ Card.prototype = {
                 cicling: (function() {
                     var cardId = id;
                     return function() {
-                        console.log(cardId)
                         if (C[cardId].params.hover) return true;
                         return false;
                     }
@@ -1644,7 +1599,6 @@ Card.prototype = {
         }
     },
     changePower: function(forcedChange) {
-        // console.log('changePower', this.id, this.$power.hasClass('powerInjured'), this.params.isHealt)
         if (this.params.type == 'N') {
             var currentPower = (this.$power.html()).split('/');
             var mod = Actions.getNinjaModPower(this.id, getUniversalObject());
@@ -1698,7 +1652,6 @@ Card.prototype = {
         var name = args.name ||  this.id + ' ' + name;
         var hc = args.hasOwnProperty('hc') ? args.hc : hc;
         var ec = args.hasOwnProperty('ec') ? args.ec : ec;
-        console.log(args,hc,ec)
         return $('<table />', {
             'border': 0,
             'cellpadding': 0,
@@ -1923,7 +1876,6 @@ Card.prototype = {
                 });
         }
         if (o.type == 'puff') {
-            console.log('ANIMATE PUFF')
             var sprite = $('<div />', {})
                 .css('width', _this.params.W * 1.2)
                 .css('height', _this.params.H * 1.2)
@@ -1957,7 +1909,6 @@ Card.prototype = {
         //animation length 8 * 60 = 480 ms
         if (o.type == 'concentrate') {
 
-            // console.log('ANIMATE concentrate')
             var sprite = $('<div />', {})
                 .css('width', _this.params.W)
                 .css('height', _this.params.H)
@@ -2012,10 +1963,10 @@ Card.prototype = {
             .css('font-size', this.params.W / 8 + 'px')
             .css('line-height', this.params.W / 4 + 'px')
         if ((this.params && this.params.faceUp) || args.faceUp) {
-            var cbg = this.glossary.colors.card.bg[this.params.type];
-            cbg.a = this.params.status === 'card' ? 1 : 0;
-            cbg.a = 0;
-            $card.css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
+            // var cbg = this.glossary.colors.card.bg[this.params.type];
+            // cbg.a = this.params.status === 'card' ? 1 : 0;
+            // cbg.a = 0;
+            // $card.css('backgroundColor', 'rgba(' + cbg.r + ',' + cbg.g + ',' + cbg.b + ',' + cbg.a + ')');
             this.fillAsFaceUp($card, args);
         } else {
             this.fillAsFaceDown($card, args);
@@ -2024,7 +1975,6 @@ Card.prototype = {
     },
 
     fillAsFaceUp : function(link, args) {
-        //console.log(this.id, this.params.isHealt, currentAttack, currentSupport )
         var args = args || {};
         var typeCard = args.type || this.params.type;
         if (typeCard == "N") this.fillAsFaceUpNinja(link, args)
@@ -2215,6 +2165,7 @@ Card.prototype = {
         var img = args.img || this.params.img;
         var hc = args.hasOwnProperty('hc') ? args.hc : this.params.hc;
         var ec = args.hasOwnProperty('ec') ? args.ec : this.params.ec;
+        var cost = args.hasOwnProperty('cost') ? args.cost : [];
 
 
         var $limon = $('<div />', {
@@ -2238,6 +2189,10 @@ Card.prototype = {
 
         $outShell.append($limon);
 
+        // var  $type = $('<div />', { "class": 'typeJutsuIcon'})
+        // $type.append($('<img />',{"src":'public/pics/icons/kunai.png'}))
+        // $outShell.append($type);
+
         for (var i in args.elements) {
 
 
@@ -2257,45 +2212,6 @@ Card.prototype = {
                     );
         }
 
-        // $outShell.append(
-        //     $('<div />', {
-        //         'class': 'icon cardIcon'
-        //     })
-        //     .css('right', '11%')
-        //     .css('bottom', '0%')
-        //     .css('width', '20%')
-        //     .css('height', '20%')
-        //     .append(
-        //         $('<div />', {
-        //             'class': 'blur'
-        //         })
-        //     )
-        //     .append(
-        //         $('<div />', {
-        //             'class': 'fire'
-        //         })
-        //     )
-        // );
-        // $outShell.append(
-        //     $('<div />', {
-        //         'class': 'icon cardIcon'
-        //     })
-        //     .css('right', '0%')
-        //     .css('bottom', '11%')
-        //     .css('width', '20%')
-        //     .css('height', '20%')
-        //     .append(
-        //         $('<div />', {
-        //             'class': 'blur'
-        //         })
-        //     )
-        //     .append(
-        //         $('<div />', {
-        //             'class': 'void'
-        //         })
-        //     )
-        // );
-
 
 
 
@@ -2307,16 +2223,16 @@ Card.prototype = {
             /*3*/ [{bottom:-3,left:12.5},{bottom:-3,left:37.5},{bottom:-3,left:62.5}]
         ]
 
-        if (args.cost.length === 1) {
-            var count = args.cost[0].length;
-            for (var i in args.cost[0]) {
+        if (cost.length === 1) {
+            var count = cost[0].length;
+            for (var i in cost[0]) {
 
                 var $icon = $('<div />', {
-                        'class': 'cost' + args.cost[0][i],
+                        'class': 'cost' + cost[0][i],
                     })
 
-                if ($.isNumeric(args.cost[0][i]) || args.cost[0][i] === 'X') {
-                    $icon.append($('<div />',{'class':'whiteTextblackBorder', 'text':'args.cost[0][i]'}))
+                if ($.isNumeric(cost[0][i]) || cost[0][i] === 'X') {
+                    $icon.append($('<div />',{'class':'whiteTextblackBorder', 'text':cost[0][i]}))
                 }
                 $outShell.append(
                     $('<div />', {
@@ -2355,19 +2271,18 @@ Card.prototype = {
 
         link
             .append($('<div />', {
-                'class': 'cbg'
+                'class': 'cbg rectangle'
             }))
 
         var outShell = $('<div />', {
                 'class': 'outShell'
-            })
-            .css('width', '92%')
-            .css('height', '92%')
-            .css('top', '4%')
-            .css('left', '4%')
+            });
+        outShell.css('width', '92%')
+        outShell.css('height', '92%')
+        outShell.css('top', '4%')
+        outShell.css('left', '4%')
 
-        outShell
-            .append(
+        outShell.append(
                 $('<div />', {
                     'class': 'rectangle'
                 }) // end create 'rectangle'
@@ -2378,46 +2293,67 @@ Card.prototype = {
                     })
                     .css('background-image', 'url(public/pics/' + img + '.jpg)')
                 )
-        ) // end append 'rectangle'
-        .append(
-            $('<div />', {
-                'class': 'icon cardIcon'
-            })
-            .css('right', '18%')
-            .css('top', '0%')
-            .css('width', '20%')
-            .css('height', '20%')
-            .append(
-                $('<div />', {
-                    'class': 'blur'
-                })
-            )
-            .append(
-                $('<div />', {
-                    'class': 'fire'
-                })
-            )
-        )
-            .append(
-                $('<div />', {
-                    'class': 'icon cardIcon'
-                })
-                .css('right', '0%')
-                .css('top', '0%')
-                .css('width', '20%')
-                .css('height', '20%')
-                .append(
-                    $('<div />', {
-                        'class': 'blur'
+        ); // end append 'rectangle'
+
+
+        for (var i in args.elements) {
+
+
+                var $icon = $('<div />', {
+                        'class': 'element' + args.elements[i],
                     })
-                )
-                .append(
+
+                outShell.append(
                     $('<div />', {
-                        'class': 'void'
+                        'class': 'icon cardIcon'
                     })
-                )
-        )
-            .append(
+                    .css('top', (5 + 21 * i) + '%')
+                    .css('right', '5%')
+                    .css('width', '20%')
+                    .css('height', '20%')
+                .append($icon)
+                    );
+        }
+
+        // outShell.append(
+        //     $('<div />', {
+        //         'class': 'icon cardIcon'
+        //     })
+        //     .css('right', '18%')
+        //     .css('top', '0%')
+        //     .css('width', '20%')
+        //     .css('height', '20%')
+        //     .append(
+        //         $('<div />', {
+        //             'class': 'blur'
+        //         })
+        //     )
+        //     .append(
+        //         $('<div />', {
+        //             'class': 'fire'
+        //         })
+        //     )
+        // );
+        // outShell.append(
+        //         $('<div />', {
+        //             'class': 'icon cardIcon'
+        //         })
+        //         .css('right', '0%')
+        //         .css('top', '0%')
+        //         .css('width', '20%')
+        //         .css('height', '20%')
+        //         .append(
+        //             $('<div />', {
+        //                 'class': 'blur'
+        //             })
+        //         )
+        //         .append(
+        //             $('<div />', {
+        //                 'class': 'void'
+        //             })
+        //         )
+        // );
+        outShell.append(
                 $('<div />', {
                     'class': 'icon cardIcon'
                 })
@@ -2431,8 +2367,8 @@ Card.prototype = {
                         'text': hc
                     })
                 )
-        )
-            .append(
+        );
+        outShell.append(
                 $('<div />', {
                     'class': 'icon cardIcon'
                 })
