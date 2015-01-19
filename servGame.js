@@ -5,28 +5,35 @@ var session_store = {
 };
 var Tables = {};
 var preGamesLobbi = {}
-var StartedGames = {};
+var StartedGames = {'rop':{}};
 var Testing = false;
 var Load = false;
-exports.StartedGames = StartedGames;
-var SesssionTable = {};
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
 var colors = require('colors');
 var fs = require('fs');
 
-//console.log(Stadies)
+
+var servGameUserMainComands = require('./logic/servGameUserMainComands.js');
+var servLobbyApi = require('./logic/servLobbyApi.js');
+
+function getStartedGames() {
+	return StartedGames;
+}
+exports.getStartedGames = getStartedGames;
+//onsole.log(Stadies)
 
 function arraySearch(array, value) {
 	for (var i in array) {
-		//console.log('msg',i,array[i], value)
+		//onsole.log('msg',i,array[i], value)
 		if (array[i] == value) {
 			return i;
 		}
 	}
 	return null
 }
+
 /**
  * This function is called by index.js to initialize a new game instance.
  *
@@ -35,24 +42,25 @@ function arraySearch(array, value) {
  */
 exports.initLobbi = function(sio, socket, session_store_) {
 	io = sio;
+	servLobbyApi.initialize(io, session_store_, StartedGames, Tables)
+
 	gameSocket = socket;
 	session_store = session_store_;
 	gameSocket.emit('connected', {
 		message: "You are connected!"
 	});
 	//-----------------------------------------
-	gameSocket.on('lobby:tables', getTables);
-	gameSocket.on('lobby:games', getGames);
-	gameSocket.on('lobby:create', lobby_create);
-	gameSocket.on('lobby:join', lobby_join);
-	gameSocket.on('lobby:delete', lobby_delete);
-	gameSocket.on('player:sit', playerSit);
-	gameSocket.on('player:unsit', playerUnsit);
+	gameSocket.on('lobby:tables', servLobbyApi.getTables);
+	gameSocket.on('lobby:games', servLobbyApi.getGames);
+	gameSocket.on('lobby:create', servLobbyApi.cretaeTable);
+	gameSocket.on('lobby:join', servLobbyApi.joinToTable);
+	gameSocket.on('lobby:delete',servLobbyApi.deleteTable);
+	//-----------------------------------------
 	gameSocket.on('imJoined', imJoined);
 	gameSocket.on('newLeader', newLeader);
 	gameSocket.on('preStackDone', preStackDone);
 	gameSocket.on('addAnswers', addAnswers);
-	gameSocket.on('save', saveGame);
+	gameSocket.on('save', servGameUserMainComands.saveGame);
 	gameSocket.on('getS', getS);
 	gameSocket.on('known', known);
 	gameSocket.on('activateEffect', activateEffect);
@@ -74,208 +82,16 @@ exports.initLobbi = function(sio, socket, session_store_) {
 	// gameSocket.on('server:connected', updServerInfoPage);
 }
 
-exports.disconnect = function(sok) {
-	for (var i in Tables) {
-		if (Tables[i].sokA == sok) {
-			delete Tables[i];
-			getTables();
-			break;
-		}
-	}
-	for (var i in StartedGames) {
-		var end = false;
-		if ('socketA' in StartedGames[i] && StartedGames[i].socketA == sok) {
-			console.log('ANULL')
-			StartedGames[i].socketA = null;
-			end = true;
-		}
-		if ('socketB' in StartedGames[i] && StartedGames[i].socketB == sok) {
-			console.log('BNULL')
-			StartedGames[i].socketB = null;
-			end = true;
-		}
-		if ('socketA' in StartedGames[i] && !StartedGames[i].socketA && 'socketB' in StartedGames[i] && !StartedGames[i].socketB) {
-			console.log('DELL')
-			console.log('socketA' in StartedGames[i], !StartedGames[i].socketA, 'socketB' in StartedGames[i], !StartedGames[i].socketB)
-			delete StartedGames[i];
-		}
-		if (end) break;
-	}
-}
-
-function lobby_create(req) {
-	var ses = JSON.parse(session_store.sessions[req.ses]);
-	for (var i in Tables) {
-		if (Tables[i].pA == ses.login || Tables[i].pB == ses.login) {
-			return;
-		}
-	}
-	Tables[getNewObjectId(Tables)] = {
-		'pA': ses.login,
-		'sesA': req.ses,
-		'sokA': this.id,
-		'deckpA': req.myDeck
-	};
-	getTables();
-}
-
-function lobby_join(req) {
-	var ses = JSON.parse(session_store.sessions[req.ses]);
-	for (var i in Tables) {
-		if (Tables[i].pA == ses.login) {
-			req.table = i;
-			lobby_delete(req)
-		}
-	}
-	if (Tables[req.toTable]) {
-		if (Tables[req.toTable].sokA) {
-			var id = getNewObjectId(StartedGames)
-			StartedGames[id] = {};
-			if (Math.random() > 0.5) {
-				StartedGames[id].pA = Tables[req.toTable].pA
-				StartedGames[id].loginA = Tables[req.toTable].pA
-				StartedGames[id].sesA = Tables[req.toTable].sesA
-				StartedGames[id].deckpA = Tables[req.toTable].deckpA
-				SesssionTable[Tables[req.toTable].sesA] = id;
-				StartedGames[id].loginB = ses.login;
-				StartedGames[id].pB = ses.login;
-				StartedGames[id].sesB = req.ses;
-				StartedGames[id].deckpB = req.myDeck;
-				SesssionTable[req.ses] = id;
-			} else {
-				StartedGames[id].loginB = Tables[req.toTable].pA
-				StartedGames[id].pB = Tables[req.toTable].pA
-				StartedGames[id].sesB = Tables[req.toTable].sesA
-				StartedGames[id].deckpB = Tables[req.toTable].deckpA
-				SesssionTable[Tables[req.toTable].sesA] = id;
-				StartedGames[id].loginA = ses.login;
-				StartedGames[id].pA = ses.login;
-				StartedGames[id].sesA = req.ses;
-				StartedGames[id].deckpA = req.myDeck;
-				SesssionTable[req.ses] = id;
-			}
-			this.emit('startGame', {
-				"key": 'alert'
-			})
-			io.sockets.in(Tables[req.toTable].sokA).emit('startGame', {
-				"key": 'alert'
-			});
-		}
-		req.table = req.toTable;
-		lobby_delete(req, true);
-	}
-	console.log(StartedGames)
-}
-
-function lobby_delete(req, forced) {
-	var ses = JSON.parse(session_store.sessions[req.ses]);
-
-	if (forced || (Tables[req.table] && (Tables[req.table].pA == ses.login || Tables[req.table].pB == ses.login))
-
-	) {
-		delete Tables[req.table];
-		getTables();
-	}
-}
-
-function getNewObjectId(obj) {
-	var result = 1;
-	while (obj[result]) {
-		result++;
-	}
-	return result;
-}
-
-function getTables() {
-	var data = {};
-	for (var i in Tables) {
-		data[i] = {
-			pA: Tables[i].pA,
-			pB: Tables[i].pB
-		}
-	}
-	io.emit('setTables', data);
-}
-
-function getGames() {
-	var data = {};
-	for (var i in StartedGames) {
-		data[i] = {
-			pA: StartedGames[i].loginA,
-			pB: StartedGames[i].loginB
-		}
-	}
-	io.emit('setGames', data);
-}
-
-function playerSit(d) {
-	if (d.pX) {
-		Tables[d.id][d.pX] = d.user;
-		if (Tables[d.id].pA && Tables[d.id].pB) {
-			// second
-			this.emit('sitInLobby', {
-				"key": preGamesLobbi[d.id].key
-			})
-			this.join(preGamesLobbi[d.id].key);
-			io.sockets.in(preGamesLobbi[d.id].key).emit('startGame', {
-				some: 'data'
-			});
-
-		} else {
-			// first
-			preGamesLobbi[d.id] = {
-				key: (Math.random() * 100000) | 0
-			};
-			this.emit('sitInLobby', {
-				"key": preGamesLobbi[d.id].key
-			})
-			this.join(preGamesLobbi[d.id].key.toString());
-		}
-	}
-	io.emit('setTables', Tables);
-}
-
-function playerUnsit(d) {
-	if (d.pX && Tables[d.id][d.pX] == d.user) {
-		Tables[d.id][d.pX] = null;
-		this.emit('unsitInLobby')
-		this.leave(preGamesLobbi[d.id].key.toString());
-	}
-	if (!Tables[d.id].pA && !Tables[d.id].pB) {
-		delete preGamesLobbi[d.id]
-	}
-	io.emit('setTables', Tables);
-}
-
-/*
-	Server
- */
-
-function updServerInfoPage(d) {
-	if (!(d.b in StartedGames)) StartedGames[d.b] = {};
-	if (!StartedGames[d.b].roomS) {
-		StartedGames[d.b].roomS = StartedGames[d.b].room + "_" + this.id;
-		this.join(StartedGames[d.b].roomS);
-	}
-	var info = StartedGames[d.b]
-	this.emit('updServerInfoPage', info);
-}
+exports.disconnect = servLobbyApi.disconnect;
 
 /*
 	G
  */
 
 function S_init(d) {
-	//console.log('\nS_init')
-	//console.log(StartedGames);
-	var tableId = SesssionTable[d.ses];
+	var tableId = servLobbyApi.getTableForSession(d.ses); 
 	var table = StartedGames[tableId];
-	// console.log(SesssionTable)
-	// console.log(d)
-	// console.log(tableId)
-	// console.log(table)
 	if (!table) {
-		console.log('goOut')
 		this.emit('goOut');
 		return;
 	}
@@ -306,10 +122,7 @@ function S_init(d) {
 		this.join(StartedGames[tableId].roompA);
 		StartedGames[tableId].Snapshot = Snapshot;
 		io.sockets.in(StartedGames[tableId].roompA).emit('C_init', data); //TODO отослать только проверенному пользователю
-	} else {
-		// TODO должно выкинуть в предыдущее окно
-	}
-	// io.sockets.in(StartedGames[d.b].roomS).emit('updServerInfoPage', StartedGames[d.b]);
+	} 
 }
 
 function getRoomNumber(d) {
@@ -321,16 +134,12 @@ function getRoomNumber(d) {
 }
 
 function imJoined(d) {
-	// console.log('\nimJoined')
-	bothIsJoin(d);
+		bothIsJoin(d);
 }
 
 function bothIsJoin(d) {
-	// console.log('\nbothIsJoin')
-	var table = StartedGames[d.table]
-		// console.log('table.socketA && table.socketB', table.socketA , table.socketB, table.bothIsJoin, Testing)
-	if (table.socketA && table.socketB && !table.bothIsJoin) {
-		console.log("Otdal kajdomu")
+		var table = StartedGames[d.table]
+			if (table.socketA && table.socketB && !table.bothIsJoin) {
 		table.bothIsJoin = true;
 		table.pA = {
 			Accordance: {},
@@ -351,7 +160,6 @@ function bothIsJoin(d) {
 				Known: table.pA.Known,
 				check: 2
 			}
-			//console.log(dataTopA)
 		io.sockets.in(table.roompA).emit('bothIsJoin', dataTopA);
 		var dataTopB = {
 				isNewGame: table.Snapshot.pB.isNewGame,
@@ -359,11 +167,9 @@ function bothIsJoin(d) {
 				Known: table.pB.Known,
 				check: 1
 			}
-			//console.log(dataTopB)
 		io.sockets.in(table.roompB).emit('bothIsJoin', dataTopB);
 		// TODO нужна комната для наблюдателя
 	} else if (Testing || table.bothIsJoin) {
-		// console.log("Otdal odnomu",table[d.you].Accordance)
 		io.sockets.in(table['room' + d.you]).emit('bothIsJoin', {
 			isNewGame: table.Snapshot[d.you].isNewGame,
 			Accordance: table[d.you].Accordance,
@@ -443,9 +249,6 @@ function getStartSnapshot(table) {
 
 	var deckpA = [];
 	var deckpB = [];
-
-	console.log('TABLE'.bold)
-	console.log(table)
 
 	var pXs = {
 		'pA': 'c0',
@@ -716,7 +519,7 @@ function getStartCards(table) {
 		}
 	}
 
-	console.log('CARD'.bold)
+	//onsole.log('CARD'.bold)
 
 	for (var pX in pXs) {
 		var oboidennie = [];
@@ -759,7 +562,7 @@ function getStartMeta(S) {
 		for (var zone in zones)
 			for (var number in S.Snapshot[pXs[pX]][zones[zone]].team)
 				if (result.teamCounter <= number) result.teamCounter = number;
-	// console.log(('getStartMeta ' + result.teamCounter).bold)
+	//console.log(('getStartMeta ' + result.teamCounter).bold)
 	return result;
 }
 
@@ -843,8 +646,7 @@ function getStartAccordanceKnown(Table, pX) {
 			oneCardAccordanceКnown(Table, Table.Snapshot.stack[card].card)
 		}
 	}
-	return result;
-}
+	return result;}
 
 function oneCardAccordanceКnown(S, card, arr) {
 	var arr = arr || ['pA', 'pB'] // TODО наблюдатель
@@ -899,8 +701,8 @@ function S_startDrawHand(d) {
 /**
  * [pressNextBtn description]
  * @param  {[type]} d [description]
- * @return {[type]} d.u [description]
- * @return {[type]} d.transferInitiativeFrom Этот элемент указывает на то закончил ли игрок ход или просто передал инициативу.
+ * @param {[type]} d.u [description]
+ * @param {[type]} d.transferInitiativeFrom Этот элемент указывает на то закончил ли игрок ход или просто передал инициативу.
  * Содержит игрока последним передавшим инициативу. Если игрок что то делает в свою инициативу то это значение становиться  null
  * Если что то делает  то pA или pB. Это являеться маркером совершонного действия, если маркер передан,
  * то согласие не переход в селдующую фазу у оппонента снимаеться.
@@ -916,8 +718,8 @@ function pressNextBtn(d) {
 		meta: StartedGames[d.u.table].meta
 	})) {
 		var table = StartedGames[d.u.table];
-		// console.log('pressNextBtn'.red)
-		// console.log(d)
+		//console.log('pressNextBtn'.red)
+		//console.log(d)
 		if (d.transferInitiative) {
 			table.meta.toNextPhase[d.u.opp] = false;
 		}
@@ -930,8 +732,8 @@ function pressNextBtn(d) {
 			stackPrep: {}
 		};
 		if ((Stadies[table.Snapshot.phase].party == 'both' && table.meta.toNextPhase.pA && table.meta.toNextPhase.pB) || (Stadies[table.Snapshot.phase].party == 'attacker' && table.meta.toNextPhase[table.Snapshot.activePlayer]) || (Stadies[table.Snapshot.phase].party == 'blocker' && table.meta.toNextPhase[table.Snapshot.activePlayer == 'pA' ? 'pB' : 'pA'])) {
-			// console.log("table.Snapshot.stack".red)
-			// console.log(table.Snapshot.stack)
+			//console.log("table.Snapshot.stack".red)
+			//console.log(table.Snapshot.stack)
 			if (table.Snapshot.stack.length) {
 				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
 				LoadStack(table);
@@ -941,8 +743,8 @@ function pressNextBtn(d) {
 				data.stackPrep = actReuslt;
 				table.stackPrep = actReuslt;
 				table.stackPreppA = table.stackPreppB = null;
-				// console.log('table.meta'.red)
-				// console.log(table.meta)
+				//console.log('table.meta'.red)
+				//console.log(table.meta)
 			} else {
 				table.meta.toNextPhase.pA = table.meta.toNextPhase.pB = false;
 				var actReuslt = {
@@ -955,8 +757,8 @@ function pressNextBtn(d) {
 				table.stackPreppA = table.stackPreppB = null;
 			}
 		} else {
-			// console.log("table.Snapshot.stack".red)
-			// console.log(table.Snapshot.stack)
+			//console.log("table.Snapshot.stack".red)
+			//console.log(table.Snapshot.stack)
 			table.meta.toNextPhase[d.u.opp] = false;
 			data.acts.push({
 				'arg': {},
@@ -984,12 +786,11 @@ function LoadStack(table) {
 		});
 	}
 	// console.log("\n\ntable.stack")
-	// console.log(table.stack)
-}
+	// console.log(table.stack)}
 
 function addToTeam(d) {
 	var table = StartedGames[d.u.table];
-	//console.log(d.arg)
+	//onsole.log(d.arg)
 	if (Can.orgAddToTeam({
 		c1: {
 			card: d.arg.c1.card
@@ -1044,7 +845,7 @@ function changeInTeam(d) {
 
 function putInPlay(d) {
 	var table = StartedGames[d.u.table];
-	//console.log(d.u);
+	//onsole.log(d.u);
 	if (Can.putInPlay({
 		card: d.arg.card,
 		owner: d.arg.owner,
@@ -1091,7 +892,7 @@ function putInPlay(d) {
 
 function playJutsu(d) {
 	var table = StartedGames[d.u.table];
-	//console.log(d.u);
+	//onsole.log(d.u);
 	if (Can.playJutsu({
 		card: d.arg.card,
 		owner: d.arg.owner,
@@ -1274,7 +1075,7 @@ function activateEffect(d) {
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
 		var upds = getUpdatesForPlayers(table, actReuslt);
-		// console.log('upds',upds)
+		//console.log('upds',upds)
 		delete actReuslt.applyUpd;
 		var dataA = {
 			'stackPrep': actReuslt,
@@ -1282,7 +1083,7 @@ function activateEffect(d) {
 		if (upds && upds.pA) {
 			dataA.upd = upds.pA
 		}
-		// console.log('dataA',dataA)
+		//console.log('dataA',dataA)
 		io.sockets.in(table.roompA).emit('updact', dataA);
 
 		var dataB = {
@@ -1291,7 +1092,7 @@ function activateEffect(d) {
 		if (upds && upds.pB) {
 			dataB.upd = upds.pB
 		}
-		// console.log('dataB',dataB)
+		//console.log('dataB',dataB)
 		io.sockets.in(table.roompB).emit('updact', dataB);
 
 	}
@@ -1469,7 +1270,7 @@ function getUpdatesForPlayers(table, actReuslt) {
 function preStackDone(d) {
 	var table = StartedGames[d.u.table];
 	var logThis = true;
-	// console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
+	if (logThis) console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
@@ -1480,7 +1281,7 @@ function preStackDone(d) {
 		if (logThis) console.log("\n================".green)
 		for (var i in table.stackPrep) {
 			if (i == 'afterQuestion' || i == 'befor' || i == 'updTable' || !table.stackPrep[i].length) {
-				// console.log('del ' + i)
+				//console.log('del ' + i)
 				delete table.stackPrep[i];
 				continue;
 			}
@@ -1496,7 +1297,7 @@ function preStackDone(d) {
 		for (var i in getUniversalObject(d.u.table, {
 			pX: d.u.you
 		}).S) {
-			//console.log('+'+i)
+			//onsole.log('+'+i)
 		}
 
 		var actReuslt = Actions.preStackDone(table, getUniversalObject(d.u.table, {
@@ -1527,8 +1328,6 @@ function preStackDone(d) {
 
 		if (logThis) console.log('upds'.green);
 		if (logThis) console.log(upds);
-		// if (logThis) console.log('toClient'.green);
-		// if (logThis) console.log(actReuslt);
 
 		table.stackPrep = actReuslt;
 		table.stackPreppA = table.stackPreppB = null;
@@ -1603,22 +1402,6 @@ function preStackDone(d) {
 	}
 }
 
-function saveGame(d) {
-	var table = StartedGames[d.u.table];
-	var outputFilename = __dirname + '/tmp/my.json';
-	var toSave = {
-		S: table.Snapshot,
-		Accordance: table.Accordance
-		//K :  table.Known
-	}
-	fs.writeFile(outputFilename, JSON.stringify(toSave, null, 4), function(err) {
-		if (err) {
-			console.log(err);
-		} else {
-			console.log("JSON saved to " + outputFilename);
-		}
-	});
-}
 function getS(d) {
 	var table = StartedGames[d.u.table];
 	io.sockets.in(table.room).emit('getS',  table.Snapshot);
