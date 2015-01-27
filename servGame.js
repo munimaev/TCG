@@ -787,6 +787,7 @@ function LoadStack(table) {
 	}
 	// console.log("\n\ntable.stack")
 	// console.log(table.stack)}
+}
 
 function addToTeam(d) {
 	var table = StartedGames[d.u.table];
