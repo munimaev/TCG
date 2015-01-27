@@ -1,5 +1,11 @@
 var exp = {};
 
+var StartedGames, fs;
+exports.initialize = function(_StartedGames, _fs) {
+	StartedGames = _StartedGames;
+	fs = _fs;
+}
+
 /**
  * Функция обрабатывающая запрос от клиента. Сохраняет текщций снимок игры в файл tmp/my.json
  * @param  {[type]} d [description]
@@ -7,11 +13,11 @@ var exp = {};
  */
 exp.saveGame = function(d) {
 	var table = StartedGames[d.u.table];
-	var outputFilename = __dirname + '/tmp/my.json';
+	var outputFilename = __dirname + '/../tmp/my.json';
 	var toSave = {
 		S: table.Snapshot,
 		Accordance: table.Accordance
-		//K :  table.Known
+			//K :  table.Known
 	}
 	fs.writeFile(outputFilename, JSON.stringify(toSave, null, 4), function(err) {
 		if (err) {
@@ -21,5 +27,4 @@ exp.saveGame = function(d) {
 		}
 	});
 }
-
-module.exports = exp;
+exports.saveGame = exp.saveGame;
