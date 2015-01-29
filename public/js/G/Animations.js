@@ -412,7 +412,11 @@ var AN = {
 		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/damage.png"})
 	},
 	reward : function(cardID, o) {
-		C[cardID].effect({type:'simple', target:'one', pic:"public/pics/reward.png"})
+		if (C[cardID]) {
+			C[cardID].effect({type:'simple', target:'one', pic:"public/pics/reward.png"})
+		} else {
+			console.log('ERR C[cardID] is undefined ')
+		}
 	},
 	uturn : function(args, o) {
 		var o = o || {};
