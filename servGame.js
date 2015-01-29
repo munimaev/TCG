@@ -5,9 +5,11 @@ var session_store = {
 };
 var Tables = {};
 var preGamesLobbi = {}
-var StartedGames = {'rop':{}};
+var StartedGames = {
+	'rop': {}
+};
 var Testing = false;
-var Load = false;
+var Load = true;
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
@@ -42,8 +44,8 @@ function arraySearch(array, value) {
  */
 exports.initLobbi = function(sio, socket, session_store_) {
 	io = sio;
-	servLobbyApi.initialize(io, session_store_, StartedGames, Tables)
-
+	servLobbyApi.initialize(io, session_store_, StartedGames, Tables, Load)
+	servGameUserMainComands.initialize(StartedGames,fs);
 	gameSocket = socket;
 	session_store = session_store_;
 	gameSocket.emit('connected', {
@@ -54,7 +56,7 @@ exports.initLobbi = function(sio, socket, session_store_) {
 	gameSocket.on('lobby:games', servLobbyApi.getGames);
 	gameSocket.on('lobby:create', servLobbyApi.cretaeTable);
 	gameSocket.on('lobby:join', servLobbyApi.joinToTable);
-	gameSocket.on('lobby:delete',servLobbyApi.deleteTable);
+	gameSocket.on('lobby:delete', servLobbyApi.deleteTable);
 	//-----------------------------------------
 	gameSocket.on('imJoined', imJoined);
 	gameSocket.on('newLeader', newLeader);
@@ -87,14 +89,23 @@ exports.disconnect = servLobbyApi.disconnect;
 /*
 	G
  */
-
+/**
+ * [S_init description]
+ * @param {[type]} d Стандартный набор данных от клиента
+ */
 function S_init(d) {
-	var tableId = servLobbyApi.getTableForSession(d.ses); 
+	var tableId = servLobbyApi.getTableForSession(d.ses);
 	var table = StartedGames[tableId];
 	if (!table) {
 		this.emit('goOut');
 		return;
 	}
+		setPlayersDecks(table,{
+			'loginpA': table.loginA,
+			'loginpB': table.loginB,
+			'deckpA': table.deckpA,
+			'deckpB': table.deckpB
+		});
 	var Snapshot = getStartSnapshot(table);
 	var data = {
 		Snapshot: Snapshot,
@@ -122,7 +133,7 @@ function S_init(d) {
 		this.join(StartedGames[tableId].roompA);
 		StartedGames[tableId].Snapshot = Snapshot;
 		io.sockets.in(StartedGames[tableId].roompA).emit('C_init', data); //TODO отослать только проверенному пользователю
-	} 
+	}
 }
 
 function getRoomNumber(d) {
@@ -134,12 +145,12 @@ function getRoomNumber(d) {
 }
 
 function imJoined(d) {
-		bothIsJoin(d);
+	bothIsJoin(d);
 }
 
 function bothIsJoin(d) {
-		var table = StartedGames[d.table]
-			if (table.socketA && table.socketB && !table.bothIsJoin) {
+	var table = StartedGames[d.table]
+	if (table.socketA && table.socketB && !table.bothIsJoin) {
 		table.bothIsJoin = true;
 		table.pA = {
 			Accordance: {},
@@ -149,24 +160,27 @@ function bothIsJoin(d) {
 			Accordance: {},
 			Known: {}
 		};
+
+
 		table.Accordance = getStartAccordiance(table);
 		table.Known = getStartCards(table);
+
 		getStartAccordanceKnown(table, 'pA');
 		getStartAccordanceKnown(table, 'pB');
 		table.meta = getStartMeta(table);
 		var dataTopA = {
-				isNewGame: table.Snapshot.pA.isNewGame,
-				Accordance: table.pA.Accordance,
-				Known: table.pA.Known,
-				check: 2
-			}
+			isNewGame: table.Snapshot.pA.isNewGame,
+			Accordance: table.pA.Accordance,
+			Known: table.pA.Known,
+			check: 2
+		}
 		io.sockets.in(table.roompA).emit('bothIsJoin', dataTopA);
 		var dataTopB = {
-				isNewGame: table.Snapshot.pB.isNewGame,
-				Accordance: table.pB.Accordance,
-				Known: table.pB.Known,
-				check: 1
-			}
+			isNewGame: table.Snapshot.pB.isNewGame,
+			Accordance: table.pB.Accordance,
+			Known: table.pB.Known,
+			check: 1
+		}
 		io.sockets.in(table.roompB).emit('bothIsJoin', dataTopB);
 		// TODO нужна комната для наблюдателя
 	} else if (Testing || table.bothIsJoin) {
@@ -179,11 +193,28 @@ function bothIsJoin(d) {
 }
 
 function getStartSnapshot(table) {
+
+
+
 	if (table.Snapshot) {
 		return table.Snapshot;
 	}
 	if (Load) {
 		var obj = JSON.parse(fs.readFileSync(__dirname + '/tmp/my.json', 'utf8'));
+		console.log(('obj.S.pA.user '+ obj.S.pA.user + ' =?= table.loginA '+ table.loginA ).bold)
+		console.log(('obj.S.pB.user '+ obj.S.pB.user + ' =?= table.loginB '+ table.loginB ).bold)
+		if (obj.S.pA.user !== table.loginA) {
+			table.loadReverse =true;
+			console.log(obj.S.pA.hand)
+			obj.S.activePlayer = obj.S.activePlayer === 'pA' ? 'pB' : 'pA';
+			var tmp = obj.S.pA;
+			obj.S.pA = obj.S.pB;
+			obj.S.pB = tmp;
+			tmp = table.Decks.pA;
+			table.Decks.pA = table.Decks.pB;
+			table.Decks.pB = tmp;
+			console.log(obj.S.pA.hand)
+		}
 		return obj.S;
 	}
 	var result = { // as Snapshot
@@ -195,6 +226,7 @@ function getStartSnapshot(table) {
 			playedNinjaActivePlayer: 0
 		},
 		pA: {
+			user: table.loginA,
 			counters: {
 				playedMission: 0
 			},
@@ -221,6 +253,7 @@ function getStartSnapshot(table) {
 		battlefield: {},
 		stack: [],
 		pB: {
+			user: table.loginB,
 			counters: {
 				playedMission: 0
 			},
@@ -247,45 +280,13 @@ function getStartSnapshot(table) {
 		statuses: {}
 	};
 
-	var deckpA = [];
-	var deckpB = [];
+
 
 	var pXs = {
 		'pA': 'c0',
 		'pB': 'c1'
 	};
 
-		table.Decks = {pA:[],pB:[]};
-	for (var  pX in pXs) {
-
-
-		var loginFileName = encodeURIComponent(table[pX]);
-		var outputFilename = __dirname + '/data/decks_' + loginFileName + '.json';
-
-		var decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
-		var deck  =  decks[encodeURIComponent(table['deck'+pX])];
-
-		for (var i in deck) {
-			if (i === 'N') {
-				for (var k in deck[i]) {
-					for (var j in deck[i][k]) {
-						table.Decks[pX].push({
-							'count': deck[i][k][j],
-							'number': j
-						})
-					}
-				}
-			}
-			else {
-				for ( var k in deck[i]) {
-					table.Decks[pX].push({'count':deck[i][k],'number':k})
-				}
-			}
-		}
-
-	}
-
-	
 
 	for (var pX in pXs) {
 		var count = 1;
@@ -301,201 +302,67 @@ function getStartSnapshot(table) {
 	return result;
 }
 
-var CardBase = require('./public/js/G/CardBase.js');
 
-var Decks = {
-	//earth
-	pA: [{
-		"count": 2,
-		"number": "j517"
-	},{
-		"count": 2,
-		"number": "j697"
-	},{
-		"count": 2,
-		"number": "j710"
-	},{
-		"count": 2,
-		"number": "j890"
-	}, {
-		"count": 2,
-		"number": "m466"
-	}, {
-		"count": 2,
-		"number": "m589"
-	}, {
-		"count": 2,
-		"number": "m673"
-	}, {
-		"count": 2,
-		"number": "m777"
-	}, {
-		"count": 2,
-		"number": "m821"
-	}, {
-		"count": 2,
-		"number": "m859"
-	}, {
-		"count": 2,
-		"number": "n1279"
-	}, {
-		"count": 2,
-		"number": "n1366"
-	}, {
-		"count": 2,
-		"number": "n1423"
-	}, {
-		"count": 3,
-		"number": "n1427"
-	}, {
-		"count": 1,
-		"number": "n1429"
-	}, {
-		"count": 1,
-		"number": "n348"
-	}, {
-		"count": 1,
-		"number": "n515"
-	}, {
-		"count": 1,
-		"number": "n516"
-	}, {
-		"count": 1,
-		"number": "n589"
-	}, {
-		"count": 1,
-		"number": "n699"
-	}, {
-		"count": 1,
-		"number": "n700"
-	}, {
-		"count": 1,
-		"number": "n724"
-	}, {
-		"count": 1,
-		"number": "n823"
-	}, {
-		"count": 1,
-		"number": "n844"
-	}, {
-		"count": 2,
-		"number": "nus014"
-	}, {
-		"count": 1,
-		"number": "pr046"
-	}, ],
-	//wind
-	pB: [{
-		"count": 2,
-		"number": "j504"
-	},{
-		"count": 2,
-		"number": "j447"
-	},{
-		"count": 2,
-		"number": "j631"
-	},{
-		"count": 2,
-		"number": "j914"
-	},{
-		"count": 1,
-		"number": "j100"
-	},{
-		"count": 1,
-		"number": "m424"
-	},{
-		"count": 1,
-		"number": "m843"
-	},{
-		"count": 1,
-		"number": "m375"
-	},{
-		"count": 1,
-		"number": "m815"
-	},{
-		"count": 1,
-		"number": "m633"
-	}, {
-		"count": 1,
-		"number": "n1086"
-	}, {
-		"count": 2,
-		"number": "n1092"
-	}, {
-		"count": 2,
-		"number": "n1267"
-	}, {
-		"count": 1,
-		"number": "n130"
-	}, {
-		"count": 2,
-		"number": "n1319"
-	}, {
-		"count": 1,
-		"number": "n1321"
-	}, {
-		"count": 1,
-		"number": "n1322"
-	}, {
-		"count": 2,
-		"number": "n1325"
-	}, {
-		"count": 2,
-		"number": "n1418"
-	}, {
-		"count": 1,
-		"number": "n1420"
-	}, {
-		"count": 2,
-		"number": "n1474"
-	}, {
-		"count": 1,
-		"number": "n1481"
-	}, {
-		"count": 1,
-		"number": "n1484"
-	}, {
-		"count": 1,
-		"number": "n180"
-	}, {
-		"count": 1,
-		"number": "n483"
-	}, {
-		"count": 1,
-		"number": "n602"
-	}, {
-		"count": 2,
-		"number": "n847"
-	}, {
-		"count": 2,
-		"number": "nus025"
-	}, ]
-};
-
-function getStartCards(table) {
-	var result = {};
-
-	
-	// 	console.log(CardBase)
-
-
+function setPlayersDecks(table, args) {
+	var args = args || {'loginpA':'','loginpB':'','deckpA':'','deckpB':''}
 	var pXs = {
 		'pA': 'c0',
 		'pB': 'c1'
 	};
 
+	table.Decks = {
+		pA: [],
+		pB: []
+	};
+	for (var pX in pXs) {
+
+
+		var loginFileName = encodeURIComponent(args['login'+pX]);
+		var outputFilename = __dirname + '/data/decks_' + loginFileName + '.json';
+
+		var decks = JSON.parse(fs.readFileSync(outputFilename, 'utf8'));
+		var deck = decks[encodeURIComponent(args['deck' + pX])];
+
+		for (var i in deck) {
+			if (i === 'N') {
+				for (var k in deck[i]) {
+					for (var j in deck[i][k]) {
+						table.Decks[pX].push({
+							'count': deck[i][k][j],
+							'number': j
+						})
+					}
+				}
+			} else {
+				for (var k in deck[i]) {
+					table.Decks[pX].push({
+						'count': deck[i][k],
+						'number': k
+					})
+				}
+			}
+		}
+
+	}
+
+}
+var CardBase = require('./public/js/G/CardBase.js');
+
+function getStartCards(table) {
+	var result = {};
+
+
+	// 	console.log(CardBase)
 
 	function rec(input, output) {
 		for (var i in output) {
 			if (typeof output[i] == 'object') {
 				if (output[i].length) {
 					input[i] = rec([], output[i]);
+				} else {
+					input[i] = rec({}, output[i]);
 				}
-				else {
-					input[i] = rec({}, output[i]);  
-				}
-			}
-			else {
+			} else {
 				input[i] = output[i];
 			}
 		}
@@ -505,13 +372,12 @@ function getStartCards(table) {
 	var Known = rec({}, CardBase)
 
 	for (var card in Known) {
-		if ('effect' in Known[card]){
+		if ('effect' in Known[card]) {
 			for (var type in Known[card]['effect']) {
 				for (var subType in Known[card]['effect'][type]) {
 					for (var index in Known[card]['effect'][type][subType]) {
 						if ('ciclingCheck' in Known[card]['effect'][type][subType][index]) {
-							Known[card]['effect'][type][subType][index]['ciclingCheck'] 
-								= Actions.setCicling(Known[card]['effect'][type][subType][index]['ciclingCheck']);
+							Known[card]['effect'][type][subType][index]['ciclingCheck'] = Actions.setCicling(Known[card]['effect'][type][subType][index]['ciclingCheck']);
 						}
 					}
 				}
@@ -519,7 +385,16 @@ function getStartCards(table) {
 		}
 	}
 
-	//onsole.log('CARD'.bold)
+	var pXs = {
+		'pA': 'c0',
+		'pB': 'c1'
+	};
+	if (table.loadReverse) {
+		pXs = {
+			'pB': 'c0',
+			'pA': 'c1'
+		};		
+	}
 
 	for (var pX in pXs) {
 		var oboidennie = [];
@@ -541,7 +416,6 @@ function getStartCards(table) {
 	}
 
 
-	
 
 	return result;
 }
@@ -562,7 +436,7 @@ function getStartMeta(S) {
 		for (var zone in zones)
 			for (var number in S.Snapshot[pXs[pX]][zones[zone]].team)
 				if (result.teamCounter <= number) result.teamCounter = number;
-	//console.log(('getStartMeta ' + result.teamCounter).bold)
+				//console.log(('getStartMeta ' + result.teamCounter).bold)
 	return result;
 }
 
@@ -603,7 +477,6 @@ function getStartAccordiance(S) {
 			result[pXs[pX] + keys[i]] = pXs[pX] + values[i];
 		};
 	}
-	console.log(result)
 	return result;
 }
 
@@ -612,12 +485,12 @@ function getStartAccordanceKnown(Table, pX) {
 	var result = {};
 	if (!Table.isNewGame) {
 		var zones = [
-			Table.Snapshot[pX].hand, 
-			Table.Snapshot.pA.chackra, 
-			Table.Snapshot.pA.discard, 
-			Table.Snapshot.pA.mission, 
-			Table.Snapshot.pB.chackra, 
-			Table.Snapshot.pB.discard, 
+			Table.Snapshot[pX].hand,
+			Table.Snapshot.pA.chackra,
+			Table.Snapshot.pA.discard,
+			Table.Snapshot.pA.mission,
+			Table.Snapshot.pB.chackra,
+			Table.Snapshot.pB.discard,
 			Table.Snapshot.pB.mission
 		]
 		for (var zone in zones) {
@@ -626,11 +499,11 @@ function getStartAccordanceKnown(Table, pX) {
 			}
 		}
 		zones = [
-			Table.Snapshot.pA.village, 
-			Table.Snapshot.pA.block, 
-			Table.Snapshot.pA.attack, 
-			Table.Snapshot.pB.village, 
-			Table.Snapshot.pB.block, 
+			Table.Snapshot.pA.village,
+			Table.Snapshot.pA.block,
+			Table.Snapshot.pA.attack,
+			Table.Snapshot.pB.village,
+			Table.Snapshot.pB.block,
 			Table.Snapshot.pB.attack
 		]
 		for (var zone in zones) {
@@ -646,7 +519,8 @@ function getStartAccordanceKnown(Table, pX) {
 			oneCardAccordanceКnown(Table, Table.Snapshot.stack[card].card)
 		}
 	}
-	return result;}
+	return result;
+}
 
 function oneCardAccordanceКnown(S, card, arr) {
 	var arr = arr || ['pA', 'pB'] // TODО наблюдатель
@@ -659,64 +533,64 @@ function oneCardAccordanceКnown(S, card, arr) {
 }
 
 function S_startDrawHand(d) {
-	var table = StartedGames[d.u.table];
-	console.log('startDrawHand', d.u.you, d.u.opp)
-	if (!table.Snapshot[d.u.you].isNewGame) return;
-	table.Snapshot[d.u.you].isNewGame = false;
-	var data = {
-		upd: {}
-	};
-	// отдать информацию о верхних картах
-	data.upd.Known = {};
-	data.upd.Accordance = {};
-	var deck = table.Snapshot[d.u.you].deck;
-	for (var i in deck) {
-		if (i > 5) break
-		data.upd.Accordance[deck[i]] = table[d.u.you].Accordance[deck[i]] = table.Accordance[deck[i]];
-		data.upd.Known[table.Accordance[deck[i]]] = table[d.u.you].Known[table.Accordance[deck[i]]] = table.Known[table.Accordance[deck[i]]];
+		var table = StartedGames[d.u.table];
+		console.log('startDrawHand', d.u.you, d.u.opp)
+		if (!table.Snapshot[d.u.you].isNewGame) return;
+		table.Snapshot[d.u.you].isNewGame = false;
+		var data = {
+			upd: {}
+		};
+		// отдать информацию о верхних картах
+		data.upd.Known = {};
+		data.upd.Accordance = {};
+		var deck = table.Snapshot[d.u.you].deck;
+		for (var i in deck) {
+			if (i > 5) break
+			data.upd.Accordance[deck[i]] = table[d.u.you].Accordance[deck[i]] = table.Accordance[deck[i]];
+			data.upd.Known[table.Accordance[deck[i]]] = table[d.u.you].Known[table.Accordance[deck[i]]] = table.Known[table.Accordance[deck[i]]];
+		}
+
+		console.log('OTDAL')
+
+		var actReuslt = {
+			'startDrawHand': [{
+				player: d.u.you,
+				numberOfCard: 6
+			}]
+		};
+		data.stackPrep = actReuslt;
+		table.stackPrep = actReuslt;
+		table['stackPrep' + d.u.you] = null;
+		//io.sockets.in(table.room).emit('updact', data);
+
+		// Actions['Draw X cards']({S:table.Snapshot, pX:d.u.you});
+		io.sockets.in(table['room' + d.u.you]).emit('updact', data);
+		// io.sockets.in(table['room' + d.u.opp]).emit('updact', {stackPrep:actReuslt});
+		// io.sockets.in(table['room' + d.u.you]).emit('update', data);
+		// io.sockets.in(table.room).emit('action', {
+		// 	acts: [{'arg':{S:'get_S',pX: d.u.you}, 'act' : 'Draw X cards'}]
+		// });
+		//io.sockets.in(table.roomS).emit('updServerInfoPage',table);
 	}
-
-	console.log('OTDAL')
-
-	var actReuslt = {
-		'startDrawHand': [{
-			player: d.u.you,
-			numberOfCard: 6
-		}]
-	};
-	data.stackPrep = actReuslt;
-	table.stackPrep = actReuslt;
-	table['stackPrep' + d.u.you] = null;
-	//io.sockets.in(table.room).emit('updact', data);
-
-	// Actions['Draw X cards']({S:table.Snapshot, pX:d.u.you});
-	io.sockets.in(table['room' + d.u.you]).emit('updact', data);
-	// io.sockets.in(table['room' + d.u.opp]).emit('updact', {stackPrep:actReuslt});
-	// io.sockets.in(table['room' + d.u.you]).emit('update', data);
-	// io.sockets.in(table.room).emit('action', {
-	// 	acts: [{'arg':{S:'get_S',pX: d.u.you}, 'act' : 'Draw X cards'}]
-	// });
-	//io.sockets.in(table.roomS).emit('updServerInfoPage',table);
-}
-/**
- * [pressNextBtn description]
- * @param  {[type]} d [description]
- * @param {[type]} d.u [description]
- * @param {[type]} d.transferInitiativeFrom Этот элемент указывает на то закончил ли игрок ход или просто передал инициативу.
- * Содержит игрока последним передавшим инициативу. Если игрок что то делает в свою инициативу то это значение становиться  null
- * Если что то делает  то pA или pB. Это являеться маркером совершонного действия, если маркер передан,
- * то согласие не переход в селдующую фазу у оппонента снимаеться.
- * а текущему игроу передаеться ответ на сброс флага передачи инициативы.
- * Соотвественно необходимо рассмотреть варинаты
- *
- */
+	/**
+	 * [pressNextBtn description]
+	 * @param  {[type]} d [description]
+	 * @param {[type]} d.u [description]
+	 * @param {[type]} d.transferInitiativeFrom Этот элемент указывает на то закончил ли игрок ход или просто передал инициативу.
+	 * Содержит игрока последним передавшим инициативу. Если игрок что то делает в свою инициативу то это значение становиться  null
+	 * Если что то делает  то pA или pB. Это являеться маркером совершонного действия, если маркер передан,
+	 * то согласие не переход в селдующую фазу у оппонента снимаеться.
+	 * а текущему игроу передаеться ответ на сброс флага передачи инициативы.
+	 * Соотвественно необходимо рассмотреть варинаты
+	 *
+	 */
 function pressNextBtn(d) {
 	if (Can.pressNextBtn({
-		pX: d.u.you,
-		Stadies: Stadies,
-		S: StartedGames[d.u.table].Snapshot,
-		meta: StartedGames[d.u.table].meta
-	})) {
+			pX: d.u.you,
+			Stadies: Stadies,
+			S: StartedGames[d.u.table].Snapshot,
+			meta: StartedGames[d.u.table].meta
+		})) {
 		var table = StartedGames[d.u.table];
 		//console.log('pressNextBtn'.red)
 		//console.log(d)
@@ -785,22 +659,23 @@ function LoadStack(table) {
 			resolveJutsuInStack: [jutsuObj]
 		});
 	}
-	// console.log("\n\ntable.stack")
-	// console.log(table.stack)}
 }
+
+// console.log("\n\ntable.stack")
+// console.log(table.stack)}
 
 function addToTeam(d) {
 	var table = StartedGames[d.u.table];
 	//onsole.log(d.arg)
 	if (Can.orgAddToTeam({
-		c1: {
-			card: d.arg.c1.card
-		},
-		c2: {
-			card: d.arg.c1.card
-		},
-		pX: d.arg.pX
-	}, getUniversalObject(d.u.table))) {
+			c1: {
+				card: d.arg.c1.card
+			},
+			c2: {
+				card: d.arg.c1.card
+			},
+			pX: d.arg.pX
+		}, getUniversalObject(d.u.table))) {
 		d.arg.S = table.Snapshot;
 		Actions['addToTeam'](d.arg, getUniversalObject(d.u.table));
 		d.arg.S = 'get_S';
@@ -820,14 +695,14 @@ function addToTeam(d) {
 function changeInTeam(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.orgChangeInTeam({
-		c1: {
-			card: d.arg.c1.card
-		},
-		c2: {
-			card: d.arg.c1.card
-		},
-		pX: d.arg.pX,
-	}, getUniversalObject(d.u.table))) {
+			c1: {
+				card: d.arg.c1.card
+			},
+			c2: {
+				card: d.arg.c1.card
+			},
+			pX: d.arg.pX,
+		}, getUniversalObject(d.u.table))) {
 		d.arg.S = table.Snapshot;
 		Actions['organisation'](d.arg, getUniversalObject(d.u.table));
 		d.arg.S = 'get_S';
@@ -848,10 +723,10 @@ function putInPlay(d) {
 	var table = StartedGames[d.u.table];
 	//onsole.log(d.u);
 	if (Can.putInPlay({
-		card: d.arg.card,
-		owner: d.arg.owner,
-		pX: d.u.you,
-	}, getUniversalObject(d.u.table))) {
+			card: d.arg.card,
+			owner: d.arg.owner,
+			pX: d.u.you,
+		}, getUniversalObject(d.u.table))) {
 		var args = {
 			card: d.arg.card,
 			cardInArray: null,
@@ -895,10 +770,10 @@ function playJutsu(d) {
 	var table = StartedGames[d.u.table];
 	//onsole.log(d.u);
 	if (Can.playJutsu({
-		card: d.arg.card,
-		owner: d.arg.owner,
-		pX: d.u.you,
-	}, getUniversalObject(d.u.table))) {
+			card: d.arg.card,
+			owner: d.arg.owner,
+			pX: d.u.you,
+		}, getUniversalObject(d.u.table))) {
 		var args = {
 			card: d.arg.card,
 			cause: 'play',
@@ -931,13 +806,13 @@ function playJutsu(d) {
 function removeFromTeam(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.removeFromTeam({
-		Accordance: table.Accordance,
-		card: d.arg.card,
-		Known: table.Known,
-		owner: d.arg.owner,
-		pX: d.u.you,
-		S: table.Snapshot,
-	})) {
+			Accordance: table.Accordance,
+			card: d.arg.card,
+			Known: table.Known,
+			owner: d.arg.owner,
+			pX: d.u.you,
+			S: table.Snapshot,
+		})) {
 		d.arg.teamCounter = ++table.meta.teamCounter;
 		d.arg.S = table.Snapshot;
 		Actions['removeFromTeam'](d.arg, getUniversalObject(d.u.table));
@@ -958,15 +833,15 @@ function removeFromTeam(d) {
 function moveTeamToAttack(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.moveTeamToAttack({
-		S: table.Snapshot,
-		Known: table.Known,
-		Accordance: table.Accordance,
-		card: d.arg.card,
-		pX: d.arg.pX,
-		team: d.arg.team,
-		from: d.arg.from,
-		to: d.arg.to,
-	})) {
+			S: table.Snapshot,
+			Known: table.Known,
+			Accordance: table.Accordance,
+			card: d.arg.card,
+			pX: d.arg.pX,
+			team: d.arg.team,
+			from: d.arg.from,
+			to: d.arg.to,
+		})) {
 		d.arg.S = table.Snapshot;
 		Actions['moveTeamToAttack'](d.arg);
 		d.arg.S = 'get_S';
@@ -986,11 +861,11 @@ function moveTeamToAttack(d) {
 function block(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.block({
-		S: table.Snapshot,
-		attackTeam: d.arg.attackTeam,
-		blockTeam: d.arg.blockTeam,
-		pX: d.arg.pX
-	})) {
+			S: table.Snapshot,
+			attackTeam: d.arg.attackTeam,
+			blockTeam: d.arg.blockTeam,
+			pX: d.arg.pX
+		})) {
 		d.arg.S = table.Snapshot;
 		Actions['block'](d.arg);
 		d.arg.S = 'get_S';
@@ -1010,10 +885,10 @@ function block(d) {
 function charge(d) {
 	var table = StartedGames[d.u.table];
 	if (Can.charge({
-		card: d.arg.card,
-		owner: d.arg.owner,
-		pX: d.u.you,
-	}, getUniversalObject(d.u.table))) {
+			card: d.arg.card,
+			owner: d.arg.owner,
+			pX: d.u.you,
+		}, getUniversalObject(d.u.table))) {
 		var args = {
 				card: d.arg.card,
 				cardInArray: null,
@@ -1056,18 +931,13 @@ function charge(d) {
 function activateEffect(d) {
 	console.log(('-> ' + d.arg.card + ' ' + d.arg.effectKey).cyan)
 	var o = getUniversalObject(d.u.table);
-	if (o.Known[o.Accordance[d.arg.card]]
-		&& o.Known[o.Accordance[d.arg.card]].effect
-		&& o.Known[o.Accordance[d.arg.card]].effect.activate
-		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey]
-		&& o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can
-	){
+	if (o.Known[o.Accordance[d.arg.card]] && o.Known[o.Accordance[d.arg.card]].effect && o.Known[o.Accordance[d.arg.card]].effect.activate && o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey] && o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can) {
 		var canResult = o.Known[o.Accordance[d.arg.card]].effect.activate[d.arg.effectKey].can(d.arg, o);
 		if (!canResult.result) {
 			console.log(canResult.cause.red)
 			return;
 		}
-		
+
 
 		var table = StartedGames[d.u.table];
 		var data = {};
@@ -1096,63 +966,62 @@ function activateEffect(d) {
 		//console.log('dataB',dataB)
 		io.sockets.in(table.roompB).emit('updact', dataB);
 
-	}
-	else {
+	} else {
 		return;
-	} 
+	}
 }
 
 function drawCardAtStartTurn(d) {
-	var table = StartedGames[d.u.table];
-	if (Can.drawCardAtStartTurn({
-		Accordance: table.Accordance,
-		Known: table.Known,
-		pX: d.u.you,
-		S: table.Snapshot,
-	})) {
-		var arg = {
-			pX: d.u.you,
-			S: table.Snapshot,
-			count: 1,
-		}
-		var drawenCardId = table.Snapshot[d.u.you].deck[0];
-		Actions['Draw X cards'](arg);
-		arg.S = 'get_S';
+		var table = StartedGames[d.u.table];
+		if (Can.drawCardAtStartTurn({
+				Accordance: table.Accordance,
+				Known: table.Known,
+				pX: d.u.you,
+				S: table.Snapshot,
+			})) {
+			var arg = {
+				pX: d.u.you,
+				S: table.Snapshot,
+				count: 1,
+			}
+			var drawenCardId = table.Snapshot[d.u.you].deck[0];
+			Actions['Draw X cards'](arg);
+			arg.S = 'get_S';
 
-		var data = {
-			upd: {
-				Accordance: {},
-				Known: {}
-			},
-			acts: [{
-				'arg': arg,
-				'act': 'Draw X cards'
-			}]
+			var data = {
+				upd: {
+					Accordance: {},
+					Known: {}
+				},
+				acts: [{
+					'arg': arg,
+					'act': 'Draw X cards'
+				}]
+			}
+			io.sockets.in(table['room' + d.u.opp]).emit('updact', data);
+			data.upd.Accordance[drawenCardId] = table[d.u.you].Accordance[drawenCardId] = table.Accordance[drawenCardId];
+			data.upd.Known[table.Accordance[drawenCardId]] = table[d.u.you].Known[table.Accordance[drawenCardId]] = table.Known[table.Accordance[drawenCardId]];
+			io.sockets.in(table['room' + d.u.you]).emit('updact', data);
+		} else {
+			console.log('bad')
 		}
-		io.sockets.in(table['room' + d.u.opp]).emit('updact', data);
-		data.upd.Accordance[drawenCardId] = table[d.u.you].Accordance[drawenCardId] = table.Accordance[drawenCardId];
-		data.upd.Known[table.Accordance[drawenCardId]] = table[d.u.you].Known[table.Accordance[drawenCardId]] = table.Known[table.Accordance[drawenCardId]];
-		io.sockets.in(table['room' + d.u.you]).emit('updact', data);
-	} else {
-		console.log('bad')
+		// TODO возможно надо реагировать
 	}
-	// TODO возможно надо реагировать
-}
-/**
- * Возвращает "универсальный объект". в этом объекте храняться как снимок игры 
- * так и данные карт 
- * @param  {Number} tableID индификатор стола
- * @param  {Object} obj     Необязательный параметр свойства которого будут 
- * добавлены в возвражемый объект. 
- * @return {Object} 
- * {\n
- *    Accordance: table.Accordance,\n
- *	  Known: table.Known,\n
- *	  S: table.Snapshot,\n
- * 	  Meta: table.Meta,\n
- * 	  Stadies: Stadies,\n
- * } \n
- */
+	/**
+	 * Возвращает "универсальный объект". в этом объекте храняться как снимок игры
+	 * так и данные карт
+	 * @param  {Number} tableID индификатор стола
+	 * @param  {Object} obj     Необязательный параметр свойства которого будут
+	 * добавлены в возвражемый объект.
+	 * @return {Object}
+	 * {\n
+	 *    Accordance: table.Accordance,\n
+	 *	  Known: table.Known,\n
+	 *	  S: table.Snapshot,\n
+	 * 	  Meta: table.Meta,\n
+	 * 	  Stadies: Stadies,\n
+	 * } \n
+	 */
 function getUniversalObject(tableID, obj) {
 	var table = StartedGames[tableID];
 	var res = {
@@ -1245,21 +1114,16 @@ function getUpdatesForPlayers(table, actReuslt) {
 			}
 			result.pA.S = obj.S;
 			result.pB.S = obj.S;
-		}
-		else {
+		} else {
 			if (!(obj.forPlayer in result)) result[obj.forPlayer] = {
 				Accordance: {},
 				Known: {}
 			};
 			for (var card in obj.cards) {
 
-				result[obj.forPlayer].Accordance[obj.cards[card]] 
-					= table[obj.forPlayer].Accordance[obj.cards[card]] 
-					= actReuslt.applyUpd[i].unknown ? null : table.Accordance[obj.cards[card]];
+				result[obj.forPlayer].Accordance[obj.cards[card]] = table[obj.forPlayer].Accordance[obj.cards[card]] = actReuslt.applyUpd[i].unknown ? null : table.Accordance[obj.cards[card]];
 
-				result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
-					= table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] 
-					= actReuslt.applyUpd[i].unknown ? null : table.Known[table.Accordance[obj.cards[card]]];
+				result[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] = table[obj.forPlayer].Known[table.Accordance[obj.cards[card]]] = actReuslt.applyUpd[i].unknown ? null : table.Known[table.Accordance[obj.cards[card]]];
 			}
 		}
 	}
@@ -1271,7 +1135,7 @@ function getUpdatesForPlayers(table, actReuslt) {
 function preStackDone(d) {
 	var table = StartedGames[d.u.table];
 	var logThis = true;
-	if (logThis) console.log('on preStackDone' , table.stackPreppA , table.stackPreppB)
+	if (logThis) console.log('on preStackDone', table.stackPreppA, table.stackPreppB)
 	table['stackPrep' + d.u.you] = true;
 
 	addAnswers(d)
@@ -1296,8 +1160,8 @@ function preStackDone(d) {
 		if (logThis) console.log(table.stackPrep)
 
 		for (var i in getUniversalObject(d.u.table, {
-			pX: d.u.you
-		}).S) {
+				pX: d.u.you
+			}).S) {
 			//onsole.log('+'+i)
 		}
 
@@ -1405,12 +1269,13 @@ function preStackDone(d) {
 
 function getS(d) {
 	var table = StartedGames[d.u.table];
-	io.sockets.in(table.room).emit('getS',  table.Snapshot);
+	io.sockets.in(table.room).emit('getS', table.Snapshot);
 }
+
 function known(d) {
 	var table = StartedGames[d.u.table];
 	if (d.args.card)
-	io.sockets.in(table.room).emit('known',  table.Known[table.Accordance[d.args.card]]);
+		io.sockets.in(table.room).emit('known', table.Known[table.Accordance[d.args.card]]);
 	else
-	io.sockets.in(table.room).emit('known',  table.Known);
+		io.sockets.in(table.room).emit('known', table.Known);
 }
