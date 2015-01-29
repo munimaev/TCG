@@ -1108,24 +1108,28 @@ var CardBase = {
                     "cardEffect": function(result, args, o) {
                         // console.log('CARDEFFECT'.bold)
                         if (!('adMoveCardToZone' in result)) result.adMoveCardToZone = [];
-                        var path = Actions.cardPath({
-                            card: args.selectedCard
-                        }, o);
-                        console.log(args, path);
-                        result.adMoveCardToZone.push({
-                            pX: path.player,
-                            card: args.selectedCard,
-                            cause: 'cardEffect',
-                            from: path.zone,
-                            to: 'chackra',
-                            team: null,
-                            cardInArray: path.cardInArray
-                        })
 
-                        var owner = o.Known[o.Accordance[args.selectedCard]].owner;
+                        if (args.selectedCard) {
+                            var path = Actions.cardPath({
+                                card: args.selectedCard
+                            }, o);
+                            if (args.selectedCard && path) {
+                                result.adMoveCardToZone.push({
+                                    pX: path.player,
+                                    card: args.selectedCard,
+                                    cause: 'cardEffect',
+                                    from: path.zone,
+                                    to: 'chackra',
+                                    team: null,
+                                    cardInArray: path.cardInArray
+                                })
+                            }
+                        }
+
+                        var owner = args.pX ==='pA' ? 'pB' : 'pA'; //o.Known[o.Accordance[args.selectedCard]].owner;
                         var otherCard = [];
                         for (var i in o.S[owner].hand) {
-                            if (o.S[owner].hand[i] !== args.selectedCard) {
+                            if (o.S[owner].hand[i] !== args.selectedCard) { //args.selectedCard may be false
                                 otherCard.push(o.S[owner].hand[i]);
                             }
                         }
@@ -1137,6 +1141,7 @@ var CardBase = {
                             exept: args.selectedCard
                         }, o);
                         console.log('HAND'.red, o.S[owner].hand)
+                        console.log('otherCard'.red, otherCard)
 
 
                         if (!('applyUpd' in result)) result.applyUpd = [];
@@ -1160,20 +1165,18 @@ var CardBase = {
                             S: updS
                         })
 
-                        if (args.selectedCard) {
-                            if (!('prepareEffect' in result)) result.prepareEffect = [];
-                            result.prepareEffect.push({
-                                pX: owner,
-                                card: args.card,
-                                effectType: 'trigger',
-                                trigger: 'afterMoveCardToZone',
-                                effectKey: 0,
-                                actionArgs: args.actionArgs,
-                                step: 1,
-                                //-----///
-                                selectedCard: args.selectedCard
-                            })
-                        }
+                        if (!('prepareEffect' in result)) result.prepareEffect = [];
+                        result.prepareEffect.push({
+                            pX: owner,
+                            card: args.card,
+                            effectType: 'trigger',
+                            trigger: 'afterMoveCardToZone',
+                            effectKey: 0,
+                            actionArgs: args.actionArgs,
+                            step: 1,
+                            //-----///
+                            selectedCard: args.selectedCard
+                        })
 
 
 
@@ -1181,33 +1184,36 @@ var CardBase = {
                         return result;
                     },
                     "question1": function(args, o) {
-                        var selectedCard = o.Known[o.Accordance[args.selectedCard]];
-                        var path = Actions.cardPath({
-                            card: args.selectedCard,
-                            path: {}
-                        }, o);
+                        if (args.selectedCard) {
+                            var selectedCard = o.Known[o.Accordance[args.selectedCard]];
+                            var path = Actions.cardPath({
+                                card: args.selectedCard,
+                                path: {}
+                            }, o);
 
-                        AnimationPush({
-                            func: function() {
-                                AN.moveCardToCenter({
-                                    pX: path.player,
-                                    from: path.zone,
-                                    card: args.selectedCard,
-                                    presentation: true,
-                                    outCard: false
-                                }, o)
-                            },
-                            time: 820,
-                            name: 'Questions - card effect card to center'
-                        });
+                            AnimationPush({
+                                func: function() {
+                                    AN.moveCardToCenter({
+                                        pX: path.player,
+                                        from: path.zone,
+                                        card: args.selectedCard,
+                                        presentation: true,
+                                        outCard: false
+                                    }, o)
+                                },
+                                time: 820,
+                                name: 'Questions - card effect card to center'
+                            });
+                        }
 
                         var otherCard = [];
-                        for (var i in o.S[path.player].hand) {
-                            if (o.S[path.player].hand[i] !== args.selectedCard) {
-                                otherCard.push(o.S[path.player].hand[i]);
+                        for (var i in o.S[args.pX].hand) {
+                            if (o.S[args.pX].hand[i] !== args.selectedCard) {
+                                otherCard.push(o.S[args.pX].hand[i]);
                             }
                         }
-                        if (you !== path.player) {
+
+                        if (you !== args.pXr) {
                             AnimationPush({
                                 func: function() {
                                     for (var i in otherCard) {
@@ -1225,7 +1231,7 @@ var CardBase = {
 
                                     var preCardId = otherCard[i];
                                     C[otherCard[i]].animation({
-                                        Y: (path.player === you ? 2 : -1) * I.H,
+                                        Y: (args.pX === you ? 2 : -1) * I.H,
                                         X: I.W / 2,
                                         additional: {
                                             after: {
@@ -1240,10 +1246,18 @@ var CardBase = {
                                         }
                                     });
                                 }
+                                console.log('msg')
                                 setTimeout(function() {
                                     Card.moveToPreviewToHandBlocker = false;
-                                    AN.preStack.countDown();
-                                }, 1000)
+                                    console.log('ARGS',args)
+                                    if (!args.selectedCard) {
+                                        updTable();
+                                        setTimeout(AN.preStack.countDown, 500)
+                                    }
+                                    else {
+                                        AN.preStack.countDown();
+                                    }
+                                }, 1500)
                             },
                             time: 1000,
                             name: 'Questions - card effect move-hide'
