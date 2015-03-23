@@ -9,7 +9,7 @@ var StartedGames = {
 	'rop': {}
 };
 var Testing = false;
-var Load = true;
+var Load = false;
 var Actions = require('./public/js/G/Actions.js');
 var Can = require('./public/js/G/Can.js');
 var Stadies = require('./public/js/G/Stadies.js');
