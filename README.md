@@ -19,3 +19,4 @@
 
 #### Демка
 Презентацию раннего бета-геймплея можно посмотерть <a href="https://youtu.be/1dUdnpgcreI">тут</a>.
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/1dUdnpgcreI/0.jpg)](https://www.youtube.com/watch?v=1dUdnpgcreI)
