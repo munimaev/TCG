@@ -15,7 +15,7 @@ Implementation of the web version of the board card game Naruto TCG. Naturally, 
 #### Features
 Much attention is paid to the animation of the movement of cards on the gaming table.
 
-#### Демка
+#### Live Demo
 You can watch the early beta gameplay presentation <a href="https://youtu.be/1dUdnpgcreI">here</a>.
 
 Коллекционная карточная игра
